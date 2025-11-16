@@ -20,10 +20,13 @@ Flash is a CLI tool and framework from the `tetra_rp` package that enables you t
 git clone https://github.com/runpod/flash-examples.git
 cd flash-examples
 
+# Install dependencies (works with uv, pip, poetry, conda, or pipenv)
+make dev
+
 # Navigate to an example
 cd 01_getting_started/01_hello_world
 
-# Install dependencies
+# Install example dependencies
 pip install -r requirements.txt
 
 # Set your API key
@@ -34,6 +37,14 @@ flash run
 
 # Visit http://localhost:8000/docs
 ```
+
+**Alternative Setup Methods:**
+- **With Makefile**: `make dev` (auto-detects your package manager)
+- **With uv**: `uv sync && uv pip install -e .`
+- **With pip**: `pip install -e .`
+- **With poetry**: `poetry install`
+
+For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 
 ## Examples by Category
 
@@ -174,14 +185,15 @@ Workers automatically scale based on demand:
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines and [DEVELOPMENT.md](./DEVELOPMENT.md) for development setup.
 
 To add a new example:
 1. Follow the standard example structure
 2. Include comprehensive README with deployment steps
 3. Add tests for critical functionality
 4. Ensure all dependencies are pinned in requirements.txt
-5. Test deployment with `flash deploy`
+5. Run `make quality-check` before committing
+6. Test deployment with `flash deploy`
 
 ## Resources
 
