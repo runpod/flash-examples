@@ -204,7 +204,7 @@ To add a new example:
 
 ## Testing
 
-All examples are continuously tested against Python 3.12 to ensure correctness. See [.github/workflows/test-examples.yml](./.github/workflows/test-examples.yml) for details.
+All examples are continuously tested against Python 3.9-3.13 to ensure compatibility across all supported versions. See [.github/workflows/](./.github/workflows/) for CI configuration.
 
 ## License
 
