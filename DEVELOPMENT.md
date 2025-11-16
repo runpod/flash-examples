@@ -257,7 +257,7 @@ make lint-fix
 make format
 ```
 
-**Configuration:** `.ruff.toml` or `pyproject.toml`
+**Configuration:** `pyproject.toml`
 
 ### Mypy (Type Checking)
 
@@ -585,7 +585,6 @@ Use ALE or null-ls with ruff and mypy configured.
 
 ## Additional Resources
 
-- [Python Project Configuration](./CLAUDE.md) - Project-specific patterns
 - [Contributing Guidelines](./CONTRIBUTING.md) - Contribution process
 - [README](./README.md) - Project overview
 

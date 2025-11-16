@@ -226,7 +226,7 @@ format-check: # Check code formatting
 
 typecheck: # Check types with mypy
 	@echo "Running mypy type checker..."
-	@$(PYTHON_RUN) mypy . || [ $$? -eq 2 ] && echo "No Python files found for type checking"
+	@$(PYTHON_RUN) mypy . || { [ $$? -eq 2 ] && echo "No Python files found for type checking"; }
 
 # ============================================================================
 # Quality Gates (used in CI)
