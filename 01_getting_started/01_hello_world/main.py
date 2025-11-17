@@ -2,7 +2,7 @@
 # This is an example of a simple Flash application.
 # It consists of an API router (this file) that routes requests to a local
 # endpoint on your machine to worker code. Worker code is executed on Runpod
-# infrastructure on gpu and cpu-based serverless workers.
+# infrastructure on serverless workers with GPUs.
 
 # Subrouters and associated worker function code are defined in the ./workers/
 # dir and attached to the main router in this file. By default, running
@@ -24,14 +24,14 @@ logger = logging.getLogger(__name__)
 # We define a simple FastAPI app to serve requests from localhost.
 app = FastAPI(
     title="Flash Application",
-    description="Distributed GPU and CPU computing with Runpod Flash",
+    description="Distributed GPU computing with Runpod Flash",
     version="0.1.0",
 )
 
-# Attach gpu and cpu worker subrouters - this will route any requests to our
-# app with the prefix /gpu and /cpu to get sent to the gpu and cpu subrouters,
-# respectively. For example, curl -X POST http://localhost:{PORT}/cpu will be
-# handled entirely by the cpu subrouter.
+# Attach gpu worker subrouters - this will route any requests to our
+# app with the prefix /gpu to the gpu subrouter. To see the subrouter in action,
+# start the app and execute the following command in another terminal window:
+# curl -X POST http://localhost:8888/gpu/hello -d '{"input": "hello"}' -H "Content-Type: application/json"
 app.include_router(
     gpu_router,
     prefix="/gpu",
