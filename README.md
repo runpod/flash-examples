@@ -57,7 +57,7 @@ Learn the fundamentals of Flash applications.
 - **[01_hello_world](./sample_getting_started/)** - Simplest GPU and CPU workers with FastAPI
 - 02_cpu_worker - CPU-only worker example _(coming soon)_
 - 03_mixed_workers - Combining GPU and CPU workers _(coming soon)_
-- 04_dependencies - Managing Python and system dependencies _(coming soon)_
+- **[04_dependencies](./01_getting_started/04_dependencies/)** - Managing Python and system dependencies
 
 ### 02 - ML Inference
 Deploy machine learning models as APIs.
