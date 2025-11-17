@@ -7,15 +7,14 @@
 
 # Scaling behavior is controlled by configuration passed to the
 # `LiveServerless` class.
+from fastapi import APIRouter
+from pydantic import BaseModel
+
 from tetra_rp import (
     GpuGroup,
     LiveServerless,
     remote,
 )
-
-from fastapi import APIRouter
-from pydantic import BaseModel
-
 
 # Here, we'll define several variables that change the
 # default behavior of our serverless endpoint. `workersMin` sets our endpoint
