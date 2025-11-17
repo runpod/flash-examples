@@ -5,7 +5,7 @@ Fundamental concepts for building Flash applications. Start here if you're new t
 ## Examples
 
 ### [01_hello_world](./01_hello_world/)
-The simplest Flash application with GPU workers.
+The simplest Flash application with GPU workers
 
 **What you'll learn:**
 - Basic Flash application structure
