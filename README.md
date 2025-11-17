@@ -23,20 +23,23 @@ cd flash-examples
 # Install dependencies (works with uv, pip, poetry, conda, or pipenv)
 make dev
 
-# Navigate to an example
+# Set your API key (choose one method):
+
+# Option A: Export in shell (recommended for trying multiple examples)
+export RUNPOD_API_KEY=your_key_here
+
+# Option B: Create .env file per example (if you prefer per-example config)
+# cd 01_getting_started/01_hello_world
+# echo "RUNPOD_API_KEY=your_key_here" > .env
+
+# Try any example
 cd 01_getting_started/01_hello_world
-
-# Install example dependencies
-pip install -r requirements.txt
-
-# Set your API key
-echo "RUNPOD_API_KEY=your_key_here" > .env
-
-# Run locally
 flash run
 
-# Visit http://localhost:8000/docs
+# Visit http://localhost:8888/docs
 ```
+
+**Note**: After running `make dev`, all example dependencies are installed. You can navigate to any example directory and run `flash run` immediately. The exported API key persists in your shell session across all examples.
 
 **Alternative Setup Methods:**
 - **With Makefile**: `make dev` (auto-detects your package manager)
@@ -115,11 +118,33 @@ Flash is FastAPI-centric for building production applications, while Modal focus
 
 ```bash
 flash init              # Create new Flash project
-flash run              # Run development server (default: localhost:8000)
+flash run              # Run development server (default: localhost:8888)
 flash build            # Build application for deployment
 flash deploy new <env> # Create deployment environment
 flash deploy send <env># Deploy to Runpod
 ```
+
+## Testing Your Application
+
+After running `flash run`, you can test your API in two ways:
+
+**Option A: Using the Interactive UI**
+
+Visit **http://localhost:8888/docs** to use FastAPI's built-in Swagger UI where you can:
+- See all available endpoints
+- Test requests directly in your browser
+- View request/response schemas
+
+**Option B: Using curl**
+
+Test endpoints from the command line:
+```bash
+curl -X POST http://localhost:8888/endpoint \
+  -H "Content-Type: application/json" \
+  -d '{"key": "value"}'
+```
+
+See individual example READMEs for specific endpoint examples.
 
 ## Example Structure
 

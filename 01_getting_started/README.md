@@ -5,18 +5,17 @@ Fundamental concepts for building Flash applications. Start here if you're new t
 ## Examples
 
 ### [01_hello_world](./01_hello_world/)
-The simplest Flash application with GPU and CPU workers.
+The simplest Flash application with GPU workers.
 
 **What you'll learn:**
 - Basic Flash application structure
-- Creating GPU and CPU workers
+- Creating GPU workers
 - Using the `@remote` decorator
 - Running Flash applications locally
 - Testing endpoints with FastAPI docs
 
 **Concepts:**
 - `LiveServerless` configuration for GPU workers
-- `CpuLiveServerless` configuration for CPU workers
 - Worker auto-scaling (min/max workers)
 - FastAPI router integration
 
