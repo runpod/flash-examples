@@ -28,14 +28,21 @@ CPU-only worker example for non-GPU workloads.
 - CPU instance type selection
 - Handling API requests without GPU overhead
 
-### 03_mixed_workers _(coming soon)_
-Combining GPU and CPU workers in a single application.
+### [03_mixed_workers](./03_mixed_workers/)
+Mixed GPU/CPU workers for cost-effective ML pipelines.
 
 **What you'll learn:**
-- Routing requests to appropriate worker types
-- Cost optimization strategies
-- Load balancing between worker types
-- Common architecture patterns
+- Mixed worker architecture (CPU preprocessing → GPU inference → CPU postprocessing)
+- Cost optimization (85% savings vs GPU-only pipeline)
+- Pipeline orchestration patterns
+- Pydantic input validation at each stage
+- Fail-fast validation before expensive GPU operations
+- Remote serialization with .model_dump()
+
+**Concepts:**
+- `CpuLiveServerless` for preprocessing and postprocessing
+- Pipeline orchestration with FastAPI
+- Validation patterns for production APIs
 
 ### [04_dependencies](./04_dependencies/)
 Managing Python packages and system dependencies.
@@ -58,9 +65,9 @@ Managing Python packages and system dependencies.
 ## Learning Path
 
 1. Start with **01_hello_world** to understand the basics
-2. Move to **02_cpu_worker** to learn CPU-only patterns
-3. Explore **03_mixed_workers** for real-world architectures
-4. Master **04_dependencies** for production readiness
+2. Explore **03_mixed_workers** for cost optimization and validation patterns
+3. Move to **02_cpu_worker** to learn CPU-only patterns _(coming soon)_
+4. Master **04_dependencies** for production readiness _(coming soon)_
 
 ## Next Steps
 

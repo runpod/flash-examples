@@ -56,8 +56,8 @@ Learn the fundamentals of Flash applications.
 
 - **[01_hello_world](./01_getting_started/01_hello_world/)** - The simplest Flash application with GPU workers
 - 02_cpu_worker - CPU-only worker example _(coming soon)_
-- 03_mixed_workers - Combining GPU and CPU workers _(coming soon)_
-- **[04_dependencies](./01_getting_started/04_dependencies/)** - Managing Python and system dependencies
+- **[03_mixed_workers](./01_getting_started/03_mixed_workers/)** - Mixed GPU/CPU workers with cost optimization and validation
+- 04_dependencies - Managing Python and system dependencies _(coming soon)_
 
 ### 02 - ML Inference
 Deploy machine learning models as APIs.
@@ -102,9 +102,9 @@ Complete production-ready applications.
 ## Learning Path
 
 **New to Flash?** Start here:
-1. [01_getting_started/01_hello_world](./sample_getting_started/) - Understand the basics
-2. 02_ml_inference/01_text_generation - Deploy your first model
-3. 04_scaling_performance/01_autoscaling - Learn production patterns
+1. [01_getting_started/01_hello_world](./01_getting_started/01_hello_world/) - Understand the basics
+2. [01_getting_started/03_mixed_workers](./01_getting_started/03_mixed_workers/) - Learn cost optimization and validation patterns
+3. 02_ml_inference/01_text_generation - Deploy your first model
 
 **Coming from Modal?**
 Flash is FastAPI-centric for building production applications, while Modal focuses on standalone functions. Flash provides structured application development with built-in routing and deployment management.
