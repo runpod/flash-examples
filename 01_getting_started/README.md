@@ -19,7 +19,7 @@ The simplest Flash application with GPU workers
 - Worker auto-scaling (min/max workers)
 - FastAPI router integration
 
-### 02_cpu_worker _(coming soon)_
+### [02_cpu_worker](./02_cpu_worker/)
 CPU-only worker example for non-GPU workloads.
 
 **What you'll learn:**
