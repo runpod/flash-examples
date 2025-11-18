@@ -102,9 +102,9 @@ Complete production-ready applications.
 ## Learning Path
 
 **New to Flash?** Start here:
-2. 02_ml_inference/01_text_generation - Deploy your first model
-3. 04_scaling_performance/01_autoscaling - Learn production patterns
 1. [01_getting_started/01_hello_world](./01_getting_started/01_hello_world/) - Understand the basics
+2. [01_getting_started/03_mixed_workers](./01_getting_started/03_mixed_workers/) - Learn cost optimization and validation patterns
+3. 02_ml_inference/01_text_generation - Deploy your first model
 
 **Coming from Modal?**
 Flash is FastAPI-centric for building production applications, while Modal focuses on standalone functions. Flash provides structured application development with built-in routing and deployment management.
