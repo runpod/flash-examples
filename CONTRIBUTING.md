@@ -173,7 +173,7 @@ if __name__ == "__main__":
     import uvicorn
     import os
 
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 8888))
     uvicorn.run(app, host="0.0.0.0", port=port)
 ```
 
@@ -295,16 +295,50 @@ Test your example thoroughly:
 flash run
 
 # Test health endpoint
-curl http://localhost:8000/health
+curl http://localhost:8888/health
 
 # Test your endpoints
-curl -X POST http://localhost:8000/your/endpoint \
+curl -X POST http://localhost:8888/your/endpoint \
   -H "Content-Type: application/json" \
   -d '{"test": "data"}'
 
 # Check API docs
-open http://localhost:8000/docs
+open http://localhost:8888/docs
 ```
+
+### VS Code Debugging
+
+The repository includes VS Code debug configurations for endpoint development:
+
+**Setup:**
+
+1. Copy the root `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Add your RunPod API key to `.env`:
+   ```bash
+   RUNPOD_API_KEY=your_actual_api_key_here
+   ```
+
+3. Ensure you have the Python extension installed in VS Code
+
+**Debugging:**
+
+Two debug configurations are available:
+
+- **Python Debugger: Current File** - Debug any Python file
+- **Flash Worker: Debug Endpoint** - Debug worker endpoint files with async support
+
+To debug an endpoint:
+1. Open any `endpoint.py` file (e.g., `01_getting_started/01_hello_world/workers/gpu/endpoint.py`)
+2. Set breakpoints in your worker functions
+3. Press F5 or select "Debug: Start Debugging"
+4. Choose the appropriate debug configuration
+5. The debugger will execute the `if __name__ == "__main__"` test block
+
+The `.env` file is automatically loaded, so your `RUNPOD_API_KEY` is available during debugging.
 
 ### Unit Tests (Recommended)
 
