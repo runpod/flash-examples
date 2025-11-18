@@ -37,14 +37,23 @@ Combining GPU and CPU workers in a single application.
 - Load balancing between worker types
 - Common architecture patterns
 
-### 04_dependencies _(coming soon)_
+### [04_dependencies](./04_dependencies/)
 Managing Python packages and system dependencies.
 
 **What you'll learn:**
-- Specifying Python dependencies in `@remote`
-- Installing system packages (ffmpeg, etc.)
-- Managing dependency versions
-- Debugging dependency issues
+- Python dependency versioning and constraints
+- System package installation (ffmpeg, libgl1)
+- Input validation with Pydantic field validators
+- Version constraints (==, >=, <, ~=)
+- Minimizing cold start time
+- Best practices for reproducible builds
+
+**Concepts:**
+- `dependencies` parameter for Python packages
+- `system_dependencies` parameter for apt packages
+- Version pinning for reproducibility
+- Pydantic `@field_validator` for request validation
+- Dependency optimization strategies
 
 ## Learning Path
 
