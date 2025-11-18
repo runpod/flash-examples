@@ -33,9 +33,9 @@ Response
 
 **Cost Breakdown:**
 - Preprocessing: $0.0002/sec (CPU)
-- Inference: $0.0015/sec (GPU)  
+- Inference: $0.0015/sec (GPU)
 - Postprocessing: $0.0002/sec (CPU)
-- **Total: 85% cheaper than GPU-only pipeline**
+- **More cost-effective than GPU-only pipeline**
 
 ## Quick Start
 
@@ -102,9 +102,9 @@ Total: $0.0045/sec
 ```
 Use right tool for each job
 - Preprocessing: $0.0002/sec (CPU)
-- Inference: $0.0015/sec (GPU)  
+- Inference: $0.0015/sec (GPU)
 - Postprocessing: $0.0002/sec (CPU)
-Total: $0.0019/sec (58% savings!)
+Total: $0.0019/sec
 ```
 
 ## When to Use This Pattern
@@ -432,7 +432,7 @@ All stages: 0.28 × $0.0015 × 10,000 = $4.20/day
 Total: $126/month
 ```
 
-**Savings: $31.20/month (25%)**
+**Savings: $31.20/month**
 
 For higher volumes, savings multiply significantly.
 
