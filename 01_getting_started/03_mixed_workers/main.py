@@ -34,14 +34,10 @@ class ClassifyRequest(BaseModel):
             raise ValueError("Text cannot be empty")
         if len(v) < 3:
             raise ValueError(
-                "Text too short (minimum 3 characters). "
-                'Example: {"text": "Hello world"}'
+                'Text too short (minimum 3 characters). Example: {"text": "Hello world"}'
             )
         if len(v) > 10000:
-            raise ValueError(
-                "Text too long (maximum 10,000 characters). "
-                f"Got {len(v)} characters."
-            )
+            raise ValueError(f"Text too long (maximum 10,000 characters). Got {len(v)} characters.")
         return v
 
 
