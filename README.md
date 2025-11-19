@@ -55,9 +55,9 @@ For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 Learn the fundamentals of Flash applications.
 
 - **[01_hello_world](./01_getting_started/01_hello_world/)** - The simplest Flash application with GPU workers
-- 02_cpu_worker - CPU-only worker example _(coming soon)_
+- **[02_cpu_worker](./01_getting_started/02_cpu_worker/)** - CPU-only worker example
 - **[03_mixed_workers](./01_getting_started/03_mixed_workers/)** - Mixed GPU/CPU workers with cost optimization and validation
-- 04_dependencies - Managing Python and system dependencies _(coming soon)_
+- **[04_dependencies](./01_getting_started/04_dependencies/)** - Managing Python and system dependencies
 
 ### 02 - ML Inference
 Deploy machine learning models as APIs.
