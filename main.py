@@ -15,7 +15,6 @@ import os
 import sys
 from pathlib import Path
 from typing import Any
-
 from urllib.parse import quote
 
 from fastapi import APIRouter, FastAPI
@@ -78,19 +77,29 @@ def discover_single_file_routers(example_path: Path, example_name: str) -> list[
                     # Extract route information for deep linking
                     routes = []
                     for route in router.routes:
-                        if hasattr(route, "endpoint") and hasattr(route, "path") and hasattr(route, "name"):
-                            routes.append({
-                                "path": str(route.path),  # type: ignore
-                                "name": str(route.name),  # type: ignore
-                            })
+                        if (
+                            hasattr(route, "endpoint")
+                            and hasattr(route, "path")
+                            and hasattr(route, "name")
+                        ):
+                            routes.append(
+                                {
+                                    "path": str(route.path),  # type: ignore
+                                    "name": str(route.name),  # type: ignore
+                                }
+                            )
 
-                    routers.append({
-                        "router": router,
-                        "prefix": f"/{example_name}/{worker_type}",
-                        "tags": [f"{example_name.replace('_', ' ').title()} - {worker_type.upper()}"],
-                        "worker_type": worker_type,
-                        "routes": routes,
-                    })
+                    routers.append(
+                        {
+                            "router": router,
+                            "prefix": f"/{example_name}/{worker_type}",
+                            "tags": [
+                                f"{example_name.replace('_', ' ').title()} - {worker_type.upper()}"
+                            ],
+                            "worker_type": worker_type,
+                            "routes": routes,
+                        }
+                    )
                     logger.info(f"Loaded {example_name}/{worker_type} from {worker_file.name}")
         except Exception as e:
             logger.warning(f"Could not load {worker_file}: {e}")
@@ -140,19 +149,29 @@ def discover_directory_routers(example_path: Path, example_name: str) -> list[di
                     # Extract route information for deep linking
                     routes = []
                     for route in router.routes:
-                        if hasattr(route, "endpoint") and hasattr(route, "path") and hasattr(route, "name"):
-                            routes.append({
-                                "path": str(route.path),  # type: ignore
-                                "name": str(route.name),  # type: ignore
-                            })
+                        if (
+                            hasattr(route, "endpoint")
+                            and hasattr(route, "path")
+                            and hasattr(route, "name")
+                        ):
+                            routes.append(
+                                {
+                                    "path": str(route.path),  # type: ignore
+                                    "name": str(route.name),  # type: ignore
+                                }
+                            )
 
-                    routers.append({
-                        "router": router,
-                        "prefix": f"/{example_name}/{worker_type}",
-                        "tags": [f"{example_name.replace('_', ' ').title()} - {worker_type.upper()}"],
-                        "worker_type": worker_type,
-                        "routes": routes,
-                    })
+                    routers.append(
+                        {
+                            "router": router,
+                            "prefix": f"/{example_name}/{worker_type}",
+                            "tags": [
+                                f"{example_name.replace('_', ' ').title()} - {worker_type.upper()}"
+                            ],
+                            "worker_type": worker_type,
+                            "routes": routes,
+                        }
+                    )
                     logger.info(f"Loaded {example_name}/{worker_type} from workers/{worker_type}")
         except Exception as e:
             logger.warning(f"Could not load {worker_dir}: {e}")
@@ -317,24 +336,24 @@ def home():
 
                 endpoints_html += f'<a href="{doc_link}" target="_blank" rel="noopener noreferrer" class="endpoint-tag">{worker_type.upper()}</a>'
 
-            examples_cards += f'''
+            examples_cards += f"""
             <div class="example-card">
                 <h3>{display_name}</h3>
                 <div class="endpoints">{endpoints_html}</div>
             </div>
-            '''
+            """
 
         # Add category section
-        categories_html += f'''
+        categories_html += f"""
         <section class="category-section">
             <h2 class="category-title">{category_display}</h2>
             <div class="examples-grid">
                 {examples_cards}
             </div>
         </section>
-        '''
+        """
 
-    return f'''
+    return f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -592,7 +611,7 @@ def home():
         </div>
     </body>
     </html>
-    '''
+    """
 
 
 @app.get("/health", tags=["Info"])
