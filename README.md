@@ -32,12 +32,17 @@ export RUNPOD_API_KEY=your_key_here
 # cd 01_getting_started/01_hello_world
 # echo "RUNPOD_API_KEY=your_key_here" > .env
 
-# Try any example
+# Option A: Run all examples from the unified app (recommended)
+flash run
+
+# Option B: Run individual examples
 cd 01_getting_started/01_hello_world
 flash run
 
 # Visit http://localhost:8888/docs
 ```
+
+**Unified App (Recommended)**: Running `flash run` from the root directory automatically discovers and loads all examples into a single FastAPI application. This allows you to explore all examples from one place without switching directories.
 
 **Note**: After running `make dev`, all example dependencies are installed. You can navigate to any example directory and run `flash run` immediately. The exported API key persists in your shell session across all examples.
 
@@ -145,6 +150,24 @@ curl -X POST http://localhost:8888/endpoint \
 ```
 
 See individual example READMEs for specific endpoint examples.
+
+## Unified App Architecture
+
+The root [main.py](main.py) provides a programmatic discovery system that automatically finds and loads all examples:
+
+**Discovery Process**:
+1. Scans all example category directories (`01_getting_started/`, `02_ml_inference/`, etc.)
+2. Detects two patterns:
+   - **Single-file workers**: `gpu_worker.py`, `cpu_worker.py` with `APIRouter` exports
+   - **Directory-based workers**: `workers/gpu/__init__.py`, `workers/cpu/__init__.py` with `APIRouter` exports
+3. Dynamically imports and registers all routers with unique prefixes (e.g., `/01_hello_world/gpu/`)
+4. Generates metadata and documentation automatically
+
+**Benefits**:
+- Add new examples without modifying the unified app
+- Consistent routing across all examples
+- Single entry point for exploring all functionality
+- Automatic discovery eliminates manual registration
 
 ## Example Structure
 
