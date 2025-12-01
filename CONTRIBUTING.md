@@ -317,7 +317,7 @@ The repository includes VS Code debug configurations for endpoint development:
    cp .env.example .env
    ```
 
-2. Add your RunPod API key to `.env`:
+2. Add your Runpod API key to `.env`:
    ```bash
    RUNPOD_API_KEY=your_actual_api_key_here
    ```

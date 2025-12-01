@@ -128,6 +128,30 @@ else ifeq ($(PKG_MANAGER),pip)
 	.venv/bin/pip install -e .
 endif
 	@echo "✓ Development environment ready!"
+	@echo ""
+	@echo "Next steps:"
+ifeq ($(PKG_MANAGER),uv)
+	@echo "  1. Run the unified Flash examples:  uv run flash run"
+	@echo "  2. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),poetry)
+	@echo "  1. Run the unified Flash examples:  poetry run flash run"
+	@echo "  2. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),pipenv)
+	@echo "  1. Run the unified Flash examples:  pipenv run flash run"
+	@echo "  2. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),conda)
+	@echo "  1. Run the unified Flash examples:  conda run -p ./.venv flash run"
+	@echo "  2. Visit:                           http://localhost:8888"
+else
+	@echo "  1. Activate environment:            source .venv/bin/activate"
+	@echo "  2. Run the unified Flash examples:  flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+endif
+	@echo ""
+	@echo "Additional commands:"
+	@echo "  make help       - Show all available commands"
+	@echo "  make lint       - Check code quality"
+	@echo "  make format     - Format code"
 
 # ============================================================================
 # Dependency File Generation
