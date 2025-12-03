@@ -5,7 +5,7 @@ preprocess_config = CpuLiveServerless(
     name="01_03_mixed_preprocess",
     instanceIds=[CpuInstanceType.CPU3G_2_8],  # Small instance - 2 vCPU, 8GB
     workersMin=0,
-    workersMax=10,  # Handle high traffic
+    workersMax=3,
     idleTimeout=3,
 )
 
@@ -14,7 +14,7 @@ postprocess_config = CpuLiveServerless(
     name="01_03_mixed_postprocess",
     instanceIds=[CpuInstanceType.CPU3G_2_8],  # Small instance - 2 vCPU, 8GB
     workersMin=0,
-    workersMax=10,
+    workersMax=3,
     idleTimeout=3,
 )
 

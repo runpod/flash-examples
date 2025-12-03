@@ -17,7 +17,7 @@ cpu_config = CpuLiveServerless(
     name="cpu_worker",
     instanceIds=[CpuInstanceType.ANY],
     workersMin=0,  # Scale to zero
-    workersMax=5,
+    workersMax=3,
     idleTimeout=5,  # Leave workers alive for 5 minutes after they serve a request
 )
 

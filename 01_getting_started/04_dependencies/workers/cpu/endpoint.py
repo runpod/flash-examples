@@ -5,7 +5,7 @@ data_config = CpuLiveServerless(
     name="01_04_deps_data",
     instanceIds=[CpuInstanceType.CPU3G_2_8],
     workersMin=0,
-    workersMax=5,
+    workersMax=3,
 )
 
 # Worker with minimal dependencies
@@ -13,7 +13,7 @@ minimal_config = CpuLiveServerless(
     name="01_04_deps_minimal",
     instanceIds=[CpuInstanceType.CPU3G_2_8],
     workersMin=0,
-    workersMax=5,
+    workersMax=3,
 )
 
 
