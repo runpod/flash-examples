@@ -5,8 +5,12 @@ description = "A collection of example applications showcasing Runpod Flash - a 
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
+    "numpy>=2.0.2",
     "tetra-rp",
     "torch",
+    "pillow>=10.0.0",
+    "structlog>=23.0.0",
+    "python-multipart>=0.0.6",
 ]
 
 [dependency-groups]
@@ -103,3 +107,6 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+
+[tool.uv.sources]
+tetra-rp = { path = "../tetra-rp", editable = true }

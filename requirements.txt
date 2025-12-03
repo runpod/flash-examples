@@ -77,11 +77,15 @@ fastapi-cli==0.0.16
 fastapi-cloud-cli==0.3.1
     # via fastapi-cli
 filelock==3.20.0
-    # via runpod
+    # via
+    #   runpod
+    #   torch
 frozenlist==1.8.0
     # via
     #   aiohttp
     #   aiosignal
+fsspec==2025.10.0
+    # via torch
 h11==0.16.0
     # via
     #   httpcore
@@ -108,7 +112,9 @@ invoke==2.2.1
 itsdangerous==2.2.0
     # via fastapi
 jinja2==3.1.6
-    # via fastapi
+    # via
+    #   fastapi
+    #   torch
 jmespath==1.0.1
     # via
     #   boto3
@@ -119,10 +125,16 @@ markupsafe==3.0.3
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
+mpmath==1.3.0
+    # via sympy
 multidict==6.7.0
     # via
     #   aiohttp
     #   yarl
+networkx==3.6
+    # via torch
+numpy==2.3.5
+    # via runpod-flash-examples (pyproject.toml)
 orjson==3.11.4
     # via fastapi
 paramiko==4.0.0
@@ -131,6 +143,8 @@ pathspec==0.12.1
     # via tetra-rp
 pfzy==0.3.4
     # via inquirerpy
+pillow==12.0.0
+    # via runpod-flash-examples (pyproject.toml)
 prettytable==3.17.0
     # via runpod
 prompt-toolkit==3.0.52
@@ -172,7 +186,9 @@ python-dotenv==1.2.1
     #   tetra-rp
     #   uvicorn
 python-multipart==0.0.20
-    # via fastapi
+    # via
+    #   runpod-flash-examples (pyproject.toml)
+    #   fastapi
 pyyaml==6.0.3
     # via
     #   fastapi
@@ -198,6 +214,8 @@ s3transfer==0.14.0
     # via boto3
 sentry-sdk==2.44.0
     # via fastapi-cloud-cli
+setuptools==80.9.0
+    # via torch
 shellingham==1.5.4
     # via typer
 six==1.17.0
@@ -206,12 +224,18 @@ sniffio==1.3.1
     # via anyio
 starlette==0.49.3
     # via fastapi
+structlog==25.5.0
+    # via runpod-flash-examples (pyproject.toml)
+sympy==1.14.0
+    # via torch
 tetra-rp==0.16.1
     # via runpod-flash-examples (pyproject.toml)
 tomli==2.3.0
     # via runpod
 tomlkit==0.13.3
     # via runpod
+torch==2.9.1
+    # via runpod-flash-examples (pyproject.toml)
 tqdm==4.67.1
     # via tqdm-loggable
 tqdm-loggable==0.2
@@ -228,6 +252,7 @@ typing-extensions==4.15.0
     #   pydantic-core
     #   pydantic-extra-types
     #   rich-toolkit
+    #   torch
     #   typer
     #   typing-inspection
 typing-inspection==0.4.2
