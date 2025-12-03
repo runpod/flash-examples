@@ -45,6 +45,8 @@ All examples must meet these standards:
 - [ ] Error handling is implemented
 - [ ] Environment variables are documented
 - [ ] Dependencies are pinned in requirements.txt
+- [ ] Dependencies synced to root with `make sync-example-deps`
+- [ ] Example loads in unified app (`flash run` from root)
 
 ### 2. Code Quality
 - [ ] Clear, readable code
@@ -100,7 +102,29 @@ flash run
 # Test all endpoints
 ```
 
-### 5. Create Pull Request
+### 5. Sync Dependencies to Root
+
+**Important**: The unified app loads all examples dynamically, so all example dependencies must be available in the root environment.
+
+After adding your example with its dependencies:
+
+```bash
+# From the repository root
+make sync-example-deps  # Syncs your example's deps to root pyproject.toml
+uv sync --all-groups    # Installs the new dependencies
+make requirements.txt   # Regenerates the lockfile
+```
+
+The sync script:
+- Automatically scans your example's `pyproject.toml`
+- Merges dependencies into the root configuration
+- Filters out transitive deps (fastapi, pydantic, uvicorn from tetra-rp)
+- Detects version conflicts
+- Preserves essential root dependencies
+
+**Verification**: Run `flash run` from the repository root to ensure your example loads without import errors.
+
+### 6. Create Pull Request
 
 ```bash
 git checkout -b add-example-name
