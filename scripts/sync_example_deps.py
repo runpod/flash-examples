@@ -11,6 +11,7 @@ Filters out transitive dependencies already provided by tetra-rp:
 - uvicorn
 """
 
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -61,6 +62,15 @@ def normalize_dep_name(dep: str) -> str:
     return dep.strip()
 
 
+def fully_normalize_name(name: str) -> str:
+    """Normalize package name for consistent comparison.
+
+    Converts to lowercase and replaces underscores with hyphens to match
+    PyPI package naming conventions.
+    """
+    return normalize_dep_name(name).lower().replace("_", "-")
+
+
 def collect_example_deps() -> dict[str, set[str]]:
     """Scan all example directories and collect dependencies."""
     deps_by_package: dict[str, set[str]] = defaultdict(set)
@@ -83,7 +93,7 @@ def collect_example_deps() -> dict[str, set[str]]:
                 deps = extract_dependencies(pyproject_data)
 
                 for dep in deps:
-                    normalized_name = normalize_dep_name(dep).lower().replace("_", "-")
+                    normalized_name = fully_normalize_name(dep)
 
                     if normalized_name not in TRANSITIVE_DEPS:
                         deps_by_package[normalized_name].add(dep)
@@ -103,6 +113,26 @@ def detect_version_conflicts(deps_by_package: dict[str, set[str]]) -> list[tuple
     return conflicts
 
 
+def select_most_permissive(dep_specs: set[str]) -> str:
+    """Select the most permissive version constraint from a set of specs.
+
+    For conflicts like ('package>=1.0', 'package>=2.0'), prefers the lower
+    minimum version. Falls back to the spec with lowest operator count if
+    min versions are equal (e.g., 'package>=1.0' over 'package>=1.0,<2.0').
+    """
+
+    def extract_min_version(spec: str) -> tuple[int, int]:
+        """Extract operator count and version from spec for sorting."""
+        # Prioritize by: fewest constraints (more permissive), then lower min version
+        constraint_count = sum(1 for op in [">=", "<=", "==", "!=", ">", "<", "~="] if op in spec)
+        # Extract first version number for comparison (simple heuristic)
+        match = re.search(r"(\d+)", spec)
+        min_version = int(match.group(1)) if match else 999
+        return (constraint_count, min_version)
+
+    return min(dep_specs, key=extract_min_version)
+
+
 def merge_dependencies(deps_by_package: dict[str, set[str]], root_deps: list[str]) -> list[str]:
     """
     Merge dependencies, preferring the most permissive version constraint.
@@ -111,11 +141,11 @@ def merge_dependencies(deps_by_package: dict[str, set[str]], root_deps: list[str
     merged = []
     added_names = set()
     example_dep_names = {
-        normalize_dep_name(dep).lower() for specs in deps_by_package.values() for dep in specs
+        fully_normalize_name(dep) for specs in deps_by_package.values() for dep in specs
     }
 
     for dep in root_deps:
-        dep_name = normalize_dep_name(dep).lower()
+        dep_name = fully_normalize_name(dep)
         if dep_name not in added_names and (
             dep_name in ESSENTIAL_ROOT_DEPS
             or (dep_name not in example_dep_names and dep_name not in TRANSITIVE_DEPS)
@@ -128,10 +158,10 @@ def merge_dependencies(deps_by_package: dict[str, set[str]], root_deps: list[str
             if len(dep_specs) == 1:
                 merged.append(next(iter(dep_specs)))
             else:
-                merged.append(max(dep_specs, key=lambda d: d.count(">=")))
+                merged.append(select_most_permissive(dep_specs))
             added_names.add(package)
 
-    return sorted(merged, key=lambda d: normalize_dep_name(d).lower())
+    return sorted(merged, key=lambda d: fully_normalize_name(d))
 
 
 def read_root_pyproject() -> tuple[dict[str, Any], str]:
