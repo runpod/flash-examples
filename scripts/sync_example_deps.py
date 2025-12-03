@@ -12,10 +12,11 @@ Filters out transitive dependencies already provided by tetra-rp:
 """
 
 import sys
-import tomllib
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
+
+import tomllib
 
 ROOT_DIR = Path(__file__).parent.parent
 ROOT_PYPROJECT = ROOT_DIR / "pyproject.toml"
@@ -109,18 +110,23 @@ def merge_dependencies(deps_by_package: dict[str, set[str]], root_deps: list[str
     """
     merged = []
     added_names = set()
-    example_dep_names = {normalize_dep_name(dep).lower() for specs in deps_by_package.values() for dep in specs}
+    example_dep_names = {
+        normalize_dep_name(dep).lower() for specs in deps_by_package.values() for dep in specs
+    }
 
     for dep in root_deps:
         dep_name = normalize_dep_name(dep).lower()
-        if dep_name not in added_names and (dep_name in ESSENTIAL_ROOT_DEPS or (dep_name not in example_dep_names and dep_name not in TRANSITIVE_DEPS)):
+        if dep_name not in added_names and (
+            dep_name in ESSENTIAL_ROOT_DEPS
+            or (dep_name not in example_dep_names and dep_name not in TRANSITIVE_DEPS)
+        ):
             merged.append(dep)
             added_names.add(dep_name)
 
     for package, dep_specs in sorted(deps_by_package.items()):
         if package not in added_names:
             if len(dep_specs) == 1:
-                merged.append(list(dep_specs)[0])
+                merged.append(next(iter(dep_specs)))
             else:
                 merged.append(max(dep_specs, key=lambda d: d.count(">=")))
             added_names.add(package)
