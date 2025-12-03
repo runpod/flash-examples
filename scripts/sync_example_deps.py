@@ -42,6 +42,9 @@ ESSENTIAL_ROOT_DEPS = {
     "tetra_rp",
 }
 
+# Fallback version number for specs without parseable versions
+FALLBACK_VERSION = 999
+
 
 def parse_pyproject(path: Path) -> dict[str, Any]:
     """Parse a pyproject.toml file."""
@@ -127,7 +130,7 @@ def select_most_permissive(dep_specs: set[str]) -> str:
         constraint_count = sum(1 for op in [">=", "<=", "==", "!=", ">", "<", "~="] if op in spec)
         # Extract first version number for comparison (simple heuristic)
         match = re.search(r"(\d+)", spec)
-        min_version = int(match.group(1)) if match else 999
+        min_version = int(match.group(1)) if match else FALLBACK_VERSION
         return (constraint_count, min_version)
 
     return min(dep_specs, key=extract_min_version)
@@ -176,7 +179,12 @@ def read_root_pyproject() -> tuple[dict[str, Any], str]:
 
 
 def update_root_pyproject(merged_deps: list[str], dry_run: bool = False) -> bool:
-    """Update root pyproject.toml with merged dependencies."""
+    """Update root pyproject.toml with merged dependencies.
+
+    Note: This uses line-by-line string manipulation to preserve file formatting
+    and comments. This approach has limitations with complex TOML syntax.
+    Consider using tomli_w library for production use with complex TOML files.
+    """
     root_data, original_content = read_root_pyproject()
     current_deps = root_data.get("project", {}).get("dependencies", [])
 
@@ -199,7 +207,7 @@ def update_root_pyproject(merged_deps: list[str], dry_run: bool = False) -> bool
     lines = original_content.split("\n")
     new_lines = []
     in_dependencies = False
-    bracket_count = 0
+    bracket_depth = 0
 
     for line in lines:
         if line.strip().startswith("dependencies = ["):
@@ -208,12 +216,23 @@ def update_root_pyproject(merged_deps: list[str], dry_run: bool = False) -> bool
             if line.strip().endswith("]"):
                 in_dependencies = False
             else:
-                bracket_count = 1
+                bracket_depth = 1
             continue
 
         if in_dependencies:
-            bracket_count += line.count("[") - line.count("]")
-            if bracket_count == 0:
+            # Count unquoted brackets to handle extras like package[extra]
+            # This is a heuristic and may fail with complex TOML
+            in_quotes = False
+            for char in line:
+                if char == '"' and (not line or line[line.index(char) - 1] != "\\"):
+                    in_quotes = not in_quotes
+                elif not in_quotes:
+                    if char == "[":
+                        bracket_depth += 1
+                    elif char == "]":
+                        bracket_depth -= 1
+
+            if bracket_depth == 0:
                 in_dependencies = False
             continue
 
