@@ -181,6 +181,11 @@ environment.yml: # Generate conda environment.yml from pyproject.toml
 	@echo "    - tetra-rp" >> environment.yml
 	@echo "✓ environment.yml created"
 
+sync-example-deps: # Sync example dependencies to root pyproject.toml
+	@echo "Scanning example directories for dependencies..."
+	$(PYTHON) scripts/sync_example_deps.py
+	@echo "✓ Example dependencies synced to root pyproject.toml"
+
 sync-deps: requirements.txt environment.yml # Generate all dependency files
 	@echo "✓ All dependency files synced"
 
