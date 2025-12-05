@@ -23,7 +23,7 @@ from tetra_rp import (
 # an idle timeout of 5 minutes so that any active worker stays alive for 5
 # minutes after completing a request.
 gpu_config = LiveServerless(
-    name="gpu_worker",
+    name="01_01_gpu_worker",
     gpus=[GpuGroup.ANY],  # Run on any GPU
     workersMin=0,
     workersMax=3,

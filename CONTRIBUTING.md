@@ -44,7 +44,9 @@ All examples must meet these standards:
 - [ ] All endpoints return correct responses
 - [ ] Error handling is implemented
 - [ ] Environment variables are documented
-- [ ] Dependencies are pinned in requirements.txt
+- [ ] Dependencies are pinned in pyproject.toml
+- [ ] Dependencies consolidated to root with `make consolidate-deps`
+- [ ] Example loads in unified app (`flash run` from root)
 
 ### 2. Code Quality
 - [ ] Clear, readable code
@@ -100,7 +102,28 @@ flash run
 # Test all endpoints
 ```
 
-### 5. Create Pull Request
+### 5. Consolidate Dependencies to Root
+
+**Important**: The unified app loads all examples dynamically, so all example dependencies must be available in the root environment.
+
+After adding your example with its dependencies, consolidate them to the root:
+
+```bash
+# From the repository root
+make consolidate-deps  # Consolidates your example's deps to root pyproject.toml
+uv sync                # Installs the new dependencies
+```
+
+The consolidation script:
+- Automatically scans your example's `pyproject.toml`
+- Merges all dependencies into the root configuration
+- Lets pip/uv handle version resolution
+
+If pip/uv reports version conflicts, resolve them manually in the root `pyproject.toml`.
+
+**Verification**: Run `flash run` from the repository root to ensure your example loads without import errors.
+
+### 6. Create Pull Request
 
 ```bash
 git checkout -b add-example-name

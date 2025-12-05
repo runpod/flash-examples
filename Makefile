@@ -1,4 +1,4 @@
-.PHONY: help venv-info dev sync-deps update-deps clean clean-venv lint lint-fix format format-check typecheck quality-check quality-check-strict ci-quality-github
+.PHONY: help venv-info dev consolidate-deps check-deps sync-deps update-deps clean clean-venv lint lint-fix format format-check typecheck quality-check quality-check-strict ci-quality-github
 
 # ============================================================================
 # Environment Manager Auto-Detection
@@ -181,6 +181,14 @@ environment.yml: # Generate conda environment.yml from pyproject.toml
 	@echo "    - tetra-rp" >> environment.yml
 	@echo "✓ environment.yml created"
 
+consolidate-deps: # Consolidate example dependencies to root pyproject.toml
+	@echo "Consolidating example dependencies..."
+	$(PYTHON) scripts/sync_example_deps.py
+
+check-deps: # Verify example dependencies are consolidated (CI mode)
+	@echo "Verifying dependencies are consolidated..."
+	$(PYTHON) scripts/sync_example_deps.py --check
+
 sync-deps: requirements.txt environment.yml # Generate all dependency files
 	@echo "✓ All dependency files synced"
 
@@ -259,7 +267,7 @@ typecheck: # Check types with mypy
 quality-check: format-check lint # Essential quality gate for CI
 	@echo "✓ Quality checks passed"
 
-quality-check-strict: format-check lint typecheck # Strict quality gate with type checking
+quality-check-strict: format-check lint typecheck check-deps # Strict quality gate with type checking
 	@echo "✓ Strict quality checks passed"
 
 # ============================================================================

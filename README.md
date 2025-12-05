@@ -189,6 +189,37 @@ example_name/
 └── .env.example          # Environment variable template
 ```
 
+### Dependency Management
+
+The unified app automatically discovers and loads all examples at runtime, which requires all example dependencies to be installed in the root environment.
+
+**Automatic Dependency Syncing**:
+
+When adding a new example with additional dependencies:
+
+1. Define dependencies in your example's `pyproject.toml`
+2. Run `make sync-example-deps` to update the root dependencies
+3. Run `uv sync --all-groups` to install the new packages
+4. Run `make requirements.txt` to regenerate the lockfile
+
+The sync script automatically:
+- Scans all example directories for `pyproject.toml` files
+- Merges dependencies into the root configuration
+- Filters out transitive dependencies already provided by `tetra-rp`
+- Detects version conflicts and uses the most permissive constraint
+- Preserves essential root dependencies (numpy, torch, tetra-rp)
+
+**Example**:
+
+```bash
+# After adding a new example with pillow and structlog dependencies
+make sync-example-deps  # Syncs example deps to root pyproject.toml
+uv sync --all-groups    # Installs new dependencies
+make requirements.txt   # Regenerates lockfile
+```
+
+This automation ensures that `flash run` from the root directory always has access to all required dependencies for dynamic example loading.
+
 ## Key Concepts
 
 ### Remote Workers

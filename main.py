@@ -51,13 +51,13 @@ def load_module_from_path(module_name: str, file_path: Path) -> Any:
     return module
 
 
-def discover_single_file_routers(example_path: Path, example_name: str) -> list[dict]:
+def discover_single_file_routers(example_path: Path, example_name: str) -> list[dict[str, Any]]:
     """
     Discover routers from single-file worker patterns.
 
     Looks for files like gpu_worker.py, cpu_worker.py that export APIRouters.
     """
-    routers = []
+    routers: list[dict[str, Any]] = []
     worker_files = list(example_path.glob("*_worker.py"))
 
     for worker_file in worker_files:
@@ -84,8 +84,8 @@ def discover_single_file_routers(example_path: Path, example_name: str) -> list[
                         ):
                             routes.append(
                                 {
-                                    "path": str(route.path),  # type: ignore
-                                    "name": str(route.name),  # type: ignore
+                                    "path": str(route.path),
+                                    "name": str(route.name),
                                 }
                             )
 
@@ -107,13 +107,13 @@ def discover_single_file_routers(example_path: Path, example_name: str) -> list[
     return routers
 
 
-def discover_directory_routers(example_path: Path, example_name: str) -> list[dict]:
+def discover_directory_routers(example_path: Path, example_name: str) -> list[dict[str, Any]]:
     """
     Discover routers from directory-based worker patterns.
 
     Looks for workers/gpu/__init__.py, workers/cpu/__init__.py that export APIRouters.
     """
-    routers = []
+    routers: list[dict[str, Any]] = []
     workers_dir = example_path / "workers"
 
     if not workers_dir.exists() or not workers_dir.is_dir():
@@ -156,8 +156,8 @@ def discover_directory_routers(example_path: Path, example_name: str) -> list[di
                         ):
                             routes.append(
                                 {
-                                    "path": str(route.path),  # type: ignore
-                                    "name": str(route.name),  # type: ignore
+                                    "path": str(route.path),
+                                    "name": str(route.name),
                                 }
                             )
 
@@ -179,14 +179,14 @@ def discover_directory_routers(example_path: Path, example_name: str) -> list[di
     return routers
 
 
-def discover_example_routers(example_path: Path) -> list[dict]:
+def discover_example_routers(example_path: Path) -> list[dict[str, Any]]:
     """
     Discover all routers from an example directory.
 
     Tries both single-file and directory-based patterns.
     """
     example_name = example_path.name
-    routers = []
+    routers: list[dict[str, Any]] = []
 
     # Try single-file pattern
     routers.extend(discover_single_file_routers(example_path, example_name))
@@ -197,13 +197,13 @@ def discover_example_routers(example_path: Path) -> list[dict]:
     return routers
 
 
-def register_all_examples() -> dict[str, dict]:
+def register_all_examples() -> dict[str, dict[str, Any]]:
     """
     Discover and register all examples.
 
     Returns a dictionary of category -> examples metadata for the home endpoint.
     """
-    examples_by_category = {}
+    examples_by_category: dict[str, dict[str, Any]] = {}
 
     for examples_dir in EXAMPLES_DIRS:
         if not examples_dir.exists() or not examples_dir.is_dir():
@@ -264,8 +264,8 @@ def extract_operation_ids_from_app() -> dict[str, dict[str, list[str]]]:
 
     for route in app.routes:
         if hasattr(route, "tags") and hasattr(route, "unique_id"):
-            tags = route.tags or []  # type: ignore
-            operation_id = str(route.unique_id)  # type: ignore
+            tags = route.tags or []
+            operation_id = str(route.unique_id)
 
             # Parse tag to get example_name and worker_type
             # Tag format: "01 Hello World - GPU"
