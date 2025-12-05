@@ -30,5 +30,11 @@ jobs:
       - name: Install dependencies
         run: make dev
 
+      - name: Check dependency sync
+        run: |
+          echo "::group::Dependency sync check"
+          uv run python scripts/sync_example_deps.py --check
+          echo "::endgroup::"
+
       - name: Run quality checks
         run: make ci-quality-github
