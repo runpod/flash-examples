@@ -44,8 +44,8 @@ All examples must meet these standards:
 - [ ] All endpoints return correct responses
 - [ ] Error handling is implemented
 - [ ] Environment variables are documented
-- [ ] Dependencies are pinned in requirements.txt
-- [ ] Dependencies synced to root with `make sync-example-deps`
+- [ ] Dependencies are pinned in pyproject.toml
+- [ ] Dependencies consolidated to root with `make consolidate-deps`
 - [ ] Example loads in unified app (`flash run` from root)
 
 ### 2. Code Quality
@@ -102,25 +102,24 @@ flash run
 # Test all endpoints
 ```
 
-### 5. Sync Dependencies to Root
+### 5. Consolidate Dependencies to Root
 
 **Important**: The unified app loads all examples dynamically, so all example dependencies must be available in the root environment.
 
-After adding your example with its dependencies:
+After adding your example with its dependencies, consolidate them to the root:
 
 ```bash
 # From the repository root
-make sync-example-deps  # Syncs your example's deps to root pyproject.toml
-uv sync --all-groups    # Installs the new dependencies
-make requirements.txt   # Regenerates the lockfile
+make consolidate-deps  # Consolidates your example's deps to root pyproject.toml
+uv sync                # Installs the new dependencies
 ```
 
-The sync script:
+The consolidation script:
 - Automatically scans your example's `pyproject.toml`
-- Merges dependencies into the root configuration
-- Filters out transitive deps (fastapi, pydantic, uvicorn from tetra-rp)
-- Detects version conflicts
-- Preserves essential root dependencies
+- Merges all dependencies into the root configuration
+- Lets pip/uv handle version resolution
+
+If pip/uv reports version conflicts, resolve them manually in the root `pyproject.toml`.
 
 **Verification**: Run `flash run` from the repository root to ensure your example loads without import errors.
 
