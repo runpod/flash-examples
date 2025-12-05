@@ -3689,8 +3689,8 @@ wheels = [
 
 [[package]]
 name = "runpod"
-version = "1.8.2.dev22"
-source = { git = "https://github.com/runpod/runpod-python?rev=tmp%2Fnew-job-scheduler#f6135cb43b590d719deca442e4468468a9162405" }
+version = "1.8.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp", extra = ["speedups"] },
     { name = "aiohttp-retry" },
@@ -3715,6 +3715,10 @@ dependencies = [
     { name = "urllib3", version = "1.26.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "urllib3", version = "2.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "watchdog" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/84/d4/79710eb65047e4a43c9639e4633c3a5333bf36cc33cb4d15f18518872157/runpod-1.8.1.tar.gz", hash = "sha256:3d31aa0e175a91e7c962fe1de51e2872a06e78f5d7e37ff7520ba23db1485413", size = 284691 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/88/5c/ce583cfbba69f4f989658c7e984b1175d4e1f5f19132d9554a5ff7031647/runpod-1.8.1-py3-none-any.whl", hash = "sha256:2cc36ce80c02b7b6f54216154345e5064bfa510718acfc684cd9f56ac506d518", size = 157526 },
 ]
 
 [[package]]
@@ -3743,6 +3747,7 @@ dev = [
     { name = "pytest-asyncio", version = "1.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "tomli-w" },
 ]
 
 [package.metadata]
@@ -3751,7 +3756,7 @@ requires-dist = [
     { name = "pillow", specifier = ">=10.0.0" },
     { name = "python-multipart", specifier = ">=0.0.6" },
     { name = "structlog", specifier = ">=23.0.0" },
-    { name = "tetra-rp", editable = "../tetra-rp" },
+    { name = "tetra-rp" },
     { name = "torch" },
 ]
 
@@ -3762,6 +3767,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=0.25.0" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "ruff", specifier = ">=0.8.0" },
+    { name = "tomli-w", specifier = ">=1.0.0" },
 ]
 
 [[package]]
@@ -3866,7 +3872,7 @@ wheels = [
 [[package]]
 name = "tetra-rp"
 version = "0.18.0"
-source = { editable = "../tetra-rp" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cloudpickle" },
     { name = "pathspec" },
@@ -3877,30 +3883,9 @@ dependencies = [
     { name = "runpod" },
     { name = "typer" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "cloudpickle", specifier = ">=3.1.1" },
-    { name = "pathspec", specifier = ">=0.11.0" },
-    { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "python-dotenv", specifier = ">=1.0.0" },
-    { name = "questionary", specifier = ">=2.0.0" },
-    { name = "rich", specifier = ">=14.0.0" },
-    { name = "runpod", git = "https://github.com/runpod/runpod-python?rev=tmp%2Fnew-job-scheduler" },
-    { name = "typer", specifier = ">=0.12.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "mypy", specifier = ">=1.16.1" },
-    { name = "ruff", specifier = ">=0.11.9" },
-]
-test = [
-    { name = "pytest", specifier = ">=8.4.1" },
-    { name = "pytest-asyncio", specifier = ">=1.0.0" },
-    { name = "pytest-cov", specifier = ">=6.2.1" },
-    { name = "pytest-mock", specifier = ">=3.14.0" },
-    { name = "twine", specifier = ">=6.1.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/85/98/58cbd75b34d7163be860a2b6af47b0f2c7a43626f31f10f89c6327d4a2bd/tetra_rp-0.18.0.tar.gz", hash = "sha256:a4fc9c262d4d6a08bce0f88f683c931c3914ca0db2e530b3125e5667cf15fccc", size = 85404 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c9/b4/9aaf1c2113f223099fb21c8a6f242a80b01faa96db57d3ac28679a5ca1cf/tetra_rp-0.18.0-py3-none-any.whl", hash = "sha256:d78fab260e3e31cfb613b29796f1094bd8fe70c59351dbe269ce7f54bae9382e", size = 84284 },
 ]
 
 [[package]]
@@ -3950,6 +3935,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/7e/46/cc36c679f09f27ded940281c38607716c86cf8ba4a518d524e349c8b4874/tomli-2.3.0-cp314-cp314t-win32.whl", hash = "sha256:a1f7f282fe248311650081faafa5f4732bdbfef5d45fe3f2e702fbc6f2d496e0", size = 107563 },
     { url = "https://files.pythonhosted.org/packages/84/ff/426ca8683cf7b753614480484f6437f568fd2fda2edbdf57a2d3d8b27a0b/tomli-2.3.0-cp314-cp314t-win_amd64.whl", hash = "sha256:70a251f8d4ba2d9ac2542eecf008b3c8a9fc5c3f9f02c56a9d7952612be2fdba", size = 119756 },
     { url = "https://files.pythonhosted.org/packages/77/b8/0135fadc89e73be292b473cb820b4f5a08197779206b33191e801feeae40/tomli-2.3.0-py3-none-any.whl", hash = "sha256:e95b1af3c5b07d9e643909b5abbec77cd9f1217e6d0bca72b0234736b9fb1f1b", size = 14408 },
+]
+
+[[package]]
+name = "tomli-w"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/75/241269d1da26b624c0d5e110e8149093c759b7a286138f4efd61a60e75fe/tomli_w-1.2.0.tar.gz", hash = "sha256:2dd14fac5a47c27be9cd4c976af5a12d87fb1f0b4512f81d69cce3b35ae25021", size = 7184 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/18/c86eb8e0202e32dd3df50d43d7ff9854f8e0603945ff398974c1d91ac1ef/tomli_w-1.2.0-py3-none-any.whl", hash = "sha256:188306098d013b691fcadc011abd66727d3c414c571bb01b1a174ba8c983cf90", size = 6675 },
 ]
 
 [[package]]

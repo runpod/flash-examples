@@ -19,6 +19,11 @@ from typing import Any
 
 import tomllib
 
+try:
+    import tomli_w
+except ImportError:
+    tomli_w = None
+
 ROOT_DIR = Path(__file__).parent.parent
 ROOT_PYPROJECT = ROOT_DIR / "pyproject.toml"
 
@@ -181,9 +186,8 @@ def read_root_pyproject() -> tuple[dict[str, Any], str]:
 def update_root_pyproject(merged_deps: list[str], dry_run: bool = False) -> bool:
     """Update root pyproject.toml with merged dependencies.
 
-    Note: This uses line-by-line string manipulation to preserve file formatting
-    and comments. This approach has limitations with complex TOML syntax.
-    Consider using tomli_w library for production use with complex TOML files.
+    Uses tomli_w library if available to properly write TOML format.
+    Falls back to line-by-line string manipulation as a fallback.
     """
     root_data, original_content = read_root_pyproject()
     current_deps = root_data.get("project", {}).get("dependencies", [])
@@ -202,44 +206,51 @@ def update_root_pyproject(merged_deps: list[str], dry_run: bool = False) -> bool
             print(f"  - {dep}")
         return False
 
-    deps_section = '[\n    "' + '",\n    "'.join(merged_deps) + '",\n]'
+    if tomli_w:
+        # Use tomli_w to write proper TOML format
+        root_data["project"]["dependencies"] = merged_deps
+        with open(ROOT_PYPROJECT, "wb") as f:
+            tomli_w.dump(root_data, f)
+    else:
+        # Fallback to string manipulation for environments without tomli_w
+        deps_section = '[\n    "' + '",\n    "'.join(merged_deps) + '",\n]'
 
-    lines = original_content.split("\n")
-    new_lines = []
-    in_dependencies = False
-    bracket_depth = 0
+        lines = original_content.split("\n")
+        new_lines = []
+        in_dependencies = False
+        bracket_depth = 0
 
-    for line in lines:
-        if line.strip().startswith("dependencies = ["):
-            in_dependencies = True
-            new_lines.append(f"dependencies = {deps_section}")
-            if line.strip().endswith("]"):
-                in_dependencies = False
-            else:
-                bracket_depth = 1
-            continue
+        for line in lines:
+            if line.strip().startswith("dependencies = ["):
+                in_dependencies = True
+                new_lines.append(f"dependencies = {deps_section}")
+                if line.strip().endswith("]"):
+                    in_dependencies = False
+                else:
+                    bracket_depth = 1
+                continue
 
-        if in_dependencies:
-            # Count unquoted brackets to handle extras like package[extra]
-            # This is a heuristic and may fail with complex TOML
-            in_quotes = False
-            for char in line:
-                if char == '"' and (not line or line[line.index(char) - 1] != "\\"):
-                    in_quotes = not in_quotes
-                elif not in_quotes:
-                    if char == "[":
-                        bracket_depth += 1
-                    elif char == "]":
-                        bracket_depth -= 1
+            if in_dependencies:
+                # Count unquoted brackets to handle extras like package[extra]
+                # This is a heuristic and may fail with complex TOML
+                in_quotes = False
+                for char in line:
+                    if char == '"' and (not line or line[line.index(char) - 1] != "\\"):
+                        in_quotes = not in_quotes
+                    elif not in_quotes:
+                        if char == "[":
+                            bracket_depth += 1
+                        elif char == "]":
+                            bracket_depth -= 1
 
-            if bracket_depth == 0:
-                in_dependencies = False
-            continue
+                if bracket_depth == 0:
+                    in_dependencies = False
+                continue
 
-        new_lines.append(line)
+            new_lines.append(line)
 
-    with open(ROOT_PYPROJECT, "w") as f:
-        f.write("\n".join(new_lines))
+        with open(ROOT_PYPROJECT, "w") as f:
+            f.write("\n".join(new_lines))
 
     print(f"Updated {ROOT_PYPROJECT}")
     return True
