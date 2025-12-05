@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import tomllib
+from packaging import version
 
 try:
     import tomli_w
@@ -129,13 +130,19 @@ def select_most_permissive(dep_specs: set[str]) -> str:
     min versions are equal (e.g., 'package>=1.0' over 'package>=1.0,<2.0').
     """
 
-    def extract_min_version(spec: str) -> tuple[int, int]:
+    def extract_min_version(spec: str) -> tuple[int, Any]:
         """Extract operator count and version from spec for sorting."""
         # Prioritize by: fewest constraints (more permissive), then lower min version
         constraint_count = sum(1 for op in [">=", "<=", "==", "!=", ">", "<", "~="] if op in spec)
-        # Extract first version number for comparison (simple heuristic)
-        match = re.search(r"(\d+)", spec)
-        min_version = int(match.group(1)) if match else FALLBACK_VERSION
+        # Extract version number for proper semantic version comparison
+        match = re.search(r"(\d+(?:\.\d+)*)", spec)
+        if match:
+            try:
+                min_version = version.parse(match.group(1))
+            except version.InvalidVersion:
+                min_version = version.parse("999.0.0")  # Fallback for unparseable versions
+        else:
+            min_version = version.parse("999.0.0")  # Fallback for specs without version numbers
         return (constraint_count, min_version)
 
     return min(dep_specs, key=extract_min_version)
@@ -231,11 +238,23 @@ def update_root_pyproject(merged_deps: list[str], dry_run: bool = False) -> bool
                 continue
 
             if in_dependencies:
-                # Count unquoted brackets to handle extras like package[extra]
-                # This is a heuristic and may fail with complex TOML
+                # Count unquoted brackets to handle extras like package[extra].
+                # Known failure cases include:
+                #   - Multiline strings in dependencies (triple quotes)
+                #   - Nested arrays or tables within dependencies
+                #   - Comments inside the dependencies array
+                #   - Inline tables or complex value types
+                if '"""' in line or "'''" in line or (line.count("{") > 0) or (line.count("}") > 0):
+                    print(
+                        "ERROR: Detected complex TOML structure in dependencies array. "
+                        "Please ensure 'tomli_w' is installed for safe operation.",
+                        file=sys.stderr,
+                    )
+                    return False
+
                 in_quotes = False
-                for char in line:
-                    if char == '"' and (not line or line[line.index(char) - 1] != "\\"):
+                for i, char in enumerate(line):
+                    if char == '"' and (i == 0 or line[i - 1] != "\\"):
                         in_quotes = not in_quotes
                     elif not in_quotes:
                         if char == "[":
