@@ -14,7 +14,7 @@ from tetra_rp import CpuInstanceType, CpuLiveServerless, remote
 # to run up to 5 workers in parallel as the endpoint receives more work.
 # We also set an idle timeout of 5 minutes so that any active worker stays alive for 5 minutes after completing a request.
 cpu_config = CpuLiveServerless(
-    name="cpu_worker",
+    name="01_02_cpu_worker",
     instanceIds=[CpuInstanceType.ANY],
     workersMin=0,  # Scale to zero
     workersMax=3,
