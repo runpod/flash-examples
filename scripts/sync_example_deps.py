@@ -17,8 +17,8 @@ Make commands:
 import sys
 from pathlib import Path
 
-import tomllib
 import tomli_w
+import tomllib
 
 ROOT_DIR = Path(__file__).parent.parent
 ROOT_PYPROJECT = ROOT_DIR / "pyproject.toml"
