@@ -18,7 +18,11 @@ import sys
 from pathlib import Path
 
 import tomli_w
-import tomllib
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib  # type: ignore[no-redef]
 
 ROOT_DIR = Path(__file__).parent.parent
 ROOT_PYPROJECT = ROOT_DIR / "pyproject.toml"
