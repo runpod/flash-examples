@@ -196,8 +196,9 @@ if __name__ == "__main__":
     import uvicorn
     import os
 
-    port = int(os.getenv("PORT", 8888))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    host = str(os.getenv("FLASH_HOST", "localhost"))
+    port = int(os.getenv("FLASH_PORT", 8888))
+    uvicorn.run(app, host=host, port=port)
 ```
 
 ### Minimal Worker (endpoint.py)
