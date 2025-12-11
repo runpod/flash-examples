@@ -32,6 +32,11 @@ EXAMPLES_DIRS = [
     BASE_DIR / "06_real_world",
 ]
 
+# Route discovery constants
+SKIP_HEALTH_CHECK_PATHS = ("/", "/health")
+SKIP_OPENAPI_PATHS = ("/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc")
+SKIP_WORKER_TYPES = ("gpu", "cpu", "workers")
+
 app = FastAPI(
     title="Runpod Flash Examples - Unified Demo",
     description="All Flash examples automatically discovered and unified in one FastAPI application",
@@ -225,23 +230,18 @@ def discover_main_app_routes(
                     continue
 
                 # Skip health check and info endpoints
-                if hasattr(route, "path") and route.path in ("/", "/health"):
+                if hasattr(route, "path") and route.path in SKIP_HEALTH_CHECK_PATHS:
                     continue
 
                 # Skip auto-generated OpenAPI documentation routes
-                if hasattr(route, "path") and route.path in (
-                    "/openapi.json",
-                    "/docs",
-                    "/docs/oauth2-redirect",
-                    "/redoc",
-                ):
+                if hasattr(route, "path") and route.path in SKIP_OPENAPI_PATHS:
                     continue
 
                 # Skip routes from included routers (routes with /gpu/, /cpu/, etc.)
                 if hasattr(route, "path"):
                     path = str(route.path)
                     # Skip routes that start with common worker types or look like they're from included routers
-                    if any(f"/{wt}/" in path for wt in ["gpu", "cpu", "workers"]):
+                    if any(f"/{wt}/" in path for wt in SKIP_WORKER_TYPES):
                         continue
 
                 # Include everything else
