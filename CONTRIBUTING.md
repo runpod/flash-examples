@@ -196,7 +196,7 @@ if __name__ == "__main__":
     import uvicorn
     import os
 
-    host = str(os.getenv("FLASH_HOST", "localhost"))
+    host = os.getenv("FLASH_HOST", "localhost")
     port = int(os.getenv("FLASH_PORT", 8888))
     uvicorn.run(app, host=host, port=port)
 ```
