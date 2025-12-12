@@ -28,10 +28,10 @@ ROOT_DIR = Path(__file__).parent.parent
 ROOT_PYPROJECT = ROOT_DIR / "pyproject.toml"
 EXAMPLES_DIRS = [
     "01_getting_started",
-    "02_advanced",
-    "03_production",
-    "04_integrations",
-    "05_scaling",
+    "02_ml_inference",
+    "03_advanced_workers",
+    "04_scaling_performance",
+    "05_data_workflows",
     "06_real_world",
 ]
 

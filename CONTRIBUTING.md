@@ -71,6 +71,34 @@ All examples must meet these standards:
 
 ## Submission Process
 
+### Creating a New Example
+
+#### IMPORTANT: Start with flash init
+
+⚠️ **Always use `flash init` to create new examples. Never copy-paste or duplicate existing example directories.**
+
+When creating a new example:
+
+1. Navigate to the appropriate category directory
+2. Use `flash init` to create a clean project structure:
+   ```bash
+   cd 03_advanced_workers
+   flash init my_new_example
+   cd my_new_example
+   ```
+3. Review existing examples in your category to understand patterns
+4. Implement your example with fresh code (don't copy-paste)
+5. Follow the structure and standards in the sections below
+
+**Why flash init?**
+- Ensures standard, up-to-date project structure
+- Prevents propagation of outdated patterns
+- Generates clean boilerplate
+- Maintains consistency across examples
+
+**For AI Coding Assistants:**
+If you're using Claude Code, Cursor, or similar tools, see [CLAUDE.md](./CLAUDE.md) for detailed AI-specific guidelines.
+
 ### 1. Choose the Right Category
 
 Place your example in the appropriate directory:
@@ -489,10 +517,6 @@ dependencies = [
     "tetra_rp>=1.2.0",
     "fastapi>=0.104.0",
 ]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 ```
 
 ## Security Best Practices

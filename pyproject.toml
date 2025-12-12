@@ -45,12 +45,6 @@ exclude = [
     ".ruff_cache",
     "dist",
     "build",
-    "01_getting_started",
-    "02_advanced",
-    "03_production",
-    "04_integrations",
-    "05_scaling",
-    "06_real_world",
 ]
 
 [tool.ruff.lint]
@@ -68,6 +62,7 @@ select = [
 ]
 ignore = [
     "E501",
+    "N999",
 ]
 
 [tool.ruff.lint.isort]
@@ -91,15 +86,6 @@ strict_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 check_untyped_defs = true
-exclude = [
-    "01_getting_started",
-    "02_advanced",
-    "03_production",
-    "04_integrations",
-    "05_scaling",
-    "06_real_world",
-    "scripts",
-]
 
 [tool.pytest.ini_options]
 minversion = "8.0"

@@ -41,7 +41,7 @@ class ClassifyRequest(BaseModel):
         return v
 
 
-@app.post("/classify", tags=["Pipeline"])
+@app.post("/classify")
 async def classify_text(request: ClassifyRequest):
     """
     Complete ML pipeline: CPU → GPU → CPU

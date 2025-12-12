@@ -6,7 +6,3 @@ requires-python = ">=3.9"
 dependencies = [
     "tetra_rp",
 ]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"

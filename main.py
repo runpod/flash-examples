@@ -32,6 +32,11 @@ EXAMPLES_DIRS = [
     BASE_DIR / "06_real_world",
 ]
 
+# Route discovery constants
+SKIP_HEALTH_CHECK_PATHS = ("/", "/health")
+SKIP_OPENAPI_PATHS = ("/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc")
+SKIP_WORKER_TYPES = ("gpu", "cpu", "workers")
+
 app = FastAPI(
     title="Runpod Flash Examples - Unified Demo",
     description="All Flash examples automatically discovered and unified in one FastAPI application",
@@ -51,7 +56,9 @@ def load_module_from_path(module_name: str, file_path: Path) -> Any:
     return module
 
 
-def discover_single_file_routers(example_path: Path, example_name: str) -> list[dict[str, Any]]:
+def discover_single_file_routers(
+    example_path: Path, example_name: str, example_tag: str = ""
+) -> list[dict[str, Any]]:
     """
     Discover routers from single-file worker patterns.
 
@@ -93,9 +100,7 @@ def discover_single_file_routers(example_path: Path, example_name: str) -> list[
                         {
                             "router": router,
                             "prefix": f"/{example_name}/{worker_type}",
-                            "tags": [
-                                f"{example_name.replace('_', ' ').title()} - {worker_type.upper()}"
-                            ],
+                            "tags": [example_tag],
                             "worker_type": worker_type,
                             "routes": routes,
                         }
@@ -107,7 +112,9 @@ def discover_single_file_routers(example_path: Path, example_name: str) -> list[
     return routers
 
 
-def discover_directory_routers(example_path: Path, example_name: str) -> list[dict[str, Any]]:
+def discover_directory_routers(
+    example_path: Path, example_name: str, example_tag: str = ""
+) -> list[dict[str, Any]]:
     """
     Discover routers from directory-based worker patterns.
 
@@ -165,9 +172,7 @@ def discover_directory_routers(example_path: Path, example_name: str) -> list[di
                         {
                             "router": router,
                             "prefix": f"/{example_name}/{worker_type}",
-                            "tags": [
-                                f"{example_name.replace('_', ' ').title()} - {worker_type.upper()}"
-                            ],
+                            "tags": [example_tag],
                             "worker_type": worker_type,
                             "routes": routes,
                         }
@@ -179,20 +184,127 @@ def discover_directory_routers(example_path: Path, example_name: str) -> list[di
     return routers
 
 
-def discover_example_routers(example_path: Path) -> list[dict[str, Any]]:
+def discover_main_app_routes(
+    example_path: Path, example_name: str, example_tag: str = ""
+) -> list[dict[str, Any]]:
+    """
+    Discover context routes from main.py FastAPI app.
+
+    Extracts only direct routes from the app's router (not included routers).
+    Skips health check, info endpoints, and auto-generated OpenAPI routes.
+    Returns routes as a single router grouped with the example (no separate prefix).
+    """
+    routers: list[dict[str, Any]] = []
+    main_file = example_path / "main.py"
+
+    if not main_file.exists():
+        return routers
+
+    module_name = f"{example_name}_main_context"
+
+    try:
+        module = load_module_from_path(module_name, main_file)
+        if module is None:
+            return routers
+
+        # Look for FastAPI app instance
+        if not hasattr(module, "app"):
+            return routers
+
+        main_app = module.app
+        if not hasattr(main_app, "routes"):
+            return routers
+
+        from fastapi.routing import Mount
+
+        # We want to extract routes that were directly added to the app (via @app.post, etc.)
+        # not routes from included routers. We'll check the app's router directly.
+        routes_list = []
+        context_router = APIRouter()
+
+        # Look at direct routes from the main app's router
+        if hasattr(main_app, "router") and hasattr(main_app.router, "routes"):
+            for route in main_app.router.routes:
+                # Skip Mount routes (these are included routers like /gpu, /cpu)
+                if isinstance(route, Mount):
+                    continue
+
+                # Skip health check and info endpoints
+                if hasattr(route, "path") and route.path in SKIP_HEALTH_CHECK_PATHS:
+                    continue
+
+                # Skip auto-generated OpenAPI documentation routes
+                if hasattr(route, "path") and route.path in SKIP_OPENAPI_PATHS:
+                    continue
+
+                # Skip routes from included routers (routes with /gpu/, /cpu/, etc.)
+                if hasattr(route, "path"):
+                    path = str(route.path)
+                    # Skip routes that start with common worker types or look like they're from included routers
+                    if any(f"/{wt}/" in path for wt in SKIP_WORKER_TYPES):
+                        continue
+
+                # Include everything else
+                if hasattr(route, "endpoint") and hasattr(route, "path") and hasattr(route, "name"):
+                    routes_list.append(
+                        {
+                            "path": str(route.path),
+                            "name": str(route.name),
+                        }
+                    )
+                    context_router.routes.append(route)
+
+        if context_router.routes:
+            routers.append(
+                {
+                    "router": context_router,
+                    "prefix": f"/{example_name}",
+                    "tags": [example_tag],
+                    "worker_type": "api",
+                    "routes": routes_list,
+                }
+            )
+            logger.info(
+                f"Loaded {example_name} context routes from main.py ({len(routes_list)} routes)"
+            )
+
+    except Exception as e:
+        logger.debug(f"Could not load context routes from {main_file}: {e}")
+
+    return routers
+
+
+def discover_example_routers(
+    example_path: Path, category_name: str = "", example_name: str = ""
+) -> list[dict[str, Any]]:
     """
     Discover all routers from an example directory.
 
-    Tries both single-file and directory-based patterns.
+    Tries single-file, directory-based, and main.py app patterns.
+    Groups all routes under a single example tag: "Category > Example"
+    Includes context routes from main.py (like pipelines) grouped with the example.
     """
-    example_name = example_path.name
+    if not example_name:
+        example_name = example_path.name
+
+    # Build example tag: "01 Getting Started > 01 Hello World"
+    example_tag = (
+        f"{category_name} > {example_name.replace('_', ' ').title()}"
+        if category_name
+        else example_name.replace("_", " ").title()
+    )
+
     routers: list[dict[str, Any]] = []
 
     # Try single-file pattern
-    routers.extend(discover_single_file_routers(example_path, example_name))
+    routers.extend(discover_single_file_routers(example_path, example_name, example_tag))
 
     # Try directory-based pattern
-    routers.extend(discover_directory_routers(example_path, example_name))
+    routers.extend(discover_directory_routers(example_path, example_name, example_tag))
+
+    # Extract context routes (main.py app routes like pipelines, classifiers)
+    # These are grouped with the example, not given special tagging
+    routers.extend(discover_main_app_routes(example_path, example_name, example_tag))
 
     return routers
 
@@ -224,7 +336,7 @@ def register_all_examples() -> dict[str, dict[str, Any]]:
                 continue
 
             example_name = example_path.name
-            routers = discover_example_routers(example_path)
+            routers = discover_example_routers(example_path, category_display, example_name)
 
             if routers:
                 # Register routers with FastAPI
@@ -238,10 +350,12 @@ def register_all_examples() -> dict[str, dict[str, Any]]:
                 # Build metadata
                 examples_by_category[category_name]["examples"][example_name] = {
                     "description": f"Example: {example_name.replace('_', ' ').title()}",
+                    "category_display": category_display,
                     "endpoints": {
                         router_info["worker_type"]: {
                             "prefix": router_info["prefix"],
                             "routes": router_info.get("routes", []),
+                            "tag": router_info["tags"][0] if router_info["tags"] else "",
                         }
                         for router_info in routers
                     },
@@ -290,7 +404,7 @@ def extract_operation_ids_from_app() -> dict[str, dict[str, list[str]]]:
     return operation_ids_map
 
 
-@app.get("/", response_class=HTMLResponse, tags=["Info"])
+@app.get("/", response_class=HTMLResponse)
 def home():
     """Branded home page with links to all automatically discovered examples."""
 
@@ -319,9 +433,13 @@ def home():
 
             total_endpoints += len(metadata["endpoints"])
 
-            for worker_type in metadata["endpoints"]:
-                # Build the tag name as it appears in FastAPI docs
-                tag_name = f"{display_name} - {worker_type.upper()}"
+            for worker_type, endpoint_info in metadata["endpoints"].items():
+                # Use the actual tag from the router registration
+                tag_name = endpoint_info.get("tag", "")
+                if not tag_name:
+                    # Fallback to old format if tag is not available
+                    tag_name = f"{display_name} - {worker_type.upper()}"
+
                 encoded_tag = quote(tag_name)
 
                 # Get the actual operation ID from the app
