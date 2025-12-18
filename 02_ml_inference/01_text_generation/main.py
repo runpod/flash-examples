@@ -1,17 +1,15 @@
-## Example 1: Hello world
-# This is an example of a simple Flash application.
-# It consists of an API router (this file) that routes requests to a local
-# endpoint on your machine to worker code. Worker code is executed on Runpod
-# infrastructure on serverless workers with GPUs.
-
-# Subrouters and associated worker function code are defined in the ./workers/
-# dir and attached to the main router in this file. By default, running
-# `flash run` will start the local API server on your machine serving requests
-# from port 8888.
-
-# We'll define a resource configuration for a GPU worker on a Runpod serverless
-# endpoint. The GPU worker will return information about the infrastructure
-# it executes on.
+## LLM demo: FastAPI router + serverless GPU worker
+# This example exposes a simple local FastAPI app (this file) with a single LLM endpoint
+# backed by a Runpod serverless GPU worker defined in `gpu_worker.py`.
+#
+# - Local API: runs on your machine via `flash run` (default: http://localhost:8888)
+# - Remote compute: executed on Runpod serverless GPUs via `tetra_rp.remote`
+#
+# Main endpoint:
+# - POST /gpu/llm  -> runs Llama chat inference on the remote GPU worker
+#
+# Note: The Llama model used in the worker is gated on Hugging Face, so you must provide
+# `HF_TOKEN` (the worker reads it from the serverless env).
 
 import logging
 import os
