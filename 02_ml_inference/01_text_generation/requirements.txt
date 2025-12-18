@@ -1,0 +1,4 @@
+tetra_rp
+torch
+transformers
+accelerate
