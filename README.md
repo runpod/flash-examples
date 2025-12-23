@@ -47,6 +47,23 @@ uv run flash login
 
 # Run all examples locally
 uv run flash dev
+# Set your API key (choose one method):
+
+# Option A: Export in shell (recommended for trying multiple examples)
+export RUNPOD_API_KEY=your_key_here
+
+# Option B: Create .env file per example (if you prefer per-example config)
+# cd 01_getting_started/01_hello_world
+# echo "RUNPOD_API_KEY=your_key_here" > .env
+
+# Option A: Run all examples from the unified app (recommended)
+uv run flash run
+
+# Option B: Run individual examples
+cd 01_getting_started/01_hello_world
+uv run flash run
+
+# Visit http://localhost:8888/docs
 ```
 
 Open **http://localhost:8888/docs** to explore all endpoints.
