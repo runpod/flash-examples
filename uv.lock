@@ -3875,7 +3875,7 @@ wheels = [
 
 [[package]]
 name = "tetra-rp"
-version = "0.18.0"
+version = "0.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cloudpickle" },
@@ -3887,9 +3887,9 @@ dependencies = [
     { name = "runpod" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/85/98/58cbd75b34d7163be860a2b6af47b0f2c7a43626f31f10f89c6327d4a2bd/tetra_rp-0.18.0.tar.gz", hash = "sha256:a4fc9c262d4d6a08bce0f88f683c931c3914ca0db2e530b3125e5667cf15fccc", size = 85404 }
+sdist = { url = "https://files.pythonhosted.org/packages/57/56/4210c7f9382749c4ed4c0de004de8705ff13a1a2352e4aea57e561e1edb5/tetra_rp-0.19.0.tar.gz", hash = "sha256:baad99bf3a1f59419b303c367492500e449e6ae50481a371024ec3bfa89791a8", size = 99321 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/b4/9aaf1c2113f223099fb21c8a6f242a80b01faa96db57d3ac28679a5ca1cf/tetra_rp-0.18.0-py3-none-any.whl", hash = "sha256:d78fab260e3e31cfb613b29796f1094bd8fe70c59351dbe269ce7f54bae9382e", size = 84284 },
+    { url = "https://files.pythonhosted.org/packages/da/ed/5ed3d95f6ba9c2765ac5b7f8ba33a279ac168be86c2bbe0a42607adc74a2/tetra_rp-0.19.0-py3-none-any.whl", hash = "sha256:4c6c230a0d5a7a9236d8e1c39403a5286bf54551535f5eb40259e69c5e4bde26", size = 99156 },
 ]
 
 [[package]]

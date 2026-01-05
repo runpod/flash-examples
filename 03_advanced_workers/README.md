@@ -4,6 +4,25 @@ Production-ready worker patterns for building robust, scalable applications.
 
 ## Examples
 
+### 05_load_balancer
+Load-balancer endpoints with custom HTTP routes.
+
+**What you'll learn:**
+- Creating load-balanced endpoints
+- Custom HTTP routing (GET, POST, PUT, DELETE, PATCH)
+- Low-latency request/response patterns
+- Multiple routes on a single endpoint
+
+**Use cases:**
+- Real-time APIs
+- REST services
+- Direct HTTP communication
+- Low-latency inference services
+
+**Resources:**
+- `LiveLoadBalancer` - Local development
+- `LoadBalancerSlsResource` - Production deployment
+
 ### 01_streaming _(coming soon)_
 Streaming responses with Server-Sent Events (SSE) and WebSockets.
 
