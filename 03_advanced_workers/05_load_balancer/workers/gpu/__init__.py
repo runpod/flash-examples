@@ -25,7 +25,7 @@ async def get_gpu_health():
 @gpu_router.post("/compute")
 async def post_gpu_compute(request: ComputeRequest):
     """Perform compute-intensive operation on GPU."""
-    return await compute_intensive(request.numbers)
+    return await compute_intensive(request)
 
 
 @gpu_router.get("/info")

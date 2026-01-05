@@ -31,11 +31,11 @@ async def gpu_health() -> dict:
 
 
 @remote(gpu_config, method="POST", path="/compute")
-async def compute_intensive(numbers: list[int]) -> dict:
+async def compute_intensive(request: ComputeRequest) -> dict:
     """Perform compute-intensive operation on GPU.
 
     Args:
-        numbers: List of numbers to process
+        request: Request with numbers to process
 
     Returns:
         Computation results
@@ -43,6 +43,7 @@ async def compute_intensive(numbers: list[int]) -> dict:
     import time
     from datetime import datetime, timezone
 
+    numbers = request.numbers
     start_time = time.time()
 
     # Simulate GPU-intensive computation
@@ -97,7 +98,8 @@ if __name__ == "__main__":
         print(f"   {result}\n")
 
         print("2. Compute intensive:")
-        result = await compute_intensive([1, 2, 3, 4, 5])
+        request = ComputeRequest(numbers=[1, 2, 3, 4, 5])
+        result = await compute_intensive(request)
         print(f"   Sum of squares: {result['sum_of_squares']}")
         print(f"   Mean: {result['mean']}\n")
 
