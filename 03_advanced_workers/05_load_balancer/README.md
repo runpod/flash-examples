@@ -88,7 +88,7 @@ cd 03_advanced_workers/05_load_balancer
 python main.py
 ```
 
-This runs the example on **http://localhost:8000** without the example name prefix.
+This runs the example on **http://localhost:8000** (default standalone port) without the example name prefix. The unified app uses port 8888, but standalone mode defaults to 8000 unless FLASH_PORT is set.
 
 ## How Load-Balancer Endpoints Work
 

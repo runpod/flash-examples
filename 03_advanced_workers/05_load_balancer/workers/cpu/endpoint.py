@@ -1,5 +1,7 @@
 from tetra_rp import CpuInstanceType, CpuLiveLoadBalancer, PodTemplate, remote
 
+VALID_OPERATIONS = ["uppercase", "lowercase", "reverse", "title"]
+
 cpu_config = CpuLiveLoadBalancer(
     name="03_05_load_balancer_cpu",
     workersMin=1,
@@ -25,7 +27,7 @@ async def validate_data(text: str) -> dict:
         Validation results
     """
     import time
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     if not text or not text.strip():
         raise ValueError("text cannot be empty")
@@ -47,7 +49,7 @@ async def validate_data(text: str) -> dict:
         "word_count": word_count,
         "average_word_length": round(avg_word_length, 2),
         "process_time_ms": round(process_time, 2),
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 
@@ -63,14 +65,13 @@ async def transform_data(text: str, operation: str = "uppercase") -> dict:
         Transformed text
     """
     import time
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     if not text or not text.strip():
         raise ValueError("text cannot be empty")
 
-    valid_operations = ["uppercase", "lowercase", "reverse", "title"]
-    if operation not in valid_operations:
-        raise ValueError(f"operation must be one of: {', '.join(valid_operations)}")
+    if operation not in VALID_OPERATIONS:
+        raise ValueError(f"operation must be one of: {', '.join(VALID_OPERATIONS)}")
 
     start_time = time.time()
     result = ""
@@ -93,7 +94,7 @@ async def transform_data(text: str, operation: str = "uppercase") -> dict:
         "transformed": result,
         "operation": operation,
         "process_time_ms": round(process_time, 2),
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 

@@ -41,10 +41,7 @@ async def compute_intensive(numbers: list[int]) -> dict:
         Computation results
     """
     import time
-    from datetime import datetime
-
-    if not numbers:
-        raise ValueError("numbers list cannot be empty")
+    from datetime import datetime, timezone
 
     start_time = time.time()
 
@@ -64,7 +61,7 @@ async def compute_intensive(numbers: list[int]) -> dict:
         "max": max_val,
         "min": min_val,
         "compute_time_ms": round(compute_time, 2),
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 
