@@ -9,8 +9,24 @@ The actual HTTP handling is managed by the tetra-rp-lb framework.
 """
 
 from fastapi import APIRouter
+from pydantic import BaseModel, field_validator
 
-from .endpoint import ComputeRequest, compute_intensive, gpu_config, gpu_health, gpu_info
+from .endpoint import compute_intensive, gpu_config, gpu_health, gpu_info
+
+
+class ComputeRequest(BaseModel):
+    """Request model for compute-intensive operations."""
+
+    numbers: list[int]
+
+    @field_validator("numbers")
+    @classmethod
+    def validate_numbers(cls, v: list[int]) -> list[int]:
+        """Validate that numbers list is not empty."""
+        if not v:
+            raise ValueError("numbers list cannot be empty")
+        return v
+
 
 # Export for unified app discovery
 gpu_router = APIRouter()
@@ -25,7 +41,7 @@ async def get_gpu_health():
 @gpu_router.post("/compute")
 async def post_gpu_compute(request: ComputeRequest):
     """Perform compute-intensive operation on GPU."""
-    return await compute_intensive(request)
+    return await compute_intensive(request.model_dump())
 
 
 @gpu_router.get("/info")

@@ -1,21 +1,4 @@
-from pydantic import BaseModel, field_validator
-
 from tetra_rp import GpuGroup, LiveLoadBalancer, remote
-
-
-class ComputeRequest(BaseModel):
-    """Request model for compute-intensive operations."""
-
-    numbers: list[int]
-
-    @field_validator("numbers")
-    @classmethod
-    def validate_numbers(cls, v: list[int]) -> list[int]:
-        """Validate that numbers list is not empty."""
-        if not v:
-            raise ValueError("numbers list cannot be empty")
-        return v
-
 
 gpu_config = LiveLoadBalancer(
     name="03_05_load_balancer_gpu",
@@ -31,11 +14,11 @@ async def gpu_health() -> dict:
 
 
 @remote(gpu_config, method="POST", path="/compute")
-async def compute_intensive(request: ComputeRequest) -> dict:
+async def compute_intensive(request: dict) -> dict:
     """Perform compute-intensive operation on GPU.
 
     Args:
-        request: Request with numbers to process
+        request: Request dict with numbers to process
 
     Returns:
         Computation results
@@ -43,7 +26,7 @@ async def compute_intensive(request: ComputeRequest) -> dict:
     import time
     from datetime import datetime, timezone
 
-    numbers = request.numbers
+    numbers = request.get("numbers", [])
     start_time = time.time()
 
     # Simulate GPU-intensive computation
@@ -98,8 +81,8 @@ if __name__ == "__main__":
         print(f"   {result}\n")
 
         print("2. Compute intensive:")
-        request = ComputeRequest(numbers=[1, 2, 3, 4, 5])
-        result = await compute_intensive(request)
+        request_data = {"numbers": [1, 2, 3, 4, 5]}
+        result = await compute_intensive(request_data)
         print(f"   Sum of squares: {result['sum_of_squares']}")
         print(f"   Mean: {result['mean']}\n")
 
