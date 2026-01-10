@@ -356,7 +356,7 @@ Diagram or description of how this example works.
 ## Quick Start
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.10+
 - Flash SDK
 
 ### Installation

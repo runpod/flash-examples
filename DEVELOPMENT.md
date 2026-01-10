@@ -16,7 +16,7 @@ This guide covers environment setup, development workflow, and tooling for contr
 
 ### Prerequisites
 
-- Python 3.11+ (3.12 recommended)
+- Python 3.10+ (3.12 recommended)
 - One of: uv, pip, poetry, conda, or pipenv
 - Git
 
