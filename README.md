@@ -79,6 +79,7 @@ Production-ready worker patterns.
 - 02_batch_processing - Batch inference optimization _(coming soon)_
 - 03_caching - Model and result caching strategies _(coming soon)_
 - 04_custom_images - Custom Docker images _(coming soon)_
+- **[05_load_balancer](./03_advanced_workers/05_load_balancer/)** - Load-balancer endpoints with custom HTTP routes
 
 ### 04 - Scaling & Performance
 Optimize for production workloads.

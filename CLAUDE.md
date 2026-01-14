@@ -59,8 +59,9 @@ make consolidate-deps
 from tetra_rp import remote, LiveServerless, GpuGroup
 
 # Configure resource requirements
+# Naming convention: {category}_{example}_{worker_type}
 gpu_config = LiveServerless(
-    name="my_example_gpu",
+    name="01_01_getting_started_gpu",
     gpus=[GpuGroup.ANY],
     workersMin=0,
     workersMax=3,
