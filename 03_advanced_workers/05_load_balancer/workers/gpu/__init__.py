@@ -50,11 +50,4 @@ async def get_gpu_info():
     return await gpu_info()
 
 
-__all__ = [
-    "ComputeRequest",
-    "compute_intensive",
-    "gpu_config",
-    "gpu_health",
-    "gpu_info",
-    "gpu_router",
-]
+__all__ = ["gpu_router"]

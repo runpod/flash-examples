@@ -2,7 +2,7 @@
 name = "load-balancer-example"
 version = "0.1.0"
 description = "Load-balancer endpoints with custom HTTP routes using Flash"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "tetra_rp",
 ]
