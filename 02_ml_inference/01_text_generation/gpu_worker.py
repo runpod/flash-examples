@@ -1,4 +1,4 @@
-## LLM chat inference on a serverless GPU 
+## LLM chat inference on a serverless GPU
 # This example runs a small chat LLM (Llama 3.2 1B Instruct) on Runpod serverless GPUs
 # using `transformers.pipeline`.
 #
@@ -60,8 +60,8 @@ async def gpu_hello(
     input_data: dict,
 ) -> dict:
     """Generate one chat response using Llama 3.2 1B Instruct on a serverless GPU."""
-    import platform
     import os
+    import platform
     from datetime import datetime
 
     import torch
@@ -137,7 +137,9 @@ class MessageRequest(BaseModel):
     """Request model for GPU worker."""
 
     message: str = "What is gpu?"
-    system_prompt: str = "You are a helpful assistant chatbot who always responds in a friendly and helpful manner!"
+    system_prompt: str = (
+        "You are a helpful assistant chatbot who always responds in a friendly and helpful manner!"
+    )
     max_new_tokens: int = 512
 
 
