@@ -4,6 +4,5 @@ version = "0.1.0"
 description = "Examples of managing Python and system dependencies in Flash workers"
 requires-python = ">=3.10"
 dependencies = [
-    "tetra_rp",
-    "torch",
+    "tetra_rp"
 ]

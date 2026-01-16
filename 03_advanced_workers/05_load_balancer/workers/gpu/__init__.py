@@ -11,7 +11,7 @@ The actual HTTP handling is managed by the tetra-rp-lb framework.
 from fastapi import APIRouter
 from pydantic import BaseModel, field_validator
 
-from .endpoint import compute_intensive, gpu_config, gpu_health, gpu_info
+from .endpoint import compute_intensive, gpu_health, gpu_info
 
 
 class ComputeRequest(BaseModel):
