@@ -2,7 +2,7 @@
 name = "03_mixed_workers"
 version = "0.1.0"
 description = "Mixed GPU/CPU workers demonstrating cost-effective ML pipelines"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "tetra_rp",
 ]

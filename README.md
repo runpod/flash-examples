@@ -8,7 +8,7 @@ Flash is a CLI tool and framework from the `tetra_rp` package that enables you t
 
 ## Prerequisites
 
-- Python 3.11+ (3.12 recommended)
+- Python 3.10+ (3.12 recommended)
 - [Runpod Account](https://console.runpod.io/signup)
 - [Runpod API Key](https://docs.runpod.io/get-started/api-keys)
 - Flash CLI: `pip install tetra_rp`
@@ -79,6 +79,7 @@ Production-ready worker patterns.
 - 02_batch_processing - Batch inference optimization _(coming soon)_
 - 03_caching - Model and result caching strategies _(coming soon)_
 - 04_custom_images - Custom Docker images _(coming soon)_
+- **[05_load_balancer](./03_advanced_workers/05_load_balancer/)** - Load-balancer endpoints with custom HTTP routes
 
 ### 04 - Scaling & Performance
 Optimize for production workloads.
@@ -283,7 +284,7 @@ To add a new example:
 
 ## Testing
 
-All examples are continuously tested against Python 3.9-3.13 to ensure compatibility across all supported versions. See [.github/workflows/](./.github/workflows/) for CI configuration.
+All examples are continuously tested against Python 3.10-3.14 to ensure compatibility across all supported versions. See [.github/workflows/](./.github/workflows/) for CI configuration.
 
 ## License
 
