@@ -1,6 +1,10 @@
 # 01_network_volumes
 
-Flash application demonstrating distributed GPU and CPU computing on Runpod's serverless infrastructure.
+Network volume example that shares model cache and generated images between GPU and CPU workers.
+
+## Overview
+
+The GPU worker generates images with Stable Diffusion and writes them to a Runpod network volume. The CPU worker lists or serves those images from the same volume.
 
 ## Quick Start
 
@@ -12,7 +16,7 @@ pip install -r requirements.txt
 
 ### 2. Configure Environment
 
-Create `.env` file:
+Create `.env`:
 
 ```bash
 RUNPOD_API_KEY=your_api_key_here
@@ -26,227 +30,101 @@ Get your API key from [Runpod Settings](https://www.runpod.io/console/user/setti
 flash run
 ```
 
-Server starts at **http://localhost:8000**
+Server starts at `http://localhost:8888`
 
 ### 4. Test the API
 
 ```bash
 # Health check
-curl http://localhost:8000/ping
+curl http://localhost:8888/ping
 
-# GPU worker
-curl -X POST http://localhost:8000/gpu/hello \
+# Generate an image on the GPU worker
+curl -X POST http://localhost:8888/gpu/generate \
   -H "Content-Type: application/json" \
-  -d '{"message": "Hello GPU!"}'
+  -d '{"prompt": "a lighthouse on a cliff at sunrise"}'
 
-# CPU worker
-curl -X POST http://localhost:8000/cpu/hello \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hello CPU!"}'
+# List generated images from the CPU worker
+curl http://localhost:8888/cpu/image
+
+# Fetch a single image by filename
+curl http://localhost:8888/cpu/image/<file_id> --output image.png
 ```
 
-Visit **http://localhost:8000/docs** for interactive API documentation.
+Visit `http://localhost:8888/docs` for interactive API documentation.
 
-## What This Demonstrates
+## What You'll Learn
 
-### GPU Worker (`workers/gpu/`)
-Simple GPU-based serverless function:
-- Remote execution with `@remote` decorator
-- GPU resource configuration
-- Automatic scaling (0-3 workers)
-- No external dependencies required
+- How to attach a shared `NetworkVolume` to GPU and CPU workers
+- How to use the GPU worker to write to the volume
+- How to read and serve files from the CPU worker
 
-```python
-@remote(
-    resource_config=LiveServerless(
-        name="gpu_worker",
-        gpus=[GpuGroup.ADA_24],  # RTX 4090
-        workersMin=0,
-        workersMax=3,
-    )
-)
-async def gpu_hello(input_data: dict) -> dict:
-    # Your GPU code here
-    return {"status": "success", "message": "Hello from GPU!"}
-```
+## Architecture
 
-### CPU Worker (`workers/cpu/`)
-Simple CPU-based serverless function:
-- CPU-only execution (no GPU overhead)
-- CpuLiveServerless configuration
-- Efficient for API endpoints
-- Automatic scaling (0-5 workers)
+- GPU worker: loads Stable Diffusion, caches weights in `/runpod-volume/models`, writes images to `/runpod-volume/generated_images`
+- CPU worker: lists images and serves files from `/runpod-volume/generated_images`
 
-```python
-@remote(
-    resource_config=CpuLiveServerless(
-        name="cpu_worker",
-        instanceIds=[CpuInstanceType.CPU3G_2_8],  # 2 vCPU, 8GB RAM
-        workersMin=0,
-        workersMax=5,
-    )
-)
-async def cpu_hello(input_data: dict) -> dict:
-    # Your CPU code here
-    return {"status": "success", "message": "Hello from CPU!"}
-```
-
-## Project Structure
+## Quick Project Structure
 
 ```
 01_network_volumes/
-├── main.py                    # FastAPI application
+├── main.py
 ├── workers/
-│   ├── gpu/                  # GPU worker
-│   │   ├── __init__.py       # FastAPI router
-│   │   └── endpoint.py       # @remote decorated function
-│   └── cpu/                  # CPU worker
-│       ├── __init__.py       # FastAPI router
-│       └── endpoint.py       # @remote decorated function
-├── .env                      # Environment variables
-├── requirements.txt          # Dependencies
-└── README.md                 # This file
+│   ├── __init__.py           # Network volume definition
+│   ├── gpu/
+│   │   ├── __init__.py       # GPU router
+│   │   └── endpoint.py       # Stable Diffusion worker
+│   └── cpu/
+│       ├── __init__.py       # CPU router
+│       └── endpoint.py       # List and serve images
+├── requirements.txt
+└── README.md
 ```
 
-## Key Concepts
+## API Endpoints
 
-### Remote Execution
-The `@remote` decorator transparently executes functions on serverless infrastructure:
-- Code runs locally during development
-- Automatically deploys to Runpod when configured
-- Handles serialization, dependencies, and resource management
+### POST /gpu/generate
 
-### Resource Scaling
-Both workers scale to zero when idle to minimize costs:
-- **idleTimeout**: Minutes before scaling down (default: 5)
-- **workersMin**: 0 = completely scales to zero
-- **workersMax**: Maximum concurrent workers
-
-### GPU Types
-Available GPU options for `LiveServerless`:
-- `GpuGroup.ADA_24` - RTX 4090 (24GB)
-- `GpuGroup.ADA_48_PRO` - RTX 6000 Ada, L40 (48GB)
-- `GpuGroup.AMPERE_80` - A100 (80GB)
-- `GpuGroup.ANY` - Any available GPU
-
-### CPU Types
-Available CPU options for `CpuLiveServerless`:
-- `CpuInstanceType.CPU3G_2_8` - 2 vCPU, 8GB RAM (General Purpose)
-- `CpuInstanceType.CPU3C_4_8` - 4 vCPU, 8GB RAM (Compute Optimized)
-- `CpuInstanceType.CPU5G_4_16` - 4 vCPU, 16GB RAM (Latest Gen)
-- `CpuInstanceType.ANY` - Any available GPU
-
-## Development Workflow
-
-### Test Workers Locally
-```bash
-# Test GPU worker
-python -m workers.gpu.endpoint
-
-# Test CPU worker
-python -m workers.cpu.endpoint
+**Request**:
+```json
+{ "prompt": "string" }
 ```
 
-### Run the Application
-```bash
-flash run
+**Response**:
+```json
+{
+  "prompt": "string",
+  "image_path": "string",
+  "timestamp": "string",
+  "generation_params": {
+    "num_inference_steps": 20,
+    "guidance_scale": 7.5,
+    "width": 512,
+    "height": 512
+  },
+  "message": "Image generated and saved locally!"
+}
 ```
 
-### Deploy to Production
+### GET /cpu/image
+
+**Response**:
+```json
+{ "status": "success", "images": ["file.png"] }
+```
+
+### GET /cpu/image/{file_id}
+
+Returns the PNG file as `image/png`.
+
+## Notes
+
+- The network volume is defined in `workers/__init__.py` and attached to both workers.
+- Stable Diffusion weights are cached in the volume so cold starts are faster after the first run.
+
+## Deployment
+
 ```bash
-# Discover and configure handlers
 flash build
-
-# Create deployment environment
 flash deploy new production
-
-# Deploy to Runpod
 flash deploy send production
 ```
-
-## Adding New Workers
-
-### Add a GPU Worker
-
-1. Create `workers/my_worker/endpoint.py`:
-```python
-from tetra_rp import remote, LiveServerless
-
-config = LiveServerless(name="my_worker")
-
-@remote(resource_config=config, dependencies=["torch"])
-async def my_function(data: dict) -> dict:
-    import torch
-    # Your code here
-    return {"result": "success"}
-```
-
-2. Create `workers/my_worker/__init__.py`:
-```python
-from fastapi import APIRouter
-from .endpoint import my_function
-
-router = APIRouter()
-
-@router.post("/process")
-async def handler(data: dict):
-    return await my_function(data)
-```
-
-3. Add to `main.py`:
-```python
-from workers.my_worker import router as my_router
-app.include_router(my_router, prefix="/my_worker")
-```
-
-### Add a CPU Worker
-
-Same pattern but use `CpuLiveServerless`:
-```python
-from tetra_rp import remote, CpuLiveServerless, CpuInstanceType
-
-config = CpuLiveServerless(
-    name="my_cpu_worker",
-    instanceIds=[CpuInstanceType.CPU3G_2_8]
-)
-
-@remote(resource_config=config, dependencies=["requests"])
-async def fetch_data(url: str) -> dict:
-    import requests
-    return requests.get(url).json()
-```
-
-## Adding Dependencies
-
-Specify dependencies in the `@remote` decorator:
-```python
-@remote(
-    resource_config=config,
-    dependencies=["torch>=2.0.0", "transformers"],  # Python packages
-    system_dependencies=["ffmpeg"]  # System packages
-)
-async def my_function(data: dict) -> dict:
-    # Dependencies are automatically installed
-    import torch
-    import transformers
-```
-
-## Environment Variables
-
-```bash
-# Required
-RUNPOD_API_KEY=your_api_key
-
-# Optional
-PORT=8000
-LOG_LEVEL=INFO
-```
-
-## Next Steps
-
-- Add your ML models or processing logic
-- Configure GPU/CPU resources based on your needs
-- Add authentication to your endpoints
-- Implement error handling and retries
-- Add monitoring and logging
-- Deploy to production with `flash deploy`

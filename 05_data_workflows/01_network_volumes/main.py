@@ -12,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Load the model into app.state
+    # Load the GPU model once and share it across requests.
     logger.info("Loading SimpleSD model...")
     app.state.sd_model = SimpleSD()
     logger.info("Model loaded successfully")
 
     yield
 
-    # Shutdown: Clean up
+    # Clean up resources on shutdown.
     logger.info("Cleaning up resources...")
     if hasattr(app.state, "sd_model"):
         del app.state.sd_model
@@ -33,7 +33,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Include routers
+# Wire GPU and CPU routers into the app.
 app.include_router(gpu_router, prefix="/gpu", tags=["GPU Workers"])
 app.include_router(cpu_router, prefix="/cpu", tags=["CPU Workers"])
 
@@ -56,7 +56,9 @@ if __name__ == "__main__":
 
     port = int(os.getenv("PORT", 8888))
     logger.info(f"Starting Flash server on port {port}")
-    logger.info(f"Try generating an image with a prompt by sending a POST request to http://localhost:8888/generate")
+    logger.info(
+        f"Try generating an image with a prompt by sending a POST request to http://localhost:8888/generate"
+    )
     logger.info(f"List generated images by querying /images")
 
     uvicorn.run(app, host="0.0.0.0", port=port)

@@ -1,5 +1,5 @@
 ## GPU worker with network volumes
-# In this example, we'll use a GPU worker with a stable diffusion pipieline to generate images.
+# In this example, a GPU worker runs Stable Diffusion and writes outputs to the shared volume.
 from tetra_rp import GpuGroup, LiveServerless, remote
 import logging
 
@@ -25,13 +25,15 @@ class SimpleSD:
     def __init__(self):
         import gc
         import os
+        import logging
 
         import torch
         from diffusers import StableDiffusionPipeline
 
+        self.logger = logging.getLogger(__name__)
         model_path = os.getenv("MODEL_PATH")
 
-        logger.info("Initializing compact Stable Diffusion model...")
+        self.logger.info("Initializing compact Stable Diffusion model...")
 
         self.pipe = StableDiffusionPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
@@ -42,7 +44,7 @@ class SimpleSD:
             low_cpu_mem_usage=True,  # Additional memory optimization
         )
 
-        # Move to GPU and optimize
+        # Move to GPU and enable small memory optimizations.
         self.pipe = self.pipe.to("cuda")
         self.pipe.enable_attention_slicing()  # Additional memory saving
 
@@ -50,12 +52,12 @@ class SimpleSD:
         gc.collect()
         torch.cuda.empty_cache()
 
-        logger.info("Compact Stable Diffusion initialized successfully!")
-        logger.info(f"Model weights stored in {model_path}: {os.listdir(model_path)}")
+        self.logger.info("Compact Stable Diffusion initialized successfully!")
+        self.logger.info(f"Model weights stored in {model_path}: {os.listdir(model_path)}")
 
-    def generate_image(self, prompt: str):
-        """Generate a single image from prompt"""
-        logger.info(f"Generating image for: '{prompt}'")
+    async def generate_image(self, prompt: str) -> dict:
+        """Generate a single image from prompt."""
+        self.logger.info(f"Generating image for: '{prompt}'")
 
         image = self.pipe(
             prompt=prompt,
@@ -65,19 +67,19 @@ class SimpleSD:
             height=512,
         ).images[0]
 
-        # Create output directory if it doesn't exist
+        # Save output into the shared volume for the CPU worker to read.
         import datetime
         import os
 
         output_dir = "/runpod-volume/generated_images"
         os.makedirs(output_dir, exist_ok=True)
 
-        # Save image locally with timestamp
+        # Save image locally with timestamp.
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         image_filename = f"sd_generated_{timestamp}.png"
         image_path = os.path.join(output_dir, image_filename)
         image.save(image_path)
-        logger.info(f"Image saved to: {image_path}")
+        self.logger.info(f"Image saved to: {image_path}")
 
         # Create response data
         response_data = {
