@@ -57,8 +57,8 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8888))
     logger.info(f"Starting Flash server on port {port}")
     logger.info(
-        f"Try generating an image with a prompt by sending a POST request to http://localhost:8888/generate"
+        "Try generating an image with a prompt by sending a POST request to http://localhost:8888/generate"
     )
-    logger.info(f"List generated images by querying /images")
+    logger.info("List generated images by querying /images")
 
     uvicorn.run(app, host="0.0.0.0", port=port)

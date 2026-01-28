@@ -1,7 +1,8 @@
 ## GPU worker with network volumes
 # In this example, a GPU worker runs Stable Diffusion and writes outputs to the shared volume.
-from tetra_rp import GpuGroup, LiveServerless, remote
 import logging
+
+from tetra_rp import GpuGroup, LiveServerless, remote
 
 from .. import volume
 
@@ -24,8 +25,8 @@ gpu_config = LiveServerless(
 class SimpleSD:
     def __init__(self):
         import gc
-        import os
         import logging
+        import os
 
         import torch
         from diffusers import StableDiffusionPipeline

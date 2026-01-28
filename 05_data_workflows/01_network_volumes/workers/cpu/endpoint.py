@@ -1,4 +1,5 @@
 from fastapi.exceptions import HTTPException
+from fastapi.responses import Response
 
 from tetra_rp import CpuInstanceType, CpuLiveServerless, remote
 
@@ -9,7 +10,7 @@ cpu_config = CpuLiveServerless(
     instanceIds=[CpuInstanceType.ANY],
     workersMin=0,
     workersMax=2,
-    idleTimeout=60*5,
+    idleTimeout=60 * 5,
     env={"LOG_LEVEL": "DEBUG"},
     networkVolume=volume,
 )
@@ -32,6 +33,7 @@ async def list_images_in_volume() -> dict:
 @remote(resource_config=cpu_config, dependencies=["fastapi"])
 async def get_image_from_volume(file_id: str) -> "Response":
     from pathlib import Path
+
     from fastapi.responses import Response
 
     image_path = Path(f"/runpod-volume/generated_images/{file_id}")

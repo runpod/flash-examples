@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
 
 from .endpoint import get_image_from_volume, list_images_in_volume
 
