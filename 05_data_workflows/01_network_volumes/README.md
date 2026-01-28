@@ -52,6 +52,8 @@ curl http://localhost:8888/cpu/image/<file_id> --output image.png
 
 Visit `http://localhost:8888/docs` for interactive API documentation.
 
+Browse the image gallery at `http://localhost:8888/cpu/`.
+
 ## What You'll Learn
 
 - How to attach a shared `NetworkVolume` to GPU and CPU workers
