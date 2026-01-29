@@ -7,10 +7,8 @@ from .. import volume
 
 cpu_config = CpuLiveServerless(
     name="cpu_worker",
-    instanceIds=[CpuInstanceType.ANY],
     workersMin=0,
     workersMax=2,
-    idleTimeout=60 * 5,
     env={"LOG_LEVEL": "DEBUG"},
     networkVolume=volume,
 )
