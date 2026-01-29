@@ -1,5 +1,5 @@
 [project]
-name = "02_cpu_worker"
+name = "01_hello_world"
 version = "0.1.0"
 description = "Getting started with GPU workers"
 requires-python = ">=3.10"

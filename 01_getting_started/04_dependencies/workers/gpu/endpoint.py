@@ -3,7 +3,7 @@ from tetra_rp import GpuGroup, LiveServerless, remote
 # Worker with ML dependencies (versioned)
 ml_config = LiveServerless(
     name="01_04_deps_ml",
-    gpus=[GpuGroup.ADA_24],
+    gpus=[GpuGroup.ADA_32_PRO],
     workersMin=0,
     workersMax=2,
 )
@@ -11,7 +11,7 @@ ml_config = LiveServerless(
 # Worker with system dependencies
 system_deps_config = LiveServerless(
     name="01_04_deps_system",
-    gpus=[GpuGroup.ADA_24],
+    gpus=[GpuGroup.AMPERE_16],
     workersMin=0,
     workersMax=2,
 )
