@@ -9,7 +9,6 @@ cpu_config = CpuLiveServerless(
     name="cpu_worker",
     workersMin=0,
     workersMax=2,
-    env={"LOG_LEVEL": "DEBUG"},
     networkVolume=volume,
 )
 
