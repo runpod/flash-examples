@@ -234,13 +234,7 @@ if __name__ == "__main__":
 ```python
 from tetra_rp import remote, LiveServerless, GpuGroup
 
-config = LiveServerless(
-    name="your_worker",
-    gpus=[GpuGroup.ADA_24],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
-)
+config = LiveServerless(name="your_worker")
 
 @remote(resource_config=config, dependencies=["torch"])
 async def your_function(input_data: dict) -> dict:
@@ -514,8 +508,7 @@ version = "0.1.0"
 description = "Brief description"
 requires-python = ">=3.12"
 dependencies = [
-    "tetra_rp>=1.2.0",
-    "fastapi>=0.104.0",
+    "tetra_rp",
 ]
 ```
 

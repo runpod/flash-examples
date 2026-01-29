@@ -3,7 +3,7 @@ from tetra_rp import CpuInstanceType, CpuLiveServerless, remote
 # Worker with data science dependencies
 data_config = CpuLiveServerless(
     name="01_04_deps_data",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],
+    instanceIds=[CpuInstanceType.CPU3C_8_16],
     workersMin=0,
     workersMax=3,
 )
@@ -11,7 +11,7 @@ data_config = CpuLiveServerless(
 # Worker with minimal dependencies
 minimal_config = CpuLiveServerless(
     name="01_04_deps_minimal",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],
+    instanceIds=[CpuInstanceType.CPU3C_1_2],
     workersMin=0,
     workersMax=3,
 )

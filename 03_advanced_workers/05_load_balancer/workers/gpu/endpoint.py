@@ -1,9 +1,8 @@
-from tetra_rp import GpuGroup, LiveLoadBalancer, remote
+from tetra_rp import LiveLoadBalancer, remote
 
 gpu_config = LiveLoadBalancer(
     name="03_05_load_balancer_gpu",
     workersMin=1,
-    gpus=[GpuGroup.ANY],
 )
 
 

@@ -1,25 +1,14 @@
 from tetra_rp import CpuInstanceType, CpuLiveServerless, remote
 
 # Preprocessing CPU worker (fast, cheap)
-preprocess_config = CpuLiveServerless(
-    name="01_03_mixed_preprocess",
+cpu_config = CpuLiveServerless(
+    name="01_03_mixed_workers_cpu",
     instanceIds=[CpuInstanceType.CPU3G_2_8],  # Small instance - 2 vCPU, 8GB
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=3,
-)
-
-# Postprocessing CPU worker (fast, cheap)
-postprocess_config = CpuLiveServerless(
-    name="01_03_mixed_postprocess",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],  # Small instance - 2 vCPU, 8GB
-    workersMin=0,
-    workersMax=3,
     idleTimeout=3,
 )
 
 
-@remote(resource_config=preprocess_config)
+@remote(resource_config=cpu_config)
 async def preprocess_text(input_data: dict) -> dict:
     """
     Preprocessing on CPU: cleaning and tokenization.
@@ -57,7 +46,7 @@ async def preprocess_text(input_data: dict) -> dict:
     }
 
 
-@remote(resource_config=postprocess_config)
+@remote(resource_config=cpu_config)
 async def postprocess_results(input_data: dict) -> dict:
     """
     Postprocessing on CPU: formatting, aggregation, logging.
