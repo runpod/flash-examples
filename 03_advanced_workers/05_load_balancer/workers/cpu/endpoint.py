@@ -1,12 +1,7 @@
-from tetra_rp import CpuInstanceType, CpuLiveLoadBalancer, PodTemplate, remote
-
-VALID_OPERATIONS = ["uppercase", "lowercase", "reverse", "title"]
+from tetra_rp import CpuLiveLoadBalancer, remote
 
 cpu_config = CpuLiveLoadBalancer(
     name="03_05_load_balancer_cpu",
-    workersMin=1,
-    instanceIds=[CpuInstanceType.CPU3C_1_2],
-    template=PodTemplate(containerDiskInGb=10),
 )
 
 
@@ -70,8 +65,10 @@ async def transform_data(text: str, operation: str = "uppercase") -> dict:
     if not text or not text.strip():
         raise ValueError("text cannot be empty")
 
-    if operation not in VALID_OPERATIONS:
-        raise ValueError(f"operation must be one of: {', '.join(VALID_OPERATIONS)}")
+    valid_operations = ["uppercase", "lowercase", "reverse", "title"]
+
+    if operation not in valid_operations:
+        raise ValueError(f"operation must be one of: {', '.join(valid_operations)}")
 
     start_time = time.time()
     result = ""
