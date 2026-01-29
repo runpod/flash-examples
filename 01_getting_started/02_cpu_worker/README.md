@@ -112,7 +112,6 @@ The CPU worker scales to zero when idle:
 
 ### CPU Instance Types
 Available CPU configurations:
-- `CpuInstanceType.ANY`: Any available CPU (flexible, lower cost)
 - `CpuInstanceType.CPU3G_2_8`: 2 vCPU, 8GB RAM (General Purpose)
 - `CpuInstanceType.CPU3C_4_8`: 4 vCPU, 8GB RAM (Compute Optimized)
 - `CpuInstanceType.CPU5G_4_16`: 4 vCPU, 16GB RAM (Latest Gen)
@@ -146,7 +145,7 @@ Compare with GPU workers when you need:
 
 ## Next Steps
 
-- Customize CPU type: Change `CpuInstanceType.ANY` to specific instance type
+- Customize CPU type: Change `CpuInstanceType.CPU3G_2_8` to specific instance type
 - Add request validation and error handling
 - Integrate with databases or external APIs
 - Deploy to production with `flash deploy`
