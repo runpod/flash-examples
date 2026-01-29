@@ -29,9 +29,9 @@ backports-zstd==1.3.0
     # via aiohttp
 bcrypt==5.0.0
     # via paramiko
-boto3==1.42.29
+boto3==1.42.38
     # via runpod
-botocore==1.42.29
+botocore==1.42.38
     # via
     #   boto3
     #   s3transfer
@@ -111,7 +111,7 @@ itsdangerous==2.2.0
     # via fastapi
 jinja2==3.1.6
     # via fastapi
-jmespath==1.0.1
+jmespath==1.1.0
     # via
     #   boto3
     #   botocore
@@ -121,17 +121,17 @@ markupsafe==3.0.3
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
-multidict==6.7.0
+multidict==6.7.1
     # via
     #   aiohttp
     #   yarl
 numpy==2.4.1
     # via runpod-flash-examples (pyproject.toml)
-orjson==3.11.5
+orjson==3.11.6
     # via fastapi
 paramiko==4.0.0
     # via runpod
-pathspec==1.0.3
+pathspec==1.0.4
     # via tetra-rp
 pfzy==0.3.4
     # via inquirerpy
@@ -151,7 +151,7 @@ py-cpuinfo==9.0.0
     # via runpod
 pycares==5.0.1
     # via aiodns
-pycparser==2.23
+pycparser==3.0
     # via cffi
 pydantic==2.12.5
     # via
@@ -177,7 +177,7 @@ python-dotenv==1.2.1
     #   pydantic-settings
     #   tetra-rp
     #   uvicorn
-python-multipart==0.0.21
+python-multipart==0.0.22
     # via
     #   runpod-flash-examples (pyproject.toml)
     #   fastapi
@@ -189,12 +189,12 @@ questionary==2.1.1
     # via tetra-rp
 requests==2.32.5
     # via runpod
-rich==14.2.0
+rich==14.3.1
     # via
     #   rich-toolkit
     #   tetra-rp
     #   typer
-rich-toolkit==0.17.1
+rich-toolkit==0.17.2
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
@@ -204,7 +204,7 @@ runpod==1.8.1
     # via tetra-rp
 s3transfer==0.16.0
     # via boto3
-sentry-sdk==2.49.0
+sentry-sdk==2.51.0
     # via fastapi-cloud-cli
 shellingham==1.5.4
     # via typer
@@ -214,7 +214,7 @@ starlette==0.50.0
     # via fastapi
 structlog==25.5.0
     # via runpod-flash-examples (pyproject.toml)
-tetra-rp==0.20.0
+tetra-rp==0.23.0
     # via runpod-flash-examples (pyproject.toml)
 tomli==2.4.0
     # via runpod
@@ -264,7 +264,7 @@ watchdog==6.0.0
     # via runpod
 watchfiles==1.1.1
     # via uvicorn
-wcwidth==0.2.14
+wcwidth==0.5.2
     # via
     #   prettytable
     #   prompt-toolkit
