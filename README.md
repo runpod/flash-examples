@@ -57,6 +57,50 @@ This checks:
 - **With pip**: `pip install -e .`
 - **With poetry**: `poetry install`
 
+**Using Without uv (pip/poetry/pipenv/conda):**
+
+If you don't have `uv` installed, the setup automatically falls back to other available package managers in this order:
+1. poetry
+2. pipenv
+3. pip (standard Python package manager)
+4. conda
+
+No additional setup needed—`make setup` automatically detects and uses the appropriate manager.
+
+To explicitly use a specific package manager:
+
+```bash
+# Force pip usage
+PKG_MANAGER=pip make setup
+
+# Force poetry
+PKG_MANAGER=poetry make setup
+
+# Force conda
+PKG_MANAGER=conda make setup
+```
+
+**For pip Users Specifically:**
+
+If only pip is available:
+
+```bash
+# 1. Setup environment (automatically uses pip)
+make setup
+
+# 2. The setup creates .venv directory and installs dependencies
+
+# 3. Activate the environment
+source .venv/bin/activate
+
+# 4. Run Flash examples
+flash run
+
+# 5. Visit http://localhost:8888/docs
+```
+
+The activation step is only needed for pip/conda. With `uv`, poetry, or pipenv, just run `flash run` directly after setup.
+
 **Note**: After running `make setup`, all example dependencies are installed. You can navigate to any example directory and run `flash run` immediately.
 
 For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
