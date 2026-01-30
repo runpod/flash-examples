@@ -33,11 +33,11 @@ export RUNPOD_API_KEY=your_key_here
 # echo "RUNPOD_API_KEY=your_key_here" > .env
 
 # Option A: Run all examples from the unified app (recommended)
-flash run
+uv run flash run
 
 # Option B: Run individual examples
 cd 01_getting_started/01_hello_world
-flash run
+uv run flash run
 
 # Visit http://localhost:8888/docs
 ```
