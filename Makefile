@@ -203,28 +203,12 @@ endif
 	@$(MAKE) verify-setup
 	@echo ""
 	@echo "Next steps:"
-ifeq ($(PKG_MANAGER),uv)
 	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
-	@echo "  2. Run the unified Flash examples:  uv run flash run"
-	@echo "  3. Visit:                           http://localhost:8888"
-else ifeq ($(PKG_MANAGER),poetry)
-	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
-	@echo "  2. Run the unified Flash examples:  poetry run flash run"
-	@echo "  3. Visit:                           http://localhost:8888"
-else ifeq ($(PKG_MANAGER),pipenv)
-	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
-	@echo "  2. Run the unified Flash examples:  pipenv run flash run"
-	@echo "  3. Visit:                           http://localhost:8888"
-else ifeq ($(PKG_MANAGER),conda)
-	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
-	@echo "  2. Run the unified Flash examples:  conda run -p ./.venv flash run"
-	@echo "  3. Visit:                           http://localhost:8888"
-else
-	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
-	@echo "  2. Activate environment:            source .venv/bin/activate"
+	@echo "  2. Activate environment:"
+	@echo "     Unix/macOS: source .venv/bin/activate"
+	@echo "     Windows:    .venv\Scripts\activate"
 	@echo "  3. Run the unified Flash examples:  flash run"
 	@echo "  4. Visit:                           http://localhost:8888"
-endif
 	@echo ""
 	@echo "Additional commands:"
 	@echo "  make help           - Show all available commands"

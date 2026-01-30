@@ -533,15 +533,17 @@ ENV_MANAGER=pip make setup
 
 **Run commands directly:**
 
+You can either use package manager prefixes or activate the environment first:
+
 ```bash
-# With uv
-uv run ruff check .
+# Option 1: Use package manager prefix
+uv run ruff check .          # With uv
+poetry run ruff check .      # With poetry
 
-# With venv
-.venv/bin/ruff check .
-
-# With poetry
-poetry run ruff check .
+# Option 2: Activate environment first (works with all managers)
+source .venv/bin/activate   # Unix/macOS
+.venv\Scripts\activate      # Windows
+ruff check .
 ```
 
 ### Import Errors
