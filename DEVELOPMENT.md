@@ -27,7 +27,7 @@ The project Makefile auto-detects your package manager and sets up the environme
 ```bash
 git clone https://github.com/runpod/flash-examples.git
 cd flash-examples
-make dev
+make setup
 ```
 
 This works with any of these package managers:
@@ -39,7 +39,7 @@ This works with any of these package managers:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Setup project
-make dev
+make setup
 ```
 
 **What it does:**
@@ -51,7 +51,7 @@ make dev
 
 ```bash
 # Setup project (creates venv automatically)
-make dev
+make setup
 ```
 
 **What it does:**
@@ -66,7 +66,7 @@ make dev
 curl -sSL https://install.python-poetry.org | python3 -
 
 # Setup project
-make dev
+make setup
 ```
 
 **What it does:**
@@ -78,7 +78,7 @@ make dev
 
 ```bash
 # Setup project
-make dev
+make setup
 ```
 
 **What it does:**
@@ -93,7 +93,7 @@ make dev
 pip install pipenv
 
 # Setup project
-make dev
+make setup
 ```
 
 **What it does:**
@@ -106,11 +106,42 @@ make dev
 Force a specific package manager:
 
 ```bash
-ENV_MANAGER=pip make dev
-ENV_MANAGER=conda make dev
+ENV_MANAGER=pip make setup
+ENV_MANAGER=conda make setup
 ```
 
-### Check Your Setup
+### Verify Your Setup
+
+Check that everything is configured correctly:
+
+```bash
+make verify-setup
+```
+
+**Output:**
+```
+═══════════════════════════════════════════════════════════════
+  Flash Examples - Setup Verification
+═══════════════════════════════════════════════════════════════
+
+→ Checking Python version...
+  ✓ Python 3.12.1 (>= 3.10 required)
+
+→ Checking virtual environment...
+  ✓ Virtual environment exists (.venv)
+
+→ Checking Flash CLI...
+  ✓ Flash CLI installed (flash, version 0.1.0)
+
+→ Checking RUNPOD_API_KEY...
+  ✓ RUNPOD_API_KEY set in environment
+
+═══════════════════════════════════════════════════════════════
+  Setup verification complete!
+═══════════════════════════════════════════════════════════════
+```
+
+### Check Environment Manager Status
 
 ```bash
 make venv-info
@@ -138,7 +169,8 @@ Shows all available commands with your detected environment manager.
 
 | Command | Description |
 |---------|-------------|
-| `make dev` | Setup development environment (auto-detects package manager) |
+| `make setup` | Setup development environment (auto-detects package manager) |
+| `make verify-setup` | Verify environment is configured correctly |
 | `make venv-info` | Display environment manager and venv status |
 | `make clean-venv` | Remove `.venv` directory |
 | `make update-deps` | Update dependencies to latest versions |
@@ -189,7 +221,7 @@ Shows all available commands with your detected environment manager.
 # Clone and setup
 git clone https://github.com/runpod/flash-examples.git
 cd flash-examples
-make dev
+make setup
 
 # Verify setup
 make venv-info
@@ -356,7 +388,7 @@ dependencies = [
 uv sync
 
 # With other managers
-make dev
+make setup
 ```
 
 **3. Generate dependency files:**
@@ -417,7 +449,7 @@ make clean-venv
 **Fresh start:**
 ```bash
 make clean-venv
-make dev
+make setup
 ```
 
 ## Troubleshooting
@@ -446,7 +478,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ```bash
 make clean-venv
-make dev
+make setup
 ```
 
 **Dependencies out of sync:**
@@ -460,7 +492,7 @@ pip install -r requirements.txt
 
 # Or recreate
 make clean-venv
-make dev
+make setup
 ```
 
 ### Quality Checks Failing
@@ -496,7 +528,7 @@ make venv-info
 **Force specific manager:**
 
 ```bash
-ENV_MANAGER=pip make dev
+ENV_MANAGER=pip make setup
 ```
 
 **Run commands directly:**
@@ -524,7 +556,7 @@ uv pip install -e .
 pip install -e .
 
 # Or use Makefile
-make dev
+make setup
 ```
 
 **Wrong virtual environment activated:**

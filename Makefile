@@ -1,4 +1,4 @@
-.PHONY: help venv-info dev consolidate-deps check-deps sync-deps update-deps clean clean-venv lint lint-fix format format-check typecheck quality-check quality-check-strict ci-quality-github
+.PHONY: help venv-info setup dev verify-setup consolidate-deps check-deps sync-deps update-deps clean clean-venv lint lint-fix format format-check typecheck quality-check quality-check-strict ci-quality-github
 
 # ============================================================================
 # Environment Manager Auto-Detection
@@ -69,16 +69,86 @@ help: # Show this help menu with detected environment
 	@echo ""
 	@echo "Detected Package Manager: $(PKG_MANAGER)"
 	@echo ""
+	@echo "Getting Started:"
+	@echo "  make setup          - Setup development environment (recommended)"
+	@echo "  make verify-setup   - Verify environment is configured correctly"
+	@echo ""
 	@echo "Available make commands:"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*# "; printf "  %-25s %s\n", "Target", "Description"} /^[a-zA-Z_-]+:.*# / {printf "  %-25s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "Override detected manager: ENV_MANAGER=pip make dev"
+	@echo "Override detected manager: ENV_MANAGER=pip make setup"
 	@echo "═══════════════════════════════════════════════════════════════"
 
 # ============================================================================
 # Environment Setup
 # ============================================================================
+
+.setup-env: # Internal: Setup .env file from .env.example if needed
+	@if [ ! -f ".env" ] && [ -f ".env.example" ]; then \
+		echo "→ Creating .env file from .env.example..."; \
+		cp .env.example .env; \
+		echo "  ✓ .env file created"; \
+		echo ""; \
+		echo "  ⚠ IMPORTANT: Add your Runpod API key to .env file"; \
+		echo "    Get your key from: https://www.runpod.io/console/user/settings"; \
+		echo "    Edit .env and replace 'your_api_key_here' with your actual key"; \
+		echo ""; \
+	elif [ -f ".env" ]; then \
+		echo "  ✓ .env file already exists"; \
+	fi
+
+verify-setup: # Verify development environment is correctly configured
+	@echo "═══════════════════════════════════════════════════════════════"
+	@echo "  Flash Examples - Setup Verification"
+	@echo "═══════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "→ Checking Python version..."
+	@python_version=$$($(PYTHON) --version 2>&1 | awk '{print $$2}'); \
+	major=$$(echo "$$python_version" | cut -d. -f1); \
+	minor=$$(echo "$$python_version" | cut -d. -f2); \
+	if [ "$$major" -gt 3 ] || ([ "$$major" -eq 3 ] && [ "$$minor" -ge 10 ]); then \
+		echo "  ✓ Python $$python_version (>= 3.10 required)"; \
+	else \
+		echo "  ✗ Python $$python_version (>= 3.10 required)"; \
+		echo "    Please upgrade Python to 3.10 or later"; \
+		exit 1; \
+	fi
+	@echo ""
+	@echo "→ Checking virtual environment..."
+	@if [ -d ".venv" ]; then \
+		echo "  ✓ Virtual environment exists (.venv)"; \
+	else \
+		echo "  ✗ Virtual environment not found"; \
+		echo "    Run 'make setup' to create it"; \
+		exit 1; \
+	fi
+	@echo ""
+	@echo "→ Checking Flash CLI..."
+	@if $(PYTHON_RUN) flash --version > /dev/null 2>&1; then \
+		flash_version=$$($(PYTHON_RUN) flash --version 2>&1); \
+		echo "  ✓ Flash CLI installed ($$flash_version)"; \
+	else \
+		echo "  ✗ Flash CLI not available"; \
+		echo "    Run 'make setup' to install it"; \
+		exit 1; \
+	fi
+	@echo ""
+	@echo "→ Checking RUNPOD_API_KEY..."
+	@if [ -n "$$RUNPOD_API_KEY" ]; then \
+		echo "  ✓ RUNPOD_API_KEY set in environment"; \
+	elif [ -f ".env" ] && grep -q "RUNPOD_API_KEY=" .env && ! grep -q "RUNPOD_API_KEY=your_api_key_here" .env; then \
+		echo "  ✓ RUNPOD_API_KEY found in .env file"; \
+	else \
+		echo "  ⚠ RUNPOD_API_KEY not configured"; \
+		echo "    Set it with: export RUNPOD_API_KEY=your_key_here"; \
+		echo "    Or add to .env file"; \
+		echo "    Get key from: https://www.runpod.io/console/user/settings"; \
+	fi
+	@echo ""
+	@echo "═══════════════════════════════════════════════════════════════"
+	@echo "  Setup verification complete!"
+	@echo "═══════════════════════════════════════════════════════════════"
 
 venv-info: # Display environment manager and virtual environment status
 	@echo "Package Manager: $(PKG_MANAGER)"
@@ -92,8 +162,9 @@ venv-info: # Display environment manager and virtual environment status
 		echo "Virtual Environment: Not found"; \
 	fi
 
-dev: # Install development dependencies and package in editable mode
+setup: .setup-env # Setup development environment with verification
 	@echo "Setting up development environment with $(PKG_MANAGER)..."
+	@echo ""
 ifeq ($(PKG_MANAGER),uv)
 	@if [ ! -d ".venv" ]; then uv venv; fi
 	uv sync --all-groups
@@ -129,29 +200,39 @@ else ifeq ($(PKG_MANAGER),pip)
 endif
 	@echo "✓ Development environment ready!"
 	@echo ""
+	@$(MAKE) verify-setup
+	@echo ""
 	@echo "Next steps:"
 ifeq ($(PKG_MANAGER),uv)
-	@echo "  1. Run the unified Flash examples:  uv run flash run"
-	@echo "  2. Visit:                           http://localhost:8888"
-else ifeq ($(PKG_MANAGER),poetry)
-	@echo "  1. Run the unified Flash examples:  poetry run flash run"
-	@echo "  2. Visit:                           http://localhost:8888"
-else ifeq ($(PKG_MANAGER),pipenv)
-	@echo "  1. Run the unified Flash examples:  pipenv run flash run"
-	@echo "  2. Visit:                           http://localhost:8888"
-else ifeq ($(PKG_MANAGER),conda)
-	@echo "  1. Run the unified Flash examples:  conda run -p ./.venv flash run"
-	@echo "  2. Visit:                           http://localhost:8888"
-else
-	@echo "  1. Activate environment:            source .venv/bin/activate"
-	@echo "  2. Run the unified Flash examples:  flash run"
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Run the unified Flash examples:  uv run flash run"
 	@echo "  3. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),poetry)
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Run the unified Flash examples:  poetry run flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),pipenv)
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Run the unified Flash examples:  pipenv run flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),conda)
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Run the unified Flash examples:  conda run -p ./.venv flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+else
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Activate environment:            source .venv/bin/activate"
+	@echo "  3. Run the unified Flash examples:  flash run"
+	@echo "  4. Visit:                           http://localhost:8888"
 endif
 	@echo ""
 	@echo "Additional commands:"
-	@echo "  make help       - Show all available commands"
-	@echo "  make lint       - Check code quality"
-	@echo "  make format     - Format code"
+	@echo "  make help           - Show all available commands"
+	@echo "  make verify-setup   - Re-run setup verification"
+	@echo "  make lint           - Check code quality"
+	@echo "  make format         - Format code"
+
+dev: setup # Alias for 'make setup' (backward compatibility)
 
 # ============================================================================
 # Dependency File Generation
