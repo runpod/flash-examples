@@ -29,9 +29,9 @@ backports-zstd==1.3.0
     # via aiohttp
 bcrypt==5.0.0
     # via paramiko
-boto3==1.42.38
+boto3==1.42.39
     # via runpod
-botocore==1.42.38
+botocore==1.42.39
     # via
     #   boto3
     #   s3transfer
@@ -220,7 +220,7 @@ tomli==2.4.0
     # via runpod
 tomlkit==0.14.0
     # via runpod
-tqdm==4.67.1
+tqdm==4.67.2
     # via tqdm-loggable
 tqdm-loggable==0.2
     # via runpod

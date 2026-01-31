@@ -20,37 +20,105 @@ Flash is a CLI tool and framework from the `tetra_rp` package that enables you t
 git clone https://github.com/runpod/flash-examples.git
 cd flash-examples
 
-# Install dependencies (works with uv, pip, poetry, conda, or pipenv)
-make dev
+# Setup development environment (auto-detects package manager)
+make setup
 
-# Set your API key (choose one method):
+# The setup will:
+# - Create virtual environment
+# - Install all dependencies
+# - Create .env file from template
+# - Verify your setup
 
-# Option A: Export in shell (recommended for trying multiple examples)
-export RUNPOD_API_KEY=your_key_here
+# Add your API key to .env file
+# Get your key from: https://www.runpod.io/console/user/settings
+nano .env  # or use your preferred editor
 
-# Option B: Create .env file per example (if you prefer per-example config)
-# cd 01_getting_started/01_hello_world
-# echo "RUNPOD_API_KEY=your_key_here" > .env
-
-# Option A: Run all examples from the unified app (recommended)
-flash run
-
-# Option B: Run individual examples
-cd 01_getting_started/01_hello_world
+# Run all examples from the unified app (recommended)
 flash run
 
 # Visit http://localhost:8888/docs
 ```
 
-**Unified App (Recommended)**: Running `flash run` from the root directory automatically discovers and loads all examples into a single FastAPI application. This allows you to explore all examples from one place without switching directories.
+**Verification:**
+After setup, verify your environment is correct:
+```bash
+make verify-setup
+```
 
-**Note**: After running `make dev`, all example dependencies are installed. You can navigate to any example directory and run `flash run` immediately. The exported API key persists in your shell session across all examples.
+This checks:
+- Python version (3.10+ required)
+- Virtual environment exists
+- Flash CLI is installed
+- API key is configured
 
 **Alternative Setup Methods:**
-- **With Makefile**: `make dev` (auto-detects your package manager)
+- **With Makefile**: `make setup` (auto-detects your package manager)
 - **With uv**: `uv sync && uv pip install -e .`
 - **With pip**: `pip install -e .`
 - **With poetry**: `poetry install`
+
+**Using Different Package Managers:**
+
+The setup automatically detects and uses your available package manager in this order:
+1. uv
+2. poetry
+3. pipenv
+4. pip (standard Python package manager)
+5. conda
+
+To explicitly use a specific package manager:
+
+```bash
+# Force pip usage
+PKG_MANAGER=pip make setup
+
+# Force poetry
+PKG_MANAGER=poetry make setup
+
+# Force conda
+PKG_MANAGER=conda make setup
+```
+
+**Running Flash Examples:**
+
+After `make setup` completes, you can run Flash in two ways:
+
+**Option A: Using Package Manager Prefix (recommended for uv/poetry/pipenv/conda)**
+
+With uv, poetry, pipenv, or conda, run commands with the package manager prefix without activation:
+
+```bash
+# With uv
+uv run flash run
+
+# With poetry
+poetry run flash run
+
+# With pipenv
+pipenv run flash run
+
+# With conda
+conda run -p ./.venv flash run
+```
+
+**Option B: Activate Virtual Environment (works with all managers)**
+
+Alternatively, activate the virtual environment first:
+
+```bash
+# Unix/macOS
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
+# Then run normally
+flash run
+```
+
+Once activated, you can run Flash and other commands directly without a prefix.
+
+**Note**: After running `make setup`, all example dependencies are installed. You can navigate to any example directory and run `flash run` immediately. The `make setup` command will show you the recommended next steps based on your detected package manager.
 
 For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 

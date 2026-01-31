@@ -28,7 +28,7 @@ jobs:
           cache-dependency-glob: "uv.lock"
 
       - name: Install dependencies
-        run: make dev
+        run: make setup
 
       - name: Check dependency sync
         run: |
