@@ -79,9 +79,31 @@ PKG_MANAGER=poetry make setup
 PKG_MANAGER=conda make setup
 ```
 
-**Activating Your Environment:**
+**Running Flash Examples:**
 
-After `make setup` completes, activate the virtual environment:
+After `make setup` completes, you can run Flash in two ways:
+
+**Option A: Using Package Manager Prefix (recommended for uv/poetry/pipenv/conda)**
+
+With uv, poetry, pipenv, or conda, run commands with the package manager prefix without activation:
+
+```bash
+# With uv
+uv run flash run
+
+# With poetry
+poetry run flash run
+
+# With pipenv
+pipenv run flash run
+
+# With conda
+conda run -p ./.venv flash run
+```
+
+**Option B: Activate Virtual Environment (works with all managers)**
+
+Alternatively, activate the virtual environment first:
 
 ```bash
 # Unix/macOS
@@ -89,20 +111,14 @@ source .venv/bin/activate
 
 # Windows
 .venv\Scripts\activate
-```
 
-Once activated, you can run Flash directly:
-
-```bash
-# Run Flash examples
+# Then run normally
 flash run
-
-# Visit http://localhost:8888/docs
 ```
 
-The activation step is the same regardless of which package manager you use (uv, pip, poetry, pipenv, or conda).
+Once activated, you can run Flash and other commands directly without a prefix.
 
-**Note**: After running `make setup`, all example dependencies are installed. You can navigate to any example directory and run `flash run` immediately.
+**Note**: After running `make setup`, all example dependencies are installed. You can navigate to any example directory and run `flash run` immediately. The `make setup` command will show you the recommended next steps based on your detected package manager.
 
 For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 

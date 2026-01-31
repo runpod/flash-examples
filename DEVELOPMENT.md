@@ -106,8 +106,8 @@ make setup
 Force a specific package manager:
 
 ```bash
-ENV_MANAGER=pip make setup
-ENV_MANAGER=conda make setup
+PKG_MANAGER=pip make setup
+PKG_MANAGER=conda make setup
 ```
 
 ### Verify Your Setup
@@ -528,7 +528,7 @@ make venv-info
 **Force specific manager:**
 
 ```bash
-ENV_MANAGER=pip make setup
+PKG_MANAGER=pip make setup
 ```
 
 **Run commands directly:**

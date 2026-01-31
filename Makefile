@@ -12,7 +12,7 @@ HAS_PIPENV := $(shell command -v pipenv 2> /dev/null)
 HAS_PIP := $(shell command -v pip 2> /dev/null)
 HAS_CONDA := $(shell command -v conda 2> /dev/null)
 
-# Detect which package manager to use (can be overridden with ENV_MANAGER=pip)
+# Detect which package manager to use (can be overridden with PKG_MANAGER=pip)
 ifndef PKG_MANAGER
 ifdef HAS_UV
 PKG_MANAGER := uv
@@ -77,7 +77,7 @@ help: # Show this help menu with detected environment
 	@echo ""
 	@awk 'BEGIN {FS = ":.*# "; printf "  %-25s %s\n", "Target", "Description"} /^[a-zA-Z_-]+:.*# / {printf "  %-25s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "Override detected manager: ENV_MANAGER=pip make setup"
+	@echo "Override detected manager: PKG_MANAGER=pip make setup"
 	@echo "═══════════════════════════════════════════════════════════════"
 
 # ============================================================================
@@ -203,12 +203,28 @@ endif
 	@$(MAKE) verify-setup
 	@echo ""
 	@echo "Next steps:"
+ifeq ($(PKG_MANAGER),uv)
 	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
-	@echo "  2. Activate environment:"
-	@echo "     Unix/macOS: source .venv/bin/activate"
-	@echo "     Windows:    .venv\Scripts\activate"
+	@echo "  2. Run the unified Flash examples:  uv run flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),poetry)
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Run the unified Flash examples:  poetry run flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),pipenv)
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Run the unified Flash examples:  pipenv run flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+else ifeq ($(PKG_MANAGER),conda)
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Run the unified Flash examples:  conda run -p ./.venv flash run"
+	@echo "  3. Visit:                           http://localhost:8888"
+else
+	@echo "  1. Edit .env and add your RUNPOD_API_KEY"
+	@echo "  2. Activate environment:            source .venv/bin/activate"
 	@echo "  3. Run the unified Flash examples:  flash run"
 	@echo "  4. Visit:                           http://localhost:8888"
+endif
 	@echo ""
 	@echo "Additional commands:"
 	@echo "  make help           - Show all available commands"
