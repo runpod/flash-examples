@@ -611,7 +611,7 @@ Dependencies take long to install?
 For local development, create `requirements.txt`:
 
 ```txt
-tetra_rp
+runpod-flash
 torch==2.1.0
 transformers==4.35.2
 Pillow>=10.0.0
@@ -625,7 +625,7 @@ numpy==1.26.2
 For complex dependencies, consider custom images:
 
 ```python
-from tetra_rp import ServerlessEndpoint
+from runpod_flash import ServerlessEndpoint
 
 custom_config = ServerlessEndpoint(
     name="custom_image_worker",

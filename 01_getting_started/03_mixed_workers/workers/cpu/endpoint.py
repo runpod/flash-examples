@@ -1,4 +1,4 @@
-from tetra_rp import CpuInstanceType, CpuLiveServerless, remote
+from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
 
 # Preprocessing CPU worker (fast, cheap)
 cpu_config = CpuLiveServerless(

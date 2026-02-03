@@ -1,7 +1,7 @@
 from fastapi.exceptions import HTTPException
 from fastapi.responses import Response
 
-from tetra_rp import CpuLiveServerless, remote
+from runpod_flash import CpuLiveServerless, remote
 
 from .. import volume
 

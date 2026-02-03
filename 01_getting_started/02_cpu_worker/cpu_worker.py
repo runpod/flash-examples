@@ -6,7 +6,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from tetra_rp import CpuInstanceType, CpuLiveServerless, remote
+from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
 
 # Scaling behavior is controlled by configuration passed to the `CpuLiveServerless` class.
 # Here, we'll define several variables that change the default behavior of our serverless endpoint.

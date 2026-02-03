@@ -41,7 +41,7 @@ Paste the full error message here
 
 - OS: (e.g., Ubuntu 22.04, macOS 14.0)
 - Python Version: (e.g., 3.12.0)
-- tetra_rp Version: (e.g., 1.2.3)
+- runpod_flash Version: (e.g., 1.2.3)
 - Flash CLI Version: (run `flash --version`)
 
 ## Additional Context

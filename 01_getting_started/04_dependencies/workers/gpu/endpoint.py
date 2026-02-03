@@ -1,4 +1,4 @@
-from tetra_rp import GpuGroup, LiveServerless, remote
+from runpod_flash import GpuGroup, LiveServerless, remote
 
 # Worker with ML dependencies (versioned)
 ml_config = LiveServerless(

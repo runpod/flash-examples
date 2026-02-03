@@ -10,7 +10,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from tetra_rp import (
+from runpod_flash import (
     GpuGroup,
     LiveServerless,
     remote,

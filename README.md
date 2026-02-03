@@ -4,14 +4,14 @@ A collection of example applications showcasing Runpod Flash - a framework for b
 
 ## What is Flash?
 
-Flash is a CLI tool and framework from the `tetra_rp` package that enables you to build FastAPI applications with workers that run on Runpod's serverless infrastructure. Write your code locally, and Flash handles deployment, scaling, and resource management.
+Flash is a CLI tool and framework from the `runpod_flash` package that enables you to build FastAPI applications with workers that run on Runpod's serverless infrastructure. Write your code locally, and Flash handles deployment, scaling, and resource management.
 
 ## Prerequisites
 
 - Python 3.10+ (3.12 recommended)
 - [Runpod Account](https://console.runpod.io/signup)
 - [Runpod API Key](https://docs.runpod.io/get-started/api-keys)
-- Flash CLI: `pip install tetra_rp`
+- Flash CLI: `pip install runpod_flash`
 
 ## Quick Start
 
@@ -274,9 +274,9 @@ When adding a new example with additional dependencies:
 The sync script automatically:
 - Scans all example directories for `pyproject.toml` files
 - Merges dependencies into the root configuration
-- Filters out transitive dependencies already provided by `tetra-rp`
+- Filters out transitive dependencies already provided by `runpod-flash`
 - Detects version conflicts and uses the most permissive constraint
-- Preserves essential root dependencies (numpy, torch, tetra-rp)
+- Preserves essential root dependencies (numpy, torch, runpod-flash)
 
 **Example**:
 
@@ -296,7 +296,7 @@ This automation ensures that `flash run` from the root directory always has acce
 The `@remote` decorator marks functions for execution on Runpod's serverless infrastructure:
 
 ```python
-from tetra_rp import remote, LiveServerless, GpuGroup
+from runpod_flash import remote, LiveServerless, GpuGroup
 
 config = LiveServerless(
     name="my_worker",
@@ -345,9 +345,9 @@ To add a new example:
 
 ## Resources
 
-- [Flash CLI Documentation](https://github.com/runpod/tetra-rp)
+- [Flash CLI Documentation](https://github.com/runpod/runpod-flash)
 - [Runpod Serverless Docs](https://docs.runpod.io/serverless/overview)
-- [Tetra SDK Reference](https://github.com/runpod/tetra-rp)
+- [Flash SDK Reference](https://github.com/runpod/runpod-flash)
 - [Community Discord](https://discord.gg/runpod)
 
 ## Testing

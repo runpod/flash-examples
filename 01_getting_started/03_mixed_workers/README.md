@@ -588,5 +588,5 @@ Review worker usage:
 ## Resources
 
 - [Runpod Cost Calculator](https://www.runpod.io/console/serverless/pricing)
-- [Flash CLI Documentation](https://github.com/runpod/tetra-rp)
+- [Flash CLI Documentation](https://github.com/runpod/runpod-flash)
 - [Serverless Architecture Patterns](https://docs.runpod.io/serverless/patterns)

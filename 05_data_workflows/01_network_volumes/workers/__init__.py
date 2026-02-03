@@ -1,4 +1,4 @@
-from tetra_rp import NetworkVolume
+from runpod_flash import NetworkVolume
 
 # Shared volume used by both GPU and CPU workers.
 volume = NetworkVolume(
