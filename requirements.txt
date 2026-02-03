@@ -29,9 +29,9 @@ backports-zstd==1.3.0
     # via aiohttp
 bcrypt==5.0.0
     # via paramiko
-boto3==1.42.39
+boto3==1.42.40
     # via runpod
-botocore==1.42.39
+botocore==1.42.40
     # via
     #   boto3
     #   s3transfer
@@ -125,9 +125,9 @@ multidict==6.7.1
     # via
     #   aiohttp
     #   yarl
-numpy==2.4.1
+numpy==2.4.2
     # via runpod-flash-examples (pyproject.toml)
-orjson==3.11.6
+orjson==3.11.7
     # via fastapi
 paramiko==4.0.0
     # via runpod
@@ -189,12 +189,12 @@ questionary==2.1.1
     # via tetra-rp
 requests==2.32.5
     # via runpod
-rich==14.3.1
+rich==14.3.2
     # via
     #   rich-toolkit
     #   tetra-rp
     #   typer
-rich-toolkit==0.17.2
+rich-toolkit==0.18.1
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
@@ -214,7 +214,7 @@ starlette==0.50.0
     # via fastapi
 structlog==25.5.0
     # via runpod-flash-examples (pyproject.toml)
-tetra-rp==0.23.1
+tetra-rp==0.25.1
     # via runpod-flash-examples (pyproject.toml)
 tomli==2.4.0
     # via runpod
@@ -264,7 +264,7 @@ watchdog==6.0.0
     # via runpod
 watchfiles==1.1.1
     # via uvicorn
-wcwidth==0.5.2
+wcwidth==0.5.3
     # via
     #   prettytable
     #   prompt-toolkit

@@ -297,7 +297,6 @@ clean: # Remove build artifacts and cache files
 	rm -rf dist build *.egg-info
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
-	find . -type f -name "*.pkl" -delete
 	@echo "✓ Build artifacts cleaned"
 
 clean-venv: # Remove virtual environment directory
