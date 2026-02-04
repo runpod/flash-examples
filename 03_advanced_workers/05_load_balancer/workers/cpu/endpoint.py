@@ -1,4 +1,4 @@
-from tetra_rp import CpuLiveLoadBalancer, remote
+from runpod_flash import CpuLiveLoadBalancer, remote
 
 cpu_config = CpuLiveLoadBalancer(
     name="03_05_load_balancer_cpu",

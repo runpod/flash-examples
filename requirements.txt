@@ -29,9 +29,9 @@ backports-zstd==1.3.0
     # via aiohttp
 bcrypt==5.0.0
     # via paramiko
-boto3==1.42.40
+boto3==1.42.41
     # via runpod
-botocore==1.42.40
+botocore==1.42.41
     # via
     #   boto3
     #   s3transfer
@@ -57,7 +57,7 @@ click==8.3.1
     #   typer
     #   uvicorn
 cloudpickle==3.1.2
-    # via tetra-rp
+    # via runpod-flash
 colorama==0.4.6
     # via runpod
 cryptography==45.0.7
@@ -132,7 +132,7 @@ orjson==3.11.7
 paramiko==4.0.0
     # via runpod
 pathspec==1.0.4
-    # via tetra-rp
+    # via runpod-flash
 pfzy==0.3.4
     # via inquirerpy
 pillow==12.1.0
@@ -159,7 +159,7 @@ pydantic==2.12.5
     #   fastapi-cloud-cli
     #   pydantic-extra-types
     #   pydantic-settings
-    #   tetra-rp
+    #   runpod-flash
 pydantic-core==2.41.5
     # via pydantic
 pydantic-extra-types==2.11.0
@@ -175,7 +175,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
     # via
     #   pydantic-settings
-    #   tetra-rp
+    #   runpod-flash
     #   uvicorn
 python-multipart==0.0.22
     # via
@@ -186,13 +186,13 @@ pyyaml==6.0.3
     #   fastapi
     #   uvicorn
 questionary==2.1.1
-    # via tetra-rp
+    # via runpod-flash
 requests==2.32.5
     # via runpod
 rich==14.3.2
     # via
     #   rich-toolkit
-    #   tetra-rp
+    #   runpod-flash
     #   typer
 rich-toolkit==0.18.1
     # via
@@ -201,7 +201,9 @@ rich-toolkit==0.18.1
 rignore==0.7.6
     # via fastapi-cloud-cli
 runpod==1.8.1
-    # via tetra-rp
+    # via runpod-flash
+runpod-flash==1.0.0
+    # via runpod-flash-examples (pyproject.toml)
 s3transfer==0.16.0
     # via boto3
 sentry-sdk==2.51.0
@@ -214,13 +216,11 @@ starlette==0.50.0
     # via fastapi
 structlog==25.5.0
     # via runpod-flash-examples (pyproject.toml)
-tetra-rp==0.25.1
-    # via runpod-flash-examples (pyproject.toml)
 tomli==2.4.0
     # via runpod
 tomlkit==0.14.0
     # via runpod
-tqdm==4.67.2
+tqdm==4.67.3
     # via tqdm-loggable
 tqdm-loggable==0.2
     # via runpod
@@ -228,17 +228,14 @@ typer==0.21.1
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
-    #   tetra-rp
+    #   runpod-flash
 typing-extensions==4.15.0
     # via
-    #   aiosignal
-    #   anyio
     #   fastapi
     #   pydantic
     #   pydantic-core
     #   pydantic-extra-types
     #   rich-toolkit
-    #   starlette
     #   typer
     #   typing-inspection
 typing-inspection==0.4.2

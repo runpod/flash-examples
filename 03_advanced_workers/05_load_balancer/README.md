@@ -97,7 +97,7 @@ This runs the example on **http://localhost:8000** (default standalone port) wit
 Load-balancer endpoints use the `@remote` decorator with `method` and `path` parameters to define HTTP routes. The decorator automatically registers the function as an HTTP endpoint on the load-balancer runtime.
 
 ```python
-from tetra_rp import remote, LiveLoadBalancer
+from runpod_flash import remote, LiveLoadBalancer
 
 # Create load-balanced endpoint (for local development)
 lb = LiveLoadBalancer(name="my_service")
@@ -274,7 +274,7 @@ Response:
 `LiveLoadBalancer` is used for local development and testing. It provides all load-balancer features in a development environment without requiring a full deployment.
 
 ```python
-from tetra_rp import LiveLoadBalancer, remote
+from runpod_flash import LiveLoadBalancer, remote
 
 # Create load-balanced endpoint for local development
 lb = LiveLoadBalancer(name="my_api")
@@ -291,7 +291,7 @@ async def process(data: dict) -> dict:
 - Running examples with `flash run` from the repository root
 
 **Features:**
-- Automatically uses the `tetra-rp-lb` container image
+- Automatically uses the `runpod-flash-lb` container image
 - Local execution with `/execute` endpoint for development
 - Perfect for testing and debugging
 - No GPU/CPU configuration needed (inherits from resource type)
@@ -301,12 +301,12 @@ async def process(data: dict) -> dict:
 `LoadBalancerSlsResource` is the production resource for deploying load-balancer endpoints to RunPod.
 
 ```python
-from tetra_rp import LoadBalancerSlsResource, remote
+from runpod_flash import LoadBalancerSlsResource, remote
 
 # Create load-balanced endpoint for production deployment
 lb = LoadBalancerSlsResource(
     name="my_api",
-    imageName="runpod/tetra-rp-lb:latest",
+    imageName="runpod/runpod-flash-lb:latest",
     workersMin=1,
     workersMax=5,
 )
@@ -363,7 +363,7 @@ The `@remote` decorator with method and path works the same way in both local an
 
 **Local Development (LiveLoadBalancer):**
 - Use `LiveLoadBalancer` for testing load-balancer endpoints locally
-- Automatically uses `tetra-rp-lb` container image
+- Automatically uses `runpod-flash-lb` container image
 - Includes `/execute` endpoint for development/testing
 - Testing via `flash run` or direct Python execution
 - Perfect for development, testing, and debugging

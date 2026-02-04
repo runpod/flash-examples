@@ -27,7 +27,7 @@ build/
 *.egg-info/
 
 # Flash resources
-.tetra_resources.pkl
+.flash_resources.pkl
 
 # Tests
 tests/

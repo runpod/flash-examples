@@ -183,7 +183,7 @@ else ifeq ($(PKG_MANAGER),conda)
 	@if [ -f "requirements.txt" ]; then \
 		conda run -p ./.venv pip install -r requirements.txt; \
 	else \
-		conda run -p ./.venv pip install tetra-rp; \
+		conda run -p ./.venv pip install runpod-flash; \
 	fi
 	conda run -p ./.venv pip install -e .
 else ifeq ($(PKG_MANAGER),pip)
@@ -194,7 +194,7 @@ else ifeq ($(PKG_MANAGER),pip)
 	@if [ -f "requirements.txt" ]; then \
 		.venv/bin/pip install -r requirements.txt; \
 	else \
-		.venv/bin/pip install tetra-rp; \
+		.venv/bin/pip install runpod-flash; \
 	fi
 	.venv/bin/pip install -e .
 endif
@@ -245,7 +245,7 @@ ifeq ($(PKG_MANAGER),uv)
 else ifdef HAS_UV
 	uv pip compile pyproject.toml -o requirements.txt
 else
-	@echo "tetra-rp" > requirements.txt
+	@echo "runpod-flash" > requirements.txt
 	@echo "✓ Basic requirements.txt created (install 'uv' for dependency resolution)"
 endif
 
@@ -259,7 +259,7 @@ environment.yml: # Generate conda environment.yml from pyproject.toml
 	@echo "  - python>=3.11" >> environment.yml
 	@echo "  - pip" >> environment.yml
 	@echo "  - pip:" >> environment.yml
-	@echo "    - tetra-rp" >> environment.yml
+	@echo "    - runpod-flash" >> environment.yml
 	@echo "✓ environment.yml created"
 
 consolidate-deps: # Consolidate example dependencies to root pyproject.toml
@@ -283,9 +283,9 @@ else ifeq ($(PKG_MANAGER),poetry)
 else ifeq ($(PKG_MANAGER),pipenv)
 	pipenv update
 else ifeq ($(PKG_MANAGER),conda)
-	conda run -p ./.venv pip install --upgrade tetra-rp
+	conda run -p ./.venv pip install --upgrade runpod-flash
 else ifeq ($(PKG_MANAGER),pip)
-	.venv/bin/pip install --upgrade tetra-rp
+	.venv/bin/pip install --upgrade runpod-flash
 endif
 	@echo "✓ Dependencies updated"
 

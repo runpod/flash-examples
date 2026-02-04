@@ -1,4 +1,4 @@
-from tetra_rp import GpuGroup, LiveServerless, remote
+from runpod_flash import GpuGroup, LiveServerless, remote
 
 # GPU worker for ML inference (expensive, powerful)
 gpu_config = LiveServerless(

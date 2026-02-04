@@ -14,7 +14,7 @@ To disable mothership deployment:
 - Comment out the 'mothership' variable below
 """
 
-from tetra_rp import CpuLiveLoadBalancer
+from runpod_flash import CpuLiveLoadBalancer
 
 # Mothership endpoint configuration
 # This serves your FastAPI app routes from main.py
@@ -35,7 +35,7 @@ mothership = CpuLiveLoadBalancer(
 
 # Use GPU-based load balancer instead of CPU
 # (requires importing LiveLoadBalancer)
-# from tetra_rp import LiveLoadBalancer
+# from runpod_flash import LiveLoadBalancer
 # mothership = LiveLoadBalancer(
 #     name="mothership-03_05_load_balancer",
 #     gpus=[GpuGroup.ANY],

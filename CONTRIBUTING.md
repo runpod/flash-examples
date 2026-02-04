@@ -232,7 +232,7 @@ if __name__ == "__main__":
 ### Minimal Worker (endpoint.py)
 
 ```python
-from tetra_rp import remote, LiveServerless, GpuGroup
+from runpod_flash import remote, LiveServerless, GpuGroup
 
 config = LiveServerless(name="your_worker")
 
@@ -485,7 +485,7 @@ async def process(data: dict):
 Pin all dependencies:
 
 ```txt
-tetra_rp==1.2.3
+runpod_flash==1.2.3
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 torch==2.1.0
@@ -508,7 +508,7 @@ version = "0.1.0"
 description = "Brief description"
 requires-python = ">=3.12"
 dependencies = [
-    "tetra_rp",
+    "runpod-flash",
 ]
 ```
 
@@ -552,7 +552,7 @@ Reviews typically take 2-7 days. Be patient and responsive to feedback.
 - **Questions**: Open a GitHub Discussion
 - **Bugs**: Open a GitHub Issue
 - **Chat**: Join the [Runpod Discord](https://discord.gg/runpod)
-- **Docs**: Check [Flash Documentation](https://github.com/runpod/tetra-rp)
+- **Docs**: Check [Flash Documentation](https://github.com/runpod/runpod-flash)
 
 ## Code of Conduct
 

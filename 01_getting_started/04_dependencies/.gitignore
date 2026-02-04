@@ -36,7 +36,7 @@ wheels/
 .env.local
 
 # Flash
-.tetra_resources.pkl
+.flash_resources.pkl
 dist/
 
 # Flash generated files (should not be committed)

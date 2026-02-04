@@ -1,4 +1,4 @@
-from tetra_rp import CpuInstanceType, CpuLiveServerless, remote
+from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
 
 # Worker with data science dependencies
 data_config = CpuLiveServerless(

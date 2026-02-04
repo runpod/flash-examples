@@ -1,4 +1,4 @@
-from tetra_rp import LiveLoadBalancer, remote
+from runpod_flash import LiveLoadBalancer, remote
 
 gpu_config = LiveLoadBalancer(
     name="03_05_load_balancer_gpu",

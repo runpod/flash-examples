@@ -5,7 +5,7 @@ These decorators automatically create HTTP routes that are registered with the
 Load Balancer runtime.
 
 For the unified app discovery, we export a router that documents the endpoints.
-The actual HTTP handling is managed by the tetra-rp-lb framework.
+The actual HTTP handling is managed by the runpod-flash-lb framework.
 """
 
 from fastapi import APIRouter

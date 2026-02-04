@@ -2,7 +2,7 @@
 # In this example, a GPU worker runs Stable Diffusion and writes outputs to the shared volume.
 import logging
 
-from tetra_rp import GpuGroup, LiveServerless, remote
+from runpod_flash import GpuGroup, LiveServerless, remote
 
 from .. import volume
 

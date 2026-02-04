@@ -56,7 +56,7 @@ make consolidate-deps
 ### Remote Worker Decorator
 
 ```python
-from tetra_rp import remote, LiveServerless, GpuGroup
+from runpod_flash import remote, LiveServerless, GpuGroup
 
 # Configure resource requirements
 # Naming convention: {category}_{example}_{worker_type}
@@ -77,7 +77,7 @@ async def process_image(input_data: dict) -> dict:
 ```
 
 Key points:
-- Imports are from `tetra_rp`, not `flash`
+- Imports are from `runpod_flash`, not `flash`
 - Create a config object (`LiveServerless` or `CpuLiveServerless`) for GPU/CPU workers
 - Pass config via `resource_config` parameter to `@remote` decorator
 - Use `async/await` for all worker functions
@@ -137,7 +137,7 @@ The unified app auto-discovery looks for:
 Every example includes a `mothership.py` file that configures the mothership endpoint - the load-balanced endpoint serving your FastAPI application routes.
 
 ```python
-from tetra_rp import CpuLiveLoadBalancer
+from runpod_flash import CpuLiveLoadBalancer
 
 # Mothership endpoint configuration
 mothership = CpuLiveLoadBalancer(

@@ -376,7 +376,7 @@ def test_user_creation():
 ```toml
 [project]
 dependencies = [
-    "tetra-rp",
+    "runpod-flash",
     "new-package>=1.0.0",
 ]
 ```
