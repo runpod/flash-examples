@@ -9,7 +9,6 @@
 # `LiveServerless` class.
 from fastapi import APIRouter
 from pydantic import BaseModel
-
 from runpod_flash import (
     GpuGroup,
     LiveServerless,

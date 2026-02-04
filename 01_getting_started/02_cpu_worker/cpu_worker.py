@@ -5,7 +5,6 @@
 # imported by main.py and attached to the FastAPI app there.
 from fastapi import APIRouter
 from pydantic import BaseModel
-
 from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
 
 # Scaling behavior is controlled by configuration passed to the `CpuLiveServerless` class.

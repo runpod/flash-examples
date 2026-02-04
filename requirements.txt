@@ -29,9 +29,9 @@ backports-zstd==1.3.0
     # via aiohttp
 bcrypt==5.0.0
     # via paramiko
-boto3==1.42.40
+boto3==1.42.41
     # via runpod
-botocore==1.42.40
+botocore==1.42.41
     # via
     #   boto3
     #   s3transfer
@@ -202,6 +202,8 @@ rignore==0.7.6
     # via fastapi-cloud-cli
 runpod==1.8.1
     # via runpod-flash
+runpod-flash==1.0.0
+    # via runpod-flash-examples (pyproject.toml)
 s3transfer==0.16.0
     # via boto3
 sentry-sdk==2.51.0
@@ -214,13 +216,11 @@ starlette==0.50.0
     # via fastapi
 structlog==25.5.0
     # via runpod-flash-examples (pyproject.toml)
-runpod-flash==0.25.1
-    # via runpod-flash-examples (pyproject.toml)
 tomli==2.4.0
     # via runpod
 tomlkit==0.14.0
     # via runpod
-tqdm==4.67.2
+tqdm==4.67.3
     # via tqdm-loggable
 tqdm-loggable==0.2
     # via runpod
@@ -231,14 +231,11 @@ typer==0.21.1
     #   runpod-flash
 typing-extensions==4.15.0
     # via
-    #   aiosignal
-    #   anyio
     #   fastapi
     #   pydantic
     #   pydantic-core
     #   pydantic-extra-types
     #   rich-toolkit
-    #   starlette
     #   typer
     #   typing-inspection
 typing-inspection==0.4.2
