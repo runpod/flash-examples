@@ -1,0 +1,10 @@
+[project]
+name = "01_text_to_speech"
+version = "0.1.0"
+description = "Text-to-Speech using Qwen3-TTS on RunPod serverless GPUs"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+]
