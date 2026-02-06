@@ -3,10 +3,8 @@ import base64
 from fastapi import APIRouter
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
-from typing import Optional
 
 from .endpoint import generate_speech, get_voices
-
 
 gpu_router = APIRouter()
 
@@ -23,7 +21,7 @@ class TTSRequest(BaseModel):
         default="Auto",
         description="Language. Options: Chinese, English, Japanese, Korean, German, French, Russian, Portuguese, Spanish, Italian, Auto",
     )
-    instruct: Optional[str] = Field(
+    instruct: str | None = Field(
         default=None,
         description="Optional emotion/style instruction (e.g., 'Speak happily', 'Say it slowly and calmly')",
     )

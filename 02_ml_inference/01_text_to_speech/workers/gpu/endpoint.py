@@ -1,6 +1,5 @@
 from runpod_flash import GpuGroup, LiveServerless, remote
 
-
 # GPU config for Qwen3-TTS - needs 24GB+ VRAM for 1.7B model
 # Naming convention: {category}_{example}_{worker_type}
 gpu_config = LiveServerless(
@@ -45,13 +44,28 @@ async def generate_speech(input_data: dict) -> dict:
 
     # Must be defined inside function for remote execution
     valid_speakers = [
-        "Vivian", "Serena", "Uncle_Fu", "Dylan", "Eric",
-        "Ryan", "Aiden", "Ono_Anna", "Sohee",
+        "Vivian",
+        "Serena",
+        "Uncle_Fu",
+        "Dylan",
+        "Eric",
+        "Ryan",
+        "Aiden",
+        "Ono_Anna",
+        "Sohee",
     ]
     valid_languages = [
-        "Chinese", "English", "Japanese", "Korean",
-        "German", "French", "Russian", "Portuguese",
-        "Spanish", "Italian", "Auto",
+        "Chinese",
+        "English",
+        "Japanese",
+        "Korean",
+        "German",
+        "French",
+        "Russian",
+        "Portuguese",
+        "Spanish",
+        "Italian",
+        "Auto",
     ]
 
     text = input_data.get("text", "Hello, this is a test.")
@@ -129,9 +143,17 @@ async def get_voices(input_data: dict) -> dict:
         "Sohee": "Warm Korean female voice with rich emotion (Korean native)",
     }
     languages = [
-        "Chinese", "English", "Japanese", "Korean",
-        "German", "French", "Russian", "Portuguese",
-        "Spanish", "Italian", "Auto",
+        "Chinese",
+        "English",
+        "Japanese",
+        "Korean",
+        "German",
+        "French",
+        "Russian",
+        "Portuguese",
+        "Spanish",
+        "Italian",
+        "Auto",
     ]
     return {
         "status": "success",
