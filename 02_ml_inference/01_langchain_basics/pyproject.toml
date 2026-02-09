@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "langchain-basics"
+version = "0.2.0"
+description = "Flash + Langchain local LLM inference with vLLM example"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "tetra_rp",
+    "langchain>=0.1.0",
+    "langchain-community>=0.0.10",
+    "vllm>=0.2.0",
+    "transformers>=4.38.0",
+    "torch>=2.1.0",
+    "pydantic>=2.0.0",
+    "structlog>=23.0.0",
+]
