@@ -13,7 +13,23 @@ Text-to-Speech API using Qwen3-TTS.
 - Using `bfloat16` precision for memory-efficient inference
 - Input validation inside self-contained `@remote` functions
 
-### 01_text_generation _(coming soon)_
+### [01_langchain_basics](./01_langchain_basics/)
+Langchain integration with Flash for cost-effective LLM orchestration using OpenAI.
+
+**What you'll learn:**
+- Integrating Langchain with Flash @remote decorator
+- CPU workers for LLM API calls (no GPU needed)
+- Prompt templating and chaining with Langchain
+- Structured output parsing with Pydantic
+- Error handling for external API calls
+- Cost-effective serverless LLM patterns
+
+**Features:**
+- Text summarization with configurable length
+- Sentiment analysis with structured output
+- Dynamic text transformation with custom instructions
+
+### 02_text_generation _(coming soon)_
 LLM inference API with streaming support.
 
 **What you'll learn:**
@@ -27,7 +43,7 @@ LLM inference API with streaming support.
 - Mistral, Mixtral
 - Qwen, Phi, Gemma
 
-### 02_image_generation _(coming soon)_
+### 03_image_generation _(coming soon)_
 Stable Diffusion image generation API.
 
 **What you'll learn:**
@@ -41,7 +57,7 @@ Stable Diffusion image generation API.
 - SDXL Turbo
 - ControlNet integration
 
-### 03_embeddings _(coming soon)_
+### 04_embeddings _(coming soon)_
 Text embedding API for semantic search and RAG.
 
 **What you'll learn:**
@@ -55,7 +71,7 @@ Text embedding API for semantic search and RAG.
 - OpenAI-compatible embeddings
 - Multilingual models
 
-### 04_multimodal _(coming soon)_
+### 05_multimodal _(coming soon)_
 Vision-language models (CLIP, LLaVA, etc.).
 
 **What you'll learn:**
