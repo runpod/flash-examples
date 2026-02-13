@@ -10,6 +10,81 @@ The flash-examples repository contains production-ready examples demonstrating F
 
 **Important**: For full contribution guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+## Quick Start for Agents
+
+Before diving deep, here's what you need to know:
+
+### 1. Repository Structure
+```
+flash-examples/
+├── main.py                    # Unified app with auto-discovery
+├── Makefile                   # Development commands
+├── scripts/
+│   └── sync_example_deps.py  # Consolidates dependencies
+├── 01_getting_started/        # Category directory
+│   ├── 01_hello_world/       # Example directory
+│   │   ├── gpu_worker.py     # Single-file worker (exports gpu_router)
+│   │   ├── main.py           # Standalone FastAPI app for this example
+│   │   ├── mothership.py     # Mothership endpoint config
+│   │   └── pyproject.toml    # Example-specific dependencies
+│   └── 03_mixed_workers/     # Complex example
+│       ├── workers/
+│       │   ├── gpu/__init__.py   # Exports gpu_router
+│       │   └── cpu/__init__.py   # Exports cpu_router
+│       ├── main.py
+│       └── pyproject.toml
+└── pyproject.toml            # Root dependencies (auto-generated)
+```
+
+### 2. Key Concepts
+
+- **Unified App**: One FastAPI app serving all examples at http://localhost:8888
+- **Auto-Discovery**: Examples are discovered by pattern matching, not manual registration
+- **Router Naming**: Must export `{worker_type}_router` (e.g., `gpu_router`)
+- **Dependency Consolidation**: Example deps → root `pyproject.toml` via `make consolidate-deps`
+- **Two Testing Modes**:
+  - Standalone: `cd example/ && flash run` (just that example)
+  - Unified: `flash run` from root (all examples)
+
+### 3. Your First Task? Start Here
+
+**Reading code**:
+1. Check `main.py:26-33` for category directories
+2. Look at an example's `gpu_worker.py` or `workers/gpu/__init__.py`
+3. Understand it exports a router with the right name
+
+**Creating an example**:
+1. `cd category_directory`
+2. `flash init my_example`
+3. Implement in fresh code (don't copy-paste)
+4. `cd ../.. && make consolidate-deps`
+5. Test with `flash run`
+
+**Modifying code**:
+1. Understand the pattern (single-file vs directory workers)
+2. Make changes
+3. Test with `flash run` from root
+4. Run `make format && make lint`
+
+## How Auto-Discovery Works
+
+Understanding the discovery mechanism is crucial when creating examples:
+
+1. **Category Scanning**: The root `main.py:26-33` defines category directories to scan
+2. **Pattern Matching**: For each example directory, it looks for:
+   - **Single-file workers**: `{worker_type}_worker.py` files (e.g., `gpu_worker.py`, `cpu_worker.py`) (main.py:59-112)
+   - **Directory workers**: `workers/{worker_type}/__init__.py` files (main.py:115-184)
+   - **Context routes**: Direct routes in example's `main.py` app (main.py:187-274)
+3. **Router Naming**: Must export `{worker_type}_router` (e.g., `gpu_router`, `cpu_router`)
+4. **URL Prefixes**: Routes are automatically prefixed with `/{example_name}/{worker_type}`
+5. **Tagging**: All routes get tagged with "Category > Example Name" for OpenAPI docs
+
+**Critical**: If your router isn't discovered, check:
+- File naming matches patterns above
+- Router variable is named correctly (`gpu_router`, not `router`)
+- Example directory is in a scanned category
+- No Python import errors in your module
+
 ## Critical: Use flash init for New Examples ⚠️
 
 ### The Rule
@@ -53,6 +128,19 @@ make consolidate-deps
 
 ## Flash-Specific Patterns
 
+### Understanding @remote Functions
+
+The `@remote` decorator is the core of Flash. It enables functions to run on remote Runpod infrastructure:
+
+**Critical Constraints**:
+- Functions decorated with `@remote` are serialized and sent to remote workers
+- They can **ONLY** access their local scope (parameters and locally defined variables)
+- All imports must be **inside the function**
+- All helper functions must be **defined inside the function**
+- No access to module-level variables, functions, or classes
+
+**Why this matters**: When your function runs remotely, it doesn't have access to the module it was defined in - only the function code itself is sent.
+
 ### Remote Worker Decorator
 
 ```python
@@ -71,9 +159,40 @@ gpu_config = LiveServerless(
 @remote(resource_config=gpu_config)
 async def process_image(input_data: dict) -> dict:
     """Process an image with GPU support."""
+    # ✅ CORRECT: All imports inside the function
+    import logging
+    from PIL import Image
+    import requests
+
+    # ✅ CORRECT: Helper functions defined locally
+    def download_image(url: str) -> Image.Image:
+        response = requests.get(url)
+        return Image.open(BytesIO(response.content))
+
+    # Now use them
+    logger = logging.getLogger(__name__)
     image_url = input_data.get("image_url")
-    # implementation
-    return {"status": "success", "result": "..."}
+    image = download_image(image_url)
+
+    return {"status": "success", "size": image.size}
+```
+
+**Anti-pattern** (❌ This will fail):
+```python
+# Module-level imports - NOT accessible in @remote
+import requests
+from PIL import Image
+
+# Module-level helper - NOT accessible in @remote
+def download_image(url: str) -> Image.Image:
+    response = requests.get(url)
+    return Image.open(BytesIO(response.content))
+
+@remote(resource_config=gpu_config)
+async def process_image(input_data: dict) -> dict:
+    # ❌ FAILS: download_image and imports not available remotely
+    image = download_image(input_data["url"])
+    return {"size": image.size}
 ```
 
 Key points:
@@ -83,6 +202,7 @@ Key points:
 - Use `async/await` for all worker functions
 - Return serializable data (dict, list, str, etc.)
 - Include comprehensive docstrings
+- **All imports and helpers inside the function**
 
 ### APIRouter Export Pattern
 
@@ -241,7 +361,14 @@ This:
 - Updates `uv.lock` with pinned versions
 - Ensures all examples can be run in the unified app environment
 
-**Never** directly edit the root `pyproject.toml` - it's auto-generated by `make consolidate-deps`.
+**How it works**: The `scripts/sync_example_deps.py` script:
+- Scans all category directories for example `pyproject.toml` files
+- Collects all dependencies into a unified set
+- Merges them with existing root dependencies
+- Sorts and writes to root `pyproject.toml`
+- No conflict resolution - if versions conflict, fix manually
+
+**Never** directly edit the root `pyproject.toml` dependencies - it's auto-generated by `make consolidate-deps`.
 
 ## Code Standards
 
@@ -325,6 +452,80 @@ flash run
 # Visit http://localhost:8888/docs to test all endpoints
 ```
 
+### Complete Testing Workflow
+
+When you've finished implementing an example, follow this workflow:
+
+**1. Local Functionality Test**
+```bash
+# From repository root
+flash run
+
+# Check discovery logs
+# Should see: "Loaded {example_name}/{worker_type} from {file}"
+
+# Verify in browser
+open http://localhost:8888
+# Your example should be listed
+
+open http://localhost:8888/docs
+# Your endpoints should appear under the category tag
+```
+
+**2. Endpoint Testing**
+
+Test via Swagger UI at `/docs`:
+- Click on your endpoint
+- Click "Try it out"
+- Enter test data
+- Execute
+- Verify response
+
+Or via curl:
+```bash
+# Example for a GPU worker endpoint
+curl -X POST http://localhost:8888/01_getting_started/my_example/gpu/process \
+  -H "Content-Type: application/json" \
+  -d '{"input": "test data"}'
+
+# Verify successful response
+```
+
+**3. Code Quality Checks**
+```bash
+# Run all quality checks
+make quality-check
+
+# If it fails:
+make format      # Fix formatting
+make lint-fix    # Fix auto-fixable lint issues
+make lint        # Check remaining issues
+
+# For strict mode (includes type checking)
+make quality-check-strict
+```
+
+**4. Dependency Verification**
+```bash
+# Ensure dependencies are consolidated
+make check-deps
+
+# If it fails, consolidate:
+make consolidate-deps
+uv sync
+```
+
+**5. Clean Build Test**
+```bash
+# Clean environment and rebuild
+make clean
+make clean-venv
+make setup
+flash run
+
+# Ensures your example works in fresh environment
+```
+
 ### Test in Unified Context
 
 When testing locally, ensure your routes work with the unified app's auto-discovery:
@@ -353,6 +554,38 @@ async def test_process_image():
 ### VS Code Debugging
 
 Examples include `.vscode/launch.json` for debugging endpoints directly in VS Code.
+
+### Definition of Done Checklist
+
+Before considering your example complete, verify:
+
+**Discovery & Routing**:
+- [ ] Example appears on http://localhost:8888 home page
+- [ ] Endpoints appear in `/docs` under correct category tag
+- [ ] Routes have correct prefix: `/{example_name}/{worker_type}/...`
+- [ ] All endpoints return expected responses
+
+**Code Quality**:
+- [ ] `make quality-check` passes
+- [ ] `make check-deps` passes
+- [ ] No Python import errors
+- [ ] All functions have type hints
+- [ ] No hardcoded credentials
+
+**Documentation**:
+- [ ] README.md is comprehensive
+- [ ] All endpoints documented with request/response examples
+- [ ] Docstrings on all functions and classes
+
+**Testing**:
+- [ ] Manual testing via `/docs` successful
+- [ ] Tested in clean environment (`make clean-venv && make setup`)
+- [ ] Works in unified app context
+
+**Git Hygiene**:
+- [ ] No auto-generated files committed (`flash_manifest.json`, example `uv.lock`)
+- [ ] `.gitignore` includes flash build artifacts
+- [ ] Only relevant files staged for commit
 
 ## Documentation Standards
 
@@ -551,6 +784,343 @@ Before submitting an example:
 9. **Not running consolidate-deps**: Critical for shared environment
 10. **Routes not exporting router**: Unified app won't discover them
 11. **Mutable default arguments**: Use None and initialize in function
+12. **Wrong router variable name**: Must be `{worker_type}_router` (e.g., `gpu_router`, `cpu_router`)
+13. **Committing auto-generated files**: Never commit `flash_manifest.json` or example-level `uv.lock`
+
+## Troubleshooting Guide
+
+### Example Not Showing in Unified App
+
+**Symptoms**: Your example doesn't appear at http://localhost:8888 or `/docs`
+
+**Diagnostics**:
+```bash
+# 1. Check the logs when starting flash run
+flash run 2>&1 | grep -i "loaded\|error\|warning"
+
+# 2. Verify your router naming
+grep -n "router" your_example/gpu_worker.py
+# Should see: gpu_router = APIRouter()
+
+# 3. Check for Python errors
+python -c "import sys; sys.path.insert(0, 'path/to/your_example'); import gpu_worker"
+
+# 4. Verify file structure matches expected patterns
+ls your_example/
+```
+
+**Common Causes**:
+- Router variable named `router` instead of `gpu_router`
+- Python import errors in your module
+- File not named `gpu_worker.py` or `workers/gpu/__init__.py`
+- Example directory not in scanned categories (see main.py:26-33)
+
+### Routes Have Wrong Prefix
+
+**Symptoms**: Endpoint is `/gpu/process` instead of `/my_example/gpu/process`
+
+**Cause**: You're testing the example's standalone `main.py` instead of the unified app
+
+**Solution**: Always test via the root-level unified app:
+```bash
+cd /path/to/flash-examples  # Root directory
+flash run  # Not from inside example directory
+```
+
+### Dependencies Not Available
+
+**Symptoms**: `ModuleNotFoundError` when running unified app
+
+**Solution**:
+```bash
+# 1. Ensure dependency is in your example's pyproject.toml
+cat path/to/example/pyproject.toml
+
+# 2. Consolidate to root
+make consolidate-deps
+
+# 3. Sync dependencies
+uv sync  # or: poetry install, pipenv sync, etc.
+
+# 4. Verify installation
+uv run python -c "import your_module"
+```
+
+### flash run Fails with Import Errors
+
+**Common Issue**: Circular imports or missing `__init__.py`
+
+**Solution**:
+- Add `__init__.py` to all directories with Python files
+- Check for circular imports between modules
+- Ensure `sys.path` modifications are correct
+
+### Mothership Endpoint Not Deploying
+
+**Symptoms**: `flash deploy` doesn't create a mothership endpoint
+
+**Check**:
+```bash
+# 1. Verify mothership.py exists
+ls your_example/mothership.py
+
+# 2. Check it exports a configured endpoint
+grep -A 5 "mothership" your_example/mothership.py
+
+# 3. Ensure variable is named 'mothership'
+python -c "from your_example.mothership import mothership; print(mothership)"
+```
+
+### Code Quality Checks Failing in CI
+
+**Symptoms**: GitHub Actions fails on `make quality-check`
+
+**Local Fix**:
+```bash
+# 1. Run the same checks locally
+make quality-check
+
+# 2. Auto-fix formatting issues
+make format
+
+# 3. Auto-fix some lint issues
+make lint-fix
+
+# 4. Check dependencies are consolidated
+make check-deps
+
+# 5. Re-run quality checks
+make quality-check
+```
+
+## Repository Navigation Tips
+
+### Finding Examples
+
+```bash
+# List all example categories
+ls -d 0*/
+
+# List examples in a category
+ls 01_getting_started/
+
+# Find all GPU workers
+find . -name "gpu_worker.py" -o -path "*/workers/gpu/__init__.py"
+
+# Find all examples with certain dependencies
+grep -r "torch" --include="pyproject.toml"
+```
+
+### Testing Your Example
+
+```bash
+# Run the unified app from root
+flash run
+# or with uv
+uv run flash run
+
+# Visit the home page
+open http://localhost:8888
+
+# Visit API docs
+open http://localhost:8888/docs
+
+# Test a specific endpoint
+curl -X POST http://localhost:8888/01_getting_started/01_hello_world/gpu/process \
+  -H "Content-Type: application/json" \
+  -d '{"message": "test"}'
+```
+
+### Common Development Workflows
+
+**Creating a new example**:
+```bash
+cd 01_getting_started
+flash init my_new_example
+cd my_new_example
+# ... implement your example ...
+cd ../..
+make consolidate-deps
+flash run  # Test in unified app
+```
+
+**Updating dependencies**:
+```bash
+# Edit your example's pyproject.toml
+cd 01_getting_started/my_example
+vim pyproject.toml  # Add your dependency
+
+# Consolidate to root
+cd ../..
+make consolidate-deps
+uv sync  # Install new dependencies
+```
+
+**Debugging discovery issues**:
+```bash
+# Check if your example is discovered
+flash run
+# Look for log lines like:
+# "Loaded 01_getting_started/my_example/gpu from gpu_worker.py"
+
+# If not discovered, check:
+# 1. Python import errors
+python -c "import sys; sys.path.insert(0, '01_getting_started/my_example'); import gpu_worker"
+
+# 2. Router naming
+grep "router" 01_getting_started/my_example/gpu_worker.py
+# Should see: gpu_router = APIRouter()
+```
+
+## Makefile Commands Reference
+
+The repository includes a sophisticated Makefile with auto-detected package manager support:
+
+### Most Common Commands
+
+- `make setup` - One-time setup, creates venv and installs everything
+- `make verify-setup` - Check that environment is configured correctly
+- `make consolidate-deps` - **Critical** - Run after adding dependencies
+- `make lint` - Check code quality with ruff
+- `make format` - Auto-format code with ruff
+- `make clean` - Remove build artifacts
+
+### Package Manager Detection
+
+The Makefile auto-detects your package manager in this priority order:
+1. uv (recommended)
+2. poetry
+3. pipenv
+4. pip
+5. conda
+
+Override with: `PKG_MANAGER=pip make setup`
+
+### Quality Checks (CI)
+
+- `make quality-check` - Essential checks (format + lint)
+- `make quality-check-strict` - Strict checks (format + lint + typecheck + deps)
+- `make check-deps` - Verify dependencies are consolidated (fails if not)
+
+## Agent-Specific Tips
+
+### Efficient Code Navigation
+
+When asked to work on this repository, use these strategies:
+
+**Understanding existing patterns**:
+```bash
+# Find all examples with GPU workers
+find . -name "gpu_worker.py" -o -path "*/workers/gpu/__init__.py"
+
+# See how @remote is used across examples
+grep -r "@remote" --include="*.py" -A 5
+
+# Find examples using specific dependencies
+grep -r "torch\|transformers\|pillow" --include="pyproject.toml"
+
+# Understand APIRouter patterns
+grep -r "APIRouter()" --include="*.py"
+```
+
+**When asked to create a similar example**:
+1. Use `find` to locate similar examples
+2. Read them to understand patterns
+3. Use `flash init` to create fresh structure
+4. Implement with your own code
+
+**When asked to debug**:
+1. Check logs first: `flash run 2>&1 | grep -i error`
+2. Verify imports: `python -c "import module_name"`
+3. Check router naming: `grep "router" file.py`
+4. Verify discovery: Look for "Loaded..." in flash run output
+
+### Common Request Patterns
+
+**"Add a new example for X"**:
+1. Ask which category (or suggest based on complexity)
+2. Run `flash init` in that category
+3. Implement following patterns from CLAUDE.md
+4. Test with `flash run`
+5. Run `make consolidate-deps`
+6. Verify with checklist
+
+**"Fix example X"**:
+1. Read the example code
+2. Run it to reproduce issue
+3. Check common mistakes section
+4. Make targeted fix
+5. Test with `flash run`
+6. Run quality checks
+
+**"Add feature Y to example X"**:
+1. Read existing example
+2. Understand its structure (single-file vs directory)
+3. Make changes following same patterns
+4. Update README.md if user-facing
+5. Test thoroughly
+6. Quality checks
+
+**"Update dependencies"**:
+1. Edit example's `pyproject.toml`
+2. Run `make consolidate-deps`
+3. Run `uv sync`
+4. Test example still works
+
+### What to Read First
+
+When starting work on a new task:
+
+**Creating examples**: Read in this order:
+1. This file (CLAUDE.md) - patterns and rules
+2. `main.py:26-184` - understand discovery
+3. An example in same category - see patterns in practice
+4. CONTRIBUTING.md - submission guidelines
+
+**Debugging issues**: Read in this order:
+1. Troubleshooting Guide (this file)
+2. `main.py` discovery logic for your issue
+3. Similar working examples for comparison
+4. Error logs and traceback
+
+**Modifying structure**: Read in this order:
+1. `main.py` - understand discovery and registration
+2. `scripts/sync_example_deps.py` - dependency management
+3. `Makefile` - build and quality workflows
+4. CONTRIBUTING.md - architectural guidelines
+
+### Avoiding Over-Engineering
+
+This repository values simplicity:
+
+**Don't add these unless explicitly requested**:
+- Extra error handling for impossible cases
+- Feature flags or configuration systems
+- Abstract base classes for one-time use
+- Helper utilities for single-use operations
+- Extensive logging for every operation
+- Backwards compatibility hacks
+
+**Do add these**:
+- Type hints (mandatory)
+- Input validation (Pydantic models)
+- Error handling for external operations (network, files, etc.)
+- Clear docstrings
+- README documentation
+
+### Performance Considerations
+
+**Tool Usage**:
+- Prefer `Glob` for finding files over `find` command
+- Use `Grep` with appropriate output_mode for searching code
+- Read files in parallel when checking multiple examples
+- Use `Task` tool for complex multi-step exploration
+
+**When Exploring**:
+- Don't read entire codebase - focus on relevant category
+- Use discovery logic in `main.py` as single source of truth
+- Check 1-2 examples, not all of them
+- Trust the patterns are consistent
 
 ## Getting Help
 
@@ -558,3 +1128,5 @@ Before submitting an example:
 2. Review CONTRIBUTING.md for additional guidelines
 3. See Flash documentation at https://docs.runpod.io
 4. Check repository issues and discussions
+5. Use `make help` to see all available commands
+6. Search this file (CLAUDE.md) for keywords related to your issue
