@@ -42,6 +42,13 @@ curl -X POST http://localhost:8000/gpu/hello \
 
 Visit **http://localhost:8000/docs** for interactive API documentation.
 
+### Full CLI Documentation
+
+For complete CLI usage including deployment, environment management, and troubleshooting:
+- **[CLI Reference](../../CLI-REFERENCE.md)** - All commands and options
+- **[Getting Started Guide](../../docs/cli/getting-started.md)** - Step-by-step tutorial
+- **[Workflows](../../docs/cli/workflows.md)** - Common development patterns
+
 ## What This Demonstrates
 
 ### GPU Worker (`gpu_worker.py`)

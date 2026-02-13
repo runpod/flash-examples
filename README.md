@@ -190,12 +190,70 @@ Flash is FastAPI-centric for building production applications, while Modal focus
 
 ## Flash CLI Commands
 
+The Flash CLI provides a complete toolkit for building, testing, and deploying distributed inference applications.
+
+### Core Commands
+
 ```bash
-flash init              # Create new Flash project
-flash run              # Run development server (default: localhost:8888)
-flash build            # Build application for deployment
-flash deploy new <env> # Create deployment environment
-flash deploy send <env># Deploy to Runpod
+flash init [project]         # Create new Flash project
+flash run                    # Run development server (localhost:8888)
+flash build                  # Build deployment package
+flash deploy --env <name>    # Build and deploy to environment
+flash undeploy <name>        # Delete deployed endpoint
+```
+
+### Environment Management
+
+```bash
+flash env list               # Show all environments
+flash env create <name>      # Create new environment (dev, staging, prod)
+flash env get <name>         # Show environment details
+flash env delete <name>      # Delete environment
+```
+
+### Application Management
+
+```bash
+flash app list               # List all Flash apps
+flash app create <name>      # Create new app
+flash app get <name>         # Show app details
+flash app delete --app <name># Delete app and all resources
+```
+
+### Command Options
+
+Many commands support additional options for customization:
+
+```bash
+flash run --host 0.0.0.0 --port 9000     # Custom host and port
+flash build --exclude torch,torchvision   # Exclude packages (reduce size)
+flash deploy --env prod --preview         # Local preview before deploying
+flash undeploy --all --force              # Remove all endpoints
+```
+
+### Full Documentation
+
+**[Complete CLI Reference](CLI-REFERENCE.md)** - Comprehensive guide with all commands, options, and examples
+
+**Step-by-Step Guides:**
+- [Getting Started (5 minutes)](docs/cli/getting-started.md) - Your first Flash project
+- [Command Reference](docs/cli/commands.md) - Exhaustive documentation for all commands
+- [Workflows](docs/cli/workflows.md) - Common development workflows
+- [Troubleshooting](docs/cli/troubleshooting.md) - Solutions to common problems
+
+### Quick Start
+
+```bash
+# 1. Create project
+flash init my-api && cd my-api
+
+# 2. Run locally
+flash run
+# Visit http://localhost:8888/docs
+
+# 3. Create environment and deploy
+flash env create production
+flash deploy --env production
 ```
 
 ## Testing Your Application

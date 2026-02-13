@@ -213,6 +213,50 @@ Shows all available commands with your detected environment manager.
 | `make clean` | Remove build artifacts, `__pycache__`, `.pyc` files |
 | `make clean-venv` | Remove virtual environment |
 
+## Flash CLI Usage
+
+The Flash CLI provides commands for local development, building, and deployment.
+
+### Development Commands
+
+```bash
+# Run development server
+flash run                    # Default: localhost:8888
+flash run --port 9000        # Custom port
+flash run --host 0.0.0.0     # Network accessible
+
+# Build deployment package
+flash build                  # Standard build
+flash build --exclude torch  # Optimize size
+```
+
+### Deployment Commands
+
+```bash
+# Environment management
+flash env create dev
+flash env create staging
+flash env create production
+
+# Deploy to environment
+flash deploy --env dev
+flash deploy --env production --exclude torch,torchvision
+
+# Manage deployments
+flash undeploy list          # Show all endpoints
+flash undeploy <name>        # Remove specific endpoint
+```
+
+### Complete Documentation
+
+See comprehensive CLI documentation:
+
+- **[CLI Reference](CLI-REFERENCE.md)** - All commands and options
+- **[Getting Started](docs/cli/getting-started.md)** - Tutorial for new users
+- **[Commands](docs/cli/commands.md)** - Detailed command documentation
+- **[Workflows](docs/cli/workflows.md)** - Common development patterns
+- **[Troubleshooting](docs/cli/troubleshooting.md)** - Problem solutions
+
 ## Development Workflow
 
 ### 1. Initial Setup

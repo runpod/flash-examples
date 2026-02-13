@@ -87,6 +87,13 @@ curl -X POST http://localhost:8888/gpu/inference \
 
 Visit http://localhost:8888/docs for interactive API documentation.
 
+### Full CLI Documentation
+
+For complete CLI usage including deployment, environment management, and troubleshooting:
+- **[CLI Reference](../../CLI-REFERENCE.md)** - All commands and options
+- **[Getting Started Guide](../../docs/cli/getting-started.md)** - Step-by-step tutorial
+- **[Workflows](../../docs/cli/workflows.md)** - Common development patterns
+
 ## Why This Pattern?
 
 ### GPU-Only Pipeline (❌ Expensive)
