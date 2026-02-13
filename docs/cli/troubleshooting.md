@@ -421,7 +421,7 @@ Common large packages:
 flash build --exclude torch,torchvision,torchaudio
 ```
 
-**RunPod base image includes:**
+**Runpod base image includes:**
 - `torch`, `torchvision`, `torchaudio` (PyTorch stack)
 - `transformers` (Hugging Face)
 - `tensorflow`, `keras` (TensorFlow stack)
@@ -430,7 +430,7 @@ flash build --exclude torch,torchvision,torchaudio
 - `numpy`, `scipy`, `pandas` (Scientific computing)
 - `pillow` (Image processing)
 
-Check RunPod documentation for complete list.
+Check Runpod documentation for complete list.
 
 **3. Use --no-deps:**
 ```bash
@@ -640,7 +640,7 @@ flash build
 
 ### Missing API Key
 
-**Problem:** RunPod API key not configured
+**Problem:** Runpod API key not configured
 
 **Symptoms:**
 ```bash
@@ -723,7 +723,7 @@ flash deploy
 
 ### Upload Failed
 
-**Problem:** Cannot upload artifact to RunPod
+**Problem:** Cannot upload artifact to Runpod
 
 **Symptoms:**
 ```bash
@@ -769,7 +769,7 @@ ls -lh artifact.tar.gz
 
 ### Endpoint Creation Failed (Insufficient GPUs)
 
-**Problem:** RunPod has no available GPUs of requested type
+**Problem:** Runpod has no available GPUs of requested type
 
 **Symptoms:**
 ```bash
@@ -813,7 +813,7 @@ sleep 300  # Wait 5 minutes
 flash deploy --env production
 ```
 
-**4. Check RunPod status:**
+**4. Check Runpod status:**
 - Visit https://runpod.io/console/serverless
 - Check GPU availability by type
 
@@ -875,7 +875,7 @@ ERROR: 500 Internal Server Error
 
 **Solutions:**
 
-**1. Check RunPod console logs:**
+**1. Check Runpod console logs:**
 1. Visit https://runpod.io/console/serverless
 2. Click on endpoint
 3. View "Logs" tab
@@ -1094,15 +1094,15 @@ echo "RUNPOD_API_KEY=new-key" > .env
 ```
 
 **References:**
-- [RunPod Console](https://runpod.io/console/user/settings)
+- [Runpod Console](https://runpod.io/console/user/settings)
 
 ---
 
 ## Network and Connectivity
 
-### Cannot Reach RunPod API
+### Cannot Reach Runpod API
 
-**Problem:** Network cannot connect to RunPod services
+**Problem:** Network cannot connect to Runpod services
 
 **Symptoms:**
 ```bash
@@ -1143,7 +1143,7 @@ flash deploy
 ```
 
 **References:**
-- [RunPod Status](https://status.runpod.io/)
+- [Runpod Status](https://status.runpod.io/)
 
 ### Slow Upload/Download
 
@@ -1232,11 +1232,11 @@ flash <command> --help
 ```
 
 **Community:**
-- RunPod Discord: https://discord.gg/runpod
+- Runpod Discord: https://discord.gg/runpod
 - GitHub Issues: https://github.com/runpod/flash/issues
 
 **Support:**
-- RunPod Support: https://runpod.io/support
+- Runpod Support: https://runpod.io/support
 
 ---
 
@@ -1291,7 +1291,7 @@ flash deploy --env production  # Redeploy to production
 
 ### Lost Configuration
 
-**Recover from RunPod console:**
+**Recover from Runpod console:**
 
 1. Visit https://runpod.io/console/serverless
 2. Note endpoint configurations

@@ -251,7 +251,16 @@ flash run [OPTIONS]
 
 Starts a local uvicorn development server that runs your Flash application. The server automatically discovers all `@remote` decorated functions and makes them available as HTTP endpoints. Supports hot reloading, custom host/port configuration, and optional resource auto-provisioning.
 
-During development, `@remote` functions run locally without deploying to RunPod. This enables fast iteration without deployment overhead.
+### Architecture: Hybrid Local + Cloud
+
+With `flash run`, your system operates in a **hybrid architecture**:
+
+- **Your FastAPI app runs locally** on your machine (localhost:8888)
+- **`@remote` functions run on Runpod** as serverless endpoints
+- **Hot reload works** because your app code is local—changes are picked up instantly
+- **Endpoints are prefixed with `live-`** to distinguish from production (e.g., `gpu-worker` becomes `live-gpu-worker`)
+
+This hybrid approach enables rapid development: iterate on your orchestration logic locally with hot-reload while testing real GPU/CPU workloads in the cloud.
 
 ### Options
 
@@ -275,7 +284,7 @@ During development, `@remote` functions run locally without deploying to RunPod.
 **`--auto-provision`**
 - Type: Boolean flag
 - Default: `false`
-- Description: Automatically provision RunPod serverless endpoints on startup. Useful for testing deployed resources locally.
+- Description: Automatically provision Runpod serverless endpoints on startup. Useful for testing deployed resources locally.
 
 ### Environment Variables
 
@@ -362,9 +371,9 @@ flash run --auto-provision
 
 This will:
 1. Start local development server
-2. Provision RunPod endpoints for all `@remote` functions
-3. Allow testing with real RunPod infrastructure
-4. Incur RunPod costs (workers will spin up)
+2. Provision Runpod endpoints for all `@remote` functions
+3. Allow testing with real Runpod infrastructure
+4. Incur Runpod costs (workers will spin up)
 
 **Use case:** Testing autoscaling behavior and cold start times.
 
@@ -569,7 +578,7 @@ flash run --auto-provision
 
 ## flash build
 
-Build the Flash application into a deployable package for RunPod serverless infrastructure.
+Build the Flash application into a deployable package for Runpod serverless infrastructure.
 
 ### Synopsis
 
@@ -579,7 +588,7 @@ flash build [OPTIONS]
 
 ### Description
 
-Packages your Flash application and its dependencies into a tar.gz archive suitable for deployment to RunPod. The build process installs dependencies cross-platform (Linux x86_64), generates handler files for each `@remote` function, creates a manifest with resource configurations, and produces a final artifact ready for upload.
+Packages your Flash application and its dependencies into a tar.gz archive suitable for deployment to Runpod. The build process installs dependencies cross-platform (Linux x86_64), generates handler files for each `@remote` function, creates a manifest with resource configurations, and produces a final artifact ready for upload.
 
 The `.build/` directory is preserved after building for inspection and debugging.
 
@@ -600,7 +609,7 @@ The `.build/` directory is preserved after building for inspection and debugging
 **`--exclude`**
 - Type: String (comma-separated)
 - Default: None
-- Description: Packages to exclude from the build. Used to avoid bundling packages already present in RunPod base images. Significantly reduces archive size.
+- Description: Packages to exclude from the build. Used to avoid bundling packages already present in Runpod base images. Significantly reduces archive size.
 
 **`--use-local-flash`**
 - Type: Boolean flag
@@ -617,7 +626,7 @@ The build command executes these steps:
 
 2. **Install Dependencies**
    - Runs `pip install --target .build/lib --platform manylinux2014_x86_64`
-   - Installs packages for Linux x86_64 (RunPod platform)
+   - Installs packages for Linux x86_64 (Runpod platform)
    - Respects `--no-deps` and `--exclude` options
 
 3. **Generate Manifest**
@@ -627,7 +636,7 @@ The build command executes these steps:
 
 4. **Generate Handlers**
    - Creates handler file for each `@remote` function
-   - Handlers interface between RunPod and your functions
+   - Handlers interface between Runpod and your functions
    - Includes error handling and serialization logic
 
 5. **Copy Application Code**
@@ -686,7 +695,7 @@ flash build -o my-app-v${VERSION}.tar.gz
 flash build --exclude torch,torchvision,torchaudio
 ```
 
-Reduces build size by excluding packages in RunPod base image.
+Reduces build size by excluding packages in Runpod base image.
 
 **Common packages to exclude:**
 - `torch`, `torchvision`, `torchaudio` - PyTorch stack
@@ -695,7 +704,7 @@ Reduces build size by excluding packages in RunPod base image.
 - `jax`, `jaxlib` - JAX ML framework
 - `opencv-python` - OpenCV
 
-Check RunPod base image documentation for full list.
+Check Runpod base image documentation for full list.
 
 #### Multiple Exclusions
 
@@ -755,7 +764,7 @@ Example output:
 **2. Exclude Packages in Base Image**
 
 ```bash
-# Exclude PyTorch (already in RunPod GPU images)
+# Exclude PyTorch (already in Runpod GPU images)
 flash build --exclude torch,torchvision,torchaudio
 ```
 
@@ -862,7 +871,7 @@ flash build
 # Native platform build
 ```
 
-This ensures your application works on RunPod's Linux infrastructure.
+This ensures your application works on Runpod's Linux infrastructure.
 
 ### Common Issues
 
@@ -971,7 +980,7 @@ flash build --exclude problematic-package
 
 ## flash deploy
 
-Build and deploy the Flash application to RunPod in a single command.
+Build and deploy the Flash application to Runpod in a single command.
 
 ### Synopsis
 
@@ -981,9 +990,21 @@ flash deploy [OPTIONS]
 
 ### Description
 
-Combines building and deploying into one streamlined command. Packages your application (same as `flash build`), then uploads to RunPod and creates serverless endpoints for each resource defined in your code.
+Combines building and deploying into one streamlined command. Packages your application (same as `flash build`), then uploads to Runpod and creates serverless endpoints for each resource defined in your code.
 
 If only one environment exists, it's used automatically. With multiple environments, specify with `--env` or select interactively.
+
+### Architecture: Fully Deployed to Runpod
+
+With `flash deploy`, your **entire application** runs on Runpod Serverless:
+
+- **Your FastAPI app runs on Runpod** as the "mothership" endpoint
+- **`@remote` functions run on Runpod** as separate worker endpoints
+- **Users call the mothership URL** directly (e.g., `https://xyz123.api.runpod.ai/api/hello`)
+- **No `live-` prefix** on endpoint names—these are production endpoints
+- **No hot reload**—code changes require a new deployment
+
+This is different from `flash run`, where your FastAPI app runs locally on your machine. With `flash deploy`, everything is in the cloud for production use.
 
 ### Options
 
@@ -1002,7 +1023,7 @@ If only one environment exists, it's used automatically. With multiple environme
 **`--preview`**
 - Type: Boolean flag
 - Default: `false`
-- Description: Build and launch local Docker preview environment instead of deploying to RunPod. Useful for testing the deployment package locally.
+- Description: Build and launch local Docker preview environment instead of deploying to Runpod. Useful for testing the deployment package locally.
 
 **Build Options** (same as `flash build`)
 
@@ -1021,7 +1042,7 @@ If only one environment exists, it's used automatically. With multiple environme
 ### Environment Variables
 
 **`RUNPOD_API_KEY`** (required)
-- RunPod API authentication key
+- Runpod API authentication key
 - Get from https://runpod.io/console/user/settings
 - Can be set in `.env` file
 
@@ -1056,7 +1077,7 @@ Next steps:
   1. Test endpoints with curl or Postman
   2. Monitor at https://runpod.io/console/serverless
   3. Update deployment: flash deploy --env dev
-  4. View logs: Visit RunPod console
+  4. View logs: Visit Runpod console
 ```
 
 #### Deploy to Specific Environment
@@ -1073,7 +1094,7 @@ Explicitly targets "production" environment.
 flash deploy --env prod --exclude torch,torchvision,torchaudio
 ```
 
-Reduces deployment package size by excluding packages in RunPod base image.
+Reduces deployment package size by excluding packages in Runpod base image.
 
 #### Deploy Different App
 
@@ -1139,7 +1160,7 @@ Optimized deployment to production environment.
    - Validate environment exists
 
 3. **Upload**
-   - Authenticate with RunPod API
+   - Authenticate with Runpod API
    - Upload artifact with progress bar
    - Verify upload integrity
 
@@ -1210,7 +1231,7 @@ curl -X POST https://efgh5678-my-api-mothership.runpod.io/your-route \
 
 ### Monitoring Deployments
 
-**View in RunPod Console:**
+**View in Runpod Console:**
 https://runpod.io/console/serverless
 
 **Check deployment status:**
@@ -1219,7 +1240,7 @@ flash env get production
 ```
 
 **View logs:**
-1. Go to RunPod console
+1. Go to Runpod console
 2. Select your endpoint
 3. View "Logs" tab
 
@@ -1363,7 +1384,7 @@ flash deploy --env production
 
 ## flash undeploy
 
-Delete deployed RunPod serverless endpoints and clean up resources.
+Delete deployed Runpod serverless endpoints and clean up resources.
 
 ### Synopsis
 
@@ -1373,9 +1394,9 @@ flash undeploy [NAME] [OPTIONS]
 
 ### Description
 
-Removes deployed endpoints from RunPod infrastructure. Supports deleting individual endpoints, bulk deletion, interactive selection, and cleaning up stale tracking data.
+Removes deployed endpoints from Runpod infrastructure. Supports deleting individual endpoints, bulk deletion, interactive selection, and cleaning up stale tracking data.
 
-Undeployment is permanent and cannot be undone. Endpoints are deleted from RunPod and removed from local tracking.
+Undeployment is permanent and cannot be undone. Endpoints are deleted from Runpod and removed from local tracking.
 
 ### Arguments
 
@@ -1399,7 +1420,7 @@ Undeployment is permanent and cannot be undone. Endpoints are deleted from RunPo
 **`--cleanup-stale`**
 - Type: Boolean flag
 - Default: `false`
-- Description: Remove endpoints from local tracking that were already deleted externally (e.g., via RunPod console). Does not delete active endpoints.
+- Description: Remove endpoints from local tracking that were already deleted externally (e.g., via Runpod console). Does not delete active endpoints.
 
 **`--force`, `-f`**
 - Type: Boolean flag
@@ -1558,7 +1579,7 @@ Stale tracking cleaned up successfully.
 
 ### What Gets Deleted
 
-**On RunPod:**
+**On Runpod:**
 - Serverless endpoint and its configuration
 - Auto-scaling settings
 - Worker instances (if running)
@@ -1618,7 +1639,7 @@ flash undeploy --all --force
 - Can be bypassed with `--force` flag
 
 **Stale Detection:**
-- Checks endpoint status on RunPod before deletion
+- Checks endpoint status on Runpod before deletion
 - Identifies endpoints deleted externally
 - Prevents errors from trying to delete non-existent endpoints
 
@@ -1652,7 +1673,7 @@ flash undeploy --cleanup-stale
 
 Problem:
 ```
-Warning: Endpoint 'my-api' not found on RunPod (may be deleted)
+Warning: Endpoint 'my-api' not found on Runpod (may be deleted)
 Remove from tracking anyway? [y/N]:
 ```
 
@@ -1694,7 +1715,7 @@ Error: Endpoint has active requests. Wait or force deletion.
 Solutions:
 ```bash
 # Wait for requests to complete
-# Check RunPod console for request status
+# Check Runpod console for request status
 
 # Or force deletion (requests will be terminated)
 flash undeploy my-api --force
@@ -1710,7 +1731,7 @@ flash undeploy list
 # Check specific environment
 flash env get production
 
-# Verify on RunPod console
+# Verify on Runpod console
 # https://runpod.io/console/serverless
 ```
 
@@ -2070,7 +2091,7 @@ flash env delete production --app old-app
 
 ### What Gets Deleted
 
-**On RunPod:**
+**On Runpod:**
 - All serverless endpoints in environment
 - Endpoint configurations and autoscaling settings
 - Running worker instances
@@ -2137,7 +2158,7 @@ Continue anyway? [y/N]:
 Solutions:
 ```bash
 # Wait for requests to complete
-# Check RunPod console
+# Check Runpod console
 
 # Or confirm to force deletion (terminates requests)
 y
@@ -2168,7 +2189,7 @@ See individual subcommand sections for detailed documentation.
 
 ## flash app list
 
-List all Flash applications under your RunPod account.
+List all Flash applications under your Runpod account.
 
 ### Synopsis
 

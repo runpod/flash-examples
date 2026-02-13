@@ -15,7 +15,7 @@ Common development workflows with step-by-step guidance. Each workflow includes 
 
 ## Local Development Workflow
 
-Rapidly iterate on your Flash application locally without deploying to RunPod.
+Rapidly iterate on your Flash application locally without deploying to Runpod.
 
 ### Goal
 
@@ -207,16 +207,16 @@ Once feature is working locally, proceed to [Build and Deploy Workflow](#build-a
 
 ## Build and Deploy Workflow
 
-Package and deploy your application to RunPod production infrastructure.
+Package and deploy your application to Runpod production infrastructure.
 
 ### Goal
 
-Deploy a tested application to RunPod with proper environment isolation and validation.
+Deploy a tested application to Runpod with proper environment isolation and validation.
 
 ### Prerequisites
 
 - Application tested locally (`flash run`)
-- RunPod API key configured (`RUNPOD_API_KEY`)
+- Runpod API key configured (`RUNPOD_API_KEY`)
 - Environment created (or will create in workflow)
 
 ### Workflow Steps
@@ -378,7 +378,7 @@ curl -X POST https://efgh5678-my-api-mothership.runpod.io/your-route \
 
 #### 8. Monitor Deployment
 
-**Check RunPod Console:**
+**Check Runpod Console:**
 1. Visit https://runpod.io/console/serverless
 2. Find your endpoints
 3. Check metrics:
@@ -440,7 +440,7 @@ flash deploy --env production
 # Check API key
 echo $RUNPOD_API_KEY
 
-# Check RunPod account status
+# Check Runpod account status
 # Visit https://runpod.io/console
 ```
 
@@ -461,7 +461,7 @@ Maintain multiple deployment environments (dev, staging, production) for safe te
 ### Prerequisites
 
 - Working Flash application
-- RunPod API key configured
+- Runpod API key configured
 - Understanding of environment isolation
 
 ### Environment Strategy
@@ -531,7 +531,7 @@ flash deploy --env staging
 # Monitor staging
 flash env get staging
 
-# Check logs in RunPod console
+# Check logs in Runpod console
 ```
 
 #### 4. Promote to Production
@@ -560,7 +560,7 @@ flash env get staging
 flash env get dev
 ```
 
-**Monitor in RunPod Console:**
+**Monitor in Runpod Console:**
 - Request rates
 - Error rates
 - Scaling behavior
@@ -654,7 +654,7 @@ flash deploy --env dev
 ```
 
 **View costs:**
-1. RunPod Console → Billing
+1. Runpod Console → Billing
 2. Filter by environment
 3. Adjust worker configs if too expensive
 
@@ -759,7 +759,7 @@ Ensure code quality and catch issues before production deployment using local pr
 
 #### Strategy 1: Local Preview Testing
 
-Test the deployment package locally before uploading to RunPod.
+Test the deployment package locally before uploading to Runpod.
 
 **1. Build and Preview:**
 ```bash
@@ -879,7 +879,7 @@ hey -n 1000 -c 10 \
 # Check worker scaling
 flash env get staging
 
-# Watch RunPod console
+# Watch Runpod console
 # - Request rate
 # - Error rate
 # - Response times
@@ -1029,7 +1029,7 @@ Regularly clean up stale deployments, test environments, and unused resources to
 
 ### Prerequisites
 
-- Access to RunPod account
+- Access to Runpod account
 - List of active projects and their environments
 
 ### Cleanup Strategies
@@ -1103,7 +1103,7 @@ Deletes environment and all its endpoints.
 
 #### Strategy 3: Remove Stale Tracking
 
-When endpoints are deleted manually via RunPod console:
+When endpoints are deleted manually via Runpod console:
 
 **1. Identify Stale Entries:**
 ```bash
@@ -1194,7 +1194,7 @@ echo "Cleaning stale endpoints..."
 flash undeploy --cleanup-stale --force
 
 # 3. Check costs
-echo "Checking costs at RunPod console..."
+echo "Checking costs at Runpod console..."
 echo "Visit: https://runpod.io/console/billing"
 
 # 4. List environments
@@ -1211,7 +1211,7 @@ Run weekly:
 
 ### Cost Monitoring
 
-**1. Check RunPod Billing:**
+**1. Check Runpod Billing:**
 - Visit https://runpod.io/console/billing
 - Review costs by environment
 - Identify expensive endpoints
@@ -1247,7 +1247,7 @@ Monthly maintenance:
 - [ ] Delete merged feature environments
 - [ ] Clean up stale tracking
 - [ ] Review and optimize worker configs
-- [ ] Check RunPod billing
+- [ ] Check Runpod billing
 - [ ] Document active deployments
 
 ### Common Issues
@@ -1273,7 +1273,7 @@ flash undeploy --cleanup-stale --force
 # Check for workers with workersMin > 0
 flash env get production
 
-# Review RunPod console for all resources
+# Review Runpod console for all resources
 # May have resources outside Flash tracking
 ```
 
@@ -1294,7 +1294,7 @@ Quickly identify and fix deployment problems using systematic troubleshooting ap
 ### Prerequisites
 
 - Understanding of Flash deployment process
-- Access to RunPod console
+- Access to Runpod console
 - Deployment logs available
 
 ### Troubleshooting Categories
@@ -1449,7 +1449,7 @@ ERROR: Failed to create endpoint: Insufficient GPU availability
 # Check GPU type in worker config
 cat gpu_worker.py
 
-# Check RunPod console for GPU availability
+# Check Runpod console for GPU availability
 ```
 
 **Solutions:**
@@ -1497,7 +1497,7 @@ Endpoint deployed but returns errors when called.
 flash env get production
 ```
 
-**B. View logs in RunPod console:**
+**B. View logs in Runpod console:**
 1. Visit https://runpod.io/console/serverless
 2. Click on endpoint
 3. View "Logs" tab
@@ -1561,7 +1561,7 @@ Slow response times or frequent cold starts.
 # Check worker configuration
 flash env get production
 
-# Monitor in RunPod console
+# Monitor in Runpod console
 # - Worker count
 # - Cold start frequency
 # - Response times
@@ -1616,7 +1616,7 @@ gpu_config = LiveServerless(
 **2. Check logs:**
 - Flash CLI output
 - `.build/` directory contents
-- RunPod console logs
+- Runpod console logs
 
 **3. Test incrementally:**
 ```bash
@@ -1663,7 +1663,7 @@ flash env get production
 
 1. Check [Troubleshooting Guide](troubleshooting.md)
 2. Review [Command Reference](commands.md)
-3. Search RunPod documentation
+3. Search Runpod documentation
 4. Open issue: https://github.com/runpod/flash/issues
 
 ### Prevention Checklist

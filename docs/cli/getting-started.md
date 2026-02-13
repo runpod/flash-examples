@@ -7,7 +7,7 @@ Complete your first Flash project in under 10 minutes. This guide walks you thro
 Before starting, ensure you have:
 
 - **Python 3.10 or higher** - Check with `python --version`
-- **RunPod API Key** - Get from https://runpod.io/console/user/settings
+- **Runpod API Key** - Get from https://runpod.io/console/user/settings
 - **Flash installed** - Install with `pip install runpod-flash`
 
 ### Verify Installation
@@ -19,7 +19,7 @@ flash --version
 
 ### Configure API Key
 
-Set your RunPod API key as an environment variable:
+Set your Runpod API key as an environment variable:
 
 ```bash
 export RUNPOD_API_KEY=your-key-here
@@ -106,6 +106,8 @@ INFO: Application startup complete
 ```
 
 **Checkpoint:** Server is running at http://localhost:8888
+
+**What's happening:** Your FastAPI app runs locally on your machine, but when you call a `@remote` function, it executes on Runpod Serverless. This hybrid architecture gives you hot-reload for rapid development while testing real GPU/CPU workloads in the cloud. Endpoints created during `flash run` are prefixed with `live-` to keep them separate from production.
 
 ---
 
@@ -200,7 +202,7 @@ Creating archive...
 
 ---
 
-### Step 7: Deploy to RunPod
+### Step 7: Deploy to Runpod
 
 Deploy your application to the "dev" environment:
 
@@ -231,7 +233,7 @@ Test your endpoint:
 
 **What happened:**
 - Built and uploaded your application
-- Created RunPod serverless endpoint
+- Created Runpod serverless endpoint
 - Configured autoscaling (0-3 workers)
 - Endpoint is live and ready to handle requests
 
@@ -267,7 +269,7 @@ curl -X POST https://abcd1234-hello-flash-gpu.runpod.io/run \
 }
 ```
 
-**Checkpoint:** Your API is live on RunPod!
+**Checkpoint:** Your API is live on Runpod!
 
 ---
 
@@ -280,7 +282,7 @@ In the past 10 minutes, you've:
 3. ✅ Tested locally via Swagger UI
 4. ✅ Created a deployment environment
 5. ✅ Built a deployment package with `flash build`
-6. ✅ Deployed to RunPod with `flash deploy`
+6. ✅ Deployed to Runpod with `flash deploy`
 7. ✅ Tested your live production endpoint
 
 ---
@@ -371,7 +373,7 @@ echo $RUNPOD_API_KEY
 
 **Solution:**
 ```bash
-# Exclude packages present in RunPod base image
+# Exclude packages present in Runpod base image
 flash build --exclude torch,torchvision,torchaudio
 ```
 
