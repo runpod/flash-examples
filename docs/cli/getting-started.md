@@ -85,9 +85,8 @@ async def process_request(input_data: dict) -> dict:
 ```
 
 **Key concepts:**
-- `@remote` decorator makes functions distributed
-- `LiveServerless` configures GPU resources
-- Functions run on RunPod when deployed, locally during development
+- `@remote` decorator marks functions to be run in the Runpod cloud
+- `LiveServerless` configures GPU resources for the function to be run on
 
 ---
 
