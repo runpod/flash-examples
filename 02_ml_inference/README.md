@@ -18,21 +18,55 @@ LLM inference API with streaming support.
 - Mistral, Mixtral
 - Qwen, Phi, Gemma
 
-### 02_image_generation _(coming soon)_
-Stable Diffusion image generation API.
+### 02_text_to_image
+Text-to-image generation API.
 
 **What you'll learn:**
-- Loading Stable Diffusion models
-- Optimizing inference with diffusers
-- Handling image uploads and downloads
-- Model caching strategies
+- Building text-to-image endpoints with `@remote` GPU workers
+- Running Diffusers pipelines on serverless GPUs
+- Returning generated images as base64 payloads
+- Tuning quality/speed tradeoffs with inference steps
 
 **Models covered:**
-- Stable Diffusion 1.5, 2.1, XL
-- SDXL Turbo
-- ControlNet integration
+- FLUX.1-schnell
 
-### 03_embeddings _(coming soon)_
+### 03_image_to_image
+Prompt-guided image transformation API with Stable Diffusion img2img.
+
+**What you'll learn:**
+- Building image-to-image endpoints with `@remote` GPU workers
+- Sending base64-encoded images through FastAPI
+- Controlling style transfer intensity with `strength` and `guidance_scale`
+- Returning transformed images from serverless workers
+
+**Models covered:**
+- Stable Diffusion v1.5 img2img pipeline
+
+### 04_text_to_video
+Prompt-guided text-to-video generation API.
+
+**What you'll learn:**
+- Building text-to-video endpoints with `@remote` GPU workers
+- Returning generated clips as portable GIF output
+- Tuning temporal quality with frames, inference steps, and guidance
+- Managing higher-memory multimodal inference workloads
+
+**Models covered:**
+- damo-vilab/text-to-video-ms-1.7b
+
+### 05_image_to_video
+Image animation API with Stable Video Diffusion.
+
+**What you'll learn:**
+- Turning still images into short animated clips on serverless GPUs
+- Sending and validating base64-encoded image inputs
+- Controlling animation dynamics with motion and noise settings
+- Returning generated clips with preview frames
+
+**Models covered:**
+- stabilityai/stable-video-diffusion-img2vid-xt
+
+### 06_embeddings _(coming soon)_
 Text embedding API for semantic search and RAG.
 
 **What you'll learn:**
@@ -46,7 +80,7 @@ Text embedding API for semantic search and RAG.
 - OpenAI-compatible embeddings
 - Multilingual models
 
-### 04_multimodal _(coming soon)_
+### 07_multimodal _(coming soon)_
 Vision-language models (CLIP, LLaVA, etc.).
 
 **What you'll learn:**

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment
+.env
+.env.local
+
+# Flash
+.flash_resources.pkl
+.tetra_resources.pkl
+
+# IDE
+.vscode/
+.idea/
+
+# Demo output
+generated.png
