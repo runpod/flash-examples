@@ -139,5 +139,7 @@ async def transform(request: ImageToImageRequest):
             raise HTTPException(status_code=500, detail=f"Default image not found: {exc}") from exc
     result = await get_worker().transform(payload)
     if result.get("status") != "success":
-        raise HTTPException(status_code=400, detail=result.get("error", "Image transformation failed"))
+        raise HTTPException(
+            status_code=400, detail=result.get("error", "Image transformation failed")
+        )
     return result

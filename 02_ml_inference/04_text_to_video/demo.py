@@ -18,9 +18,7 @@ API_URL = "http://localhost:8888/gpu/generate"
 
 def main() -> None:
     prompt = (
-        sys.argv[1]
-        if len(sys.argv) > 1
-        else "a cinematic drone shot of snowy mountains at sunrise"
+        sys.argv[1] if len(sys.argv) > 1 else "a cinematic drone shot of snowy mountains at sunrise"
     )
     output_path = Path(sys.argv[2] if len(sys.argv) > 2 else "text_to_video.gif").resolve()
 
