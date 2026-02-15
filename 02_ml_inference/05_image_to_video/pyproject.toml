@@ -1,0 +1,10 @@
+[project]
+name = "flash-image-to-video"
+version = "0.1.0"
+description = "Image-to-video generation with Diffusers on RunPod Flash"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash",
+    "fastapi>=0.104.0",
+    "pillow>=10.0.0",
+]

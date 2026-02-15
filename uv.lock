@@ -2992,12 +2992,14 @@ name = "runpod-flash-examples"
 version = "1.0.0"
 source = { editable = "." }
 dependencies = [
+    { name = "fastapi" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pillow" },
     { name = "python-multipart" },
     { name = "runpod-flash" },
     { name = "structlog" },
+    { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
@@ -3014,11 +3016,13 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "fastapi", specifier = ">=0.104.0" },
     { name = "numpy", specifier = ">=2.0.2" },
     { name = "pillow", specifier = ">=10.0.0" },
     { name = "python-multipart", specifier = ">=0.0.6" },
     { name = "runpod-flash" },
     { name = "structlog", specifier = ">=23.0.0" },
+    { name = "uvicorn", specifier = ">=0.24.0" },
 ]
 
 [package.metadata.requires-dev]
