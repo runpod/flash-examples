@@ -100,10 +100,12 @@ class ImageRequest(BaseModel):
 async def generate(request: ImageRequest):
     """Generate an image from a text prompt using FLUX.1-schnell."""
     hf_token = request.hf_token.strip() or os.environ.get("HF_TOKEN", "")
-    return await generate_image({
-        "prompt": request.prompt,
-        "width": request.width,
-        "height": request.height,
-        "num_steps": request.num_steps,
-        "hf_token": hf_token,
-    })
+    return await generate_image(
+        {
+            "prompt": request.prompt,
+            "width": request.width,
+            "height": request.height,
+            "num_steps": request.num_steps,
+            "hf_token": hf_token,
+        }
+    )
