@@ -136,9 +136,12 @@ Learn the fundamentals of Flash applications.
 Deploy machine learning models as APIs.
 
 - 01_text_generation - LLM inference (Llama, Mistral, etc.) _(coming soon)_
-- 02_image_generation - Stable Diffusion image generation _(coming soon)_
-- 03_embeddings - Text embeddings API _(coming soon)_
-- 04_multimodal - Vision-language models _(coming soon)_
+- **[02_text_to_image](./02_ml_inference/02_text_to_image/)** - Serverless text-to-image generation with FLUX.1-schnell
+- **[03_image_to_image](./02_ml_inference/03_image_to_image/)** - Serverless image-to-image transformations with Stable Diffusion
+- **[04_text_to_video](./02_ml_inference/04_text_to_video/)** - Serverless text-to-video generation with Diffusers
+- **[05_image_to_video](./02_ml_inference/05_image_to_video/)** - Serverless image-to-video animation with Stable Video Diffusion
+- 06_embeddings - Text embeddings API _(coming soon)_
+- 07_multimodal - Vision-language models _(coming soon)_
 
 ### 03 - Advanced Workers
 Production-ready worker patterns.
@@ -415,4 +418,3 @@ All examples are continuously tested against Python 3.10-3.14 to ensure compatib
 ## License
 
 MIT License - see [LICENSE](./LICENSE) for details.
-

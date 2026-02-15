@@ -1,0 +1,10 @@
+[project]
+name = "flash-image-to-image"
+version = "0.1.0"
+description = "Image-to-image transformations with Stable Diffusion on RunPod Flash"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash",
+    "fastapi>=0.104.0",
+    "pillow>=10.0.0",
+]
