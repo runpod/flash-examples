@@ -1,11 +1,11 @@
 """Flux Text-to-Image — GPU Worker
 
-One function. One decorator. Images from the cloud.
+One warm worker. Cached FLUX pipeline.
 """
 
 import os
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from runpod_flash import GpuGroup, LiveServerless, remote
 
@@ -14,14 +14,13 @@ from runpod_flash import GpuGroup, LiveServerless, remote
 # ADA_24 gives us an RTX 4090-class GPU with 24GB — plenty of room.
 gpu_config = LiveServerless(
     name="02_02_flux_schnell",
-    gpus=[GpuGroup.AMPERE_80],
+    gpus=[GpuGroup.ADA_24],
     workersMin=1,
     workersMax=3,
     idleTimeout=5,
 )
 
 
-# ── The entire inference pipeline in one function ────────────────────
 @remote(
     resource_config=gpu_config,
     dependencies=[
@@ -33,53 +32,77 @@ gpu_config = LiveServerless(
         "protobuf",
     ],
 )
-async def generate_image(input_data: dict) -> dict:
-    """Generate an image with FLUX.1-schnell on a remote GPU."""
-    import base64
-    import io
+class FluxWorker:
+    """Warm FLUX worker that caches the pipeline between requests."""
 
-    import torch
-    from diffusers import FluxPipeline
-    from huggingface_hub import login
+    def __init__(self):
+        import torch
 
-    hf_token = input_data.get("hf_token", "")
-    if hf_token:
-        login(token=hf_token)
+        self._torch = torch
+        self._model_name = "black-forest-labs/FLUX.1-schnell"
+        self._pipe = None
 
-    prompt = input_data.get("prompt", "a lightning flash above a datacenter")
-    width = input_data.get("width", 512)
-    height = input_data.get("height", 512)
-    num_steps = input_data.get("num_steps", 4)
+    def _ensure_pipeline(self, hf_token: str):
+        from diffusers import FluxPipeline
+        from huggingface_hub import login
 
-    pipe = FluxPipeline.from_pretrained(
-        "black-forest-labs/FLUX.1-schnell",
-        torch_dtype=torch.bfloat16,
-    )
-    pipe.enable_model_cpu_offload()
+        if self._pipe is not None:
+            return
 
-    image = pipe(
-        prompt,
-        num_inference_steps=num_steps,
-        width=width,
-        height=height,
-        guidance_scale=0.0,
-    ).images[0]
+        if hf_token:
+            login(token=hf_token)
 
-    buf = io.BytesIO()
-    image.save(buf, format="PNG")
-    buf.seek(0)
+        self._pipe = FluxPipeline.from_pretrained(
+            self._model_name,
+            torch_dtype=self._torch.bfloat16,
+        )
+        self._pipe.enable_model_cpu_offload()
 
-    return {
-        "status": "success",
-        "image_base64": base64.b64encode(buf.read()).decode(),
-        "prompt": prompt,
-        "width": width,
-        "height": height,
-    }
+    async def generate(self, input_data: dict) -> dict:
+        import base64
+        import io
+
+        hf_token = input_data.get("hf_token", "")
+        prompt = input_data.get("prompt", "a lightning flash above a datacenter")
+        width = int(input_data.get("width", 512))
+        height = int(input_data.get("height", 512))
+        num_steps = int(input_data.get("num_steps", 4))
+
+        try:
+            self._ensure_pipeline(hf_token=hf_token)
+            image = self._pipe(
+                prompt,
+                num_inference_steps=num_steps,
+                width=width,
+                height=height,
+                guidance_scale=0.0,
+            ).images[0]
+        except Exception as exc:
+            return {"status": "error", "error": f"Image generation failed: {exc}"}
+
+        buf = io.BytesIO()
+        image.save(buf, format="PNG")
+        buf.seek(0)
+
+        return {
+            "status": "success",
+            "image_base64": base64.b64encode(buf.read()).decode(),
+            "prompt": prompt,
+            "width": width,
+            "height": height,
+        }
 
 
 # ── FastAPI Router ───────────────────────────────────────────────────
 gpu_router = APIRouter()
+worker: FluxWorker | None = None
+
+
+def get_worker() -> FluxWorker:
+    global worker
+    if worker is None:
+        worker = FluxWorker()
+    return worker
 
 
 class ImageRequest(BaseModel):
@@ -100,7 +123,7 @@ class ImageRequest(BaseModel):
 async def generate(request: ImageRequest):
     """Generate an image from a text prompt using FLUX.1-schnell."""
     hf_token = request.hf_token.strip() or os.environ.get("HF_TOKEN", "")
-    return await generate_image(
+    result = await get_worker().generate(
         {
             "prompt": request.prompt,
             "width": request.width,
@@ -109,3 +132,6 @@ async def generate(request: ImageRequest):
             "hf_token": hf_token,
         }
     )
+    if result.get("status") != "success":
+        raise HTTPException(status_code=400, detail=result.get("error", "Image generation failed"))
+    return result
