@@ -1,3 +1,6 @@
+# GPU load-balanced endpoints with custom HTTP routes.
+# Run with: flash run
+# Test directly: python gpu_lb.py
 from runpod_flash import LiveLoadBalancer, remote
 
 gpu_config = LiveLoadBalancer(
@@ -68,7 +71,6 @@ async def gpu_info() -> dict:
     return info
 
 
-# Test locally with: python -m workers.gpu.endpoint
 if __name__ == "__main__":
     import asyncio
 
