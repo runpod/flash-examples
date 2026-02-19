@@ -1,36 +1,28 @@
+# CPU workers for text preprocessing and postprocessing.
+# Part of the mixed CPU/GPU pipeline example.
+# Run with: flash run
+# Test directly: python cpu_worker.py
 from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
 
-# Preprocessing CPU worker (fast, cheap)
 cpu_config = CpuLiveServerless(
     name="01_03_mixed_workers_cpu",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],  # Small instance - 2 vCPU, 8GB
+    instanceIds=[CpuInstanceType.CPU3G_2_8],
     idleTimeout=3,
 )
 
 
 @remote(resource_config=cpu_config)
 async def preprocess_text(input_data: dict) -> dict:
-    """
-    Preprocessing on CPU: cleaning and tokenization.
-
-    Why CPU:
-    - No ML operations
-    - Fast text operations
-    - 85% cheaper than GPU
-
-    Note: Input validation handled by Pydantic at API layer
-    """
+    """Preprocess text: cleaning and tokenization (cheap CPU work)."""
     import re
     from datetime import datetime
 
     text = input_data.get("text", "")
 
-    # Text cleaning
     cleaned_text = text.strip()
-    cleaned_text = re.sub(r"\s+", " ", cleaned_text)  # Remove extra whitespace
-    cleaned_text = re.sub(r"[^\w\s.,!?-]", "", cleaned_text)  # Remove special chars
+    cleaned_text = re.sub(r"\s+", " ", cleaned_text)
+    cleaned_text = re.sub(r"[^\w\s.,!?-]", "", cleaned_text)
 
-    # Simple tokenization (word count, sentence count)
     words = cleaned_text.split()
     sentences = len(re.split(r"[.!?]+", cleaned_text))
 
@@ -48,21 +40,13 @@ async def preprocess_text(input_data: dict) -> dict:
 
 @remote(resource_config=cpu_config)
 async def postprocess_results(input_data: dict) -> dict:
-    """
-    Postprocessing on CPU: formatting, aggregation, logging.
-
-    Why CPU:
-    - No ML operations
-    - Simple data formatting
-    - 85% cheaper than GPU
-    """
+    """Postprocess GPU results: formatting and aggregation (cheap CPU work)."""
     from datetime import datetime
 
     predictions = input_data.get("predictions", [])
     original_text = input_data.get("original_text", "")
     metadata = input_data.get("metadata", {})
 
-    # Find top prediction
     if predictions:
         top_prediction = max(predictions, key=lambda x: x["confidence"])
         confidence_level = (
@@ -76,8 +60,7 @@ async def postprocess_results(input_data: dict) -> dict:
         top_prediction = None
         confidence_level = "none"
 
-    # Format response
-    formatted_result = {
+    return {
         "status": "success",
         "text_preview": original_text[:100] + "..." if len(original_text) > 100 else original_text,
         "classification": {
@@ -94,16 +77,9 @@ async def postprocess_results(input_data: dict) -> dict:
         "worker_type": "CPU Postprocessing",
     }
 
-    return formatted_result
 
-
-# Test locally
 if __name__ == "__main__":
     import asyncio
-
-    from dotenv import find_dotenv, load_dotenv
-
-    load_dotenv(find_dotenv())  # Find and load root .env file
 
     async def test_workers():
         print("\n=== Testing Preprocessing ===")
