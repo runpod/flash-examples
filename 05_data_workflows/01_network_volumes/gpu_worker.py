@@ -1,14 +1,18 @@
-## GPU worker with network volumes
-# In this example, a GPU worker runs Stable Diffusion and writes outputs to the shared volume.
+# GPU worker with network volume for Stable Diffusion image generation.
+# Run with: flash run
+# Test directly: python gpu_worker.py
 import logging
 
-from runpod_flash import GpuGroup, LiveServerless, remote
-
-from .. import volume
+from runpod_flash import GpuGroup, LiveServerless, NetworkVolume, remote
 
 logger = logging.getLogger(__name__)
 
 MODEL_PATH = "/runpod-volume/models"
+
+volume = NetworkVolume(
+    name="flash-05-volume",
+    size=50,
+)
 
 gpu_config = LiveServerless(
     name="gpu_worker",
@@ -39,17 +43,15 @@ class SimpleSD:
         self.pipe = StableDiffusionPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
             torch_dtype=torch.float16,
-            safety_checker=None,  # Disable to save memory
+            safety_checker=None,
             use_safetensors=True,
             requires_safety_checker=False,
-            low_cpu_mem_usage=True,  # Additional memory optimization
+            low_cpu_mem_usage=True,
         )
 
-        # Move to GPU and enable small memory optimizations.
         self.pipe = self.pipe.to("cuda")
-        self.pipe.enable_attention_slicing()  # Additional memory saving
+        self.pipe.enable_attention_slicing()
 
-        # Clean up any leftover memory
         gc.collect()
         torch.cuda.empty_cache()
 
@@ -68,22 +70,19 @@ class SimpleSD:
             height=512,
         ).images[0]
 
-        # Save output into the shared volume for the CPU worker to read.
         import datetime
         import os
 
         output_dir = "/runpod-volume/generated_images"
         os.makedirs(output_dir, exist_ok=True)
 
-        # Save image locally with timestamp.
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         image_filename = f"sd_generated_{timestamp}.png"
         image_path = os.path.join(output_dir, image_filename)
         image.save(image_path)
         self.logger.info(f"Image saved to: {image_path}")
 
-        # Create response data
-        response_data = {
+        return {
             "prompt": prompt,
             "image_path": image_path,
             "timestamp": timestamp,
@@ -95,10 +94,8 @@ class SimpleSD:
             },
             "message": "Image generated and saved locally!",
         }
-        return response_data
 
 
-# Test locally with: python -m workers.gpu.endpoint
 if __name__ == "__main__":
     import asyncio
 
