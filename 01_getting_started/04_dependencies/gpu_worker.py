@@ -1,3 +1,6 @@
+# GPU workers demonstrating Python and system dependency management.
+# Run with: flash run
+# Test directly: python gpu_worker.py
 from runpod_flash import GpuGroup, LiveServerless, remote
 
 # Worker with ML dependencies (versioned)
@@ -108,10 +111,6 @@ async def process_with_system_deps(input_data: dict) -> dict:
 
 if __name__ == "__main__":
     import asyncio
-
-    from dotenv import find_dotenv, load_dotenv
-
-    load_dotenv(find_dotenv())  # Find and load root .env file
 
     async def test():
         print("\n=== Testing ML Dependencies ===")
