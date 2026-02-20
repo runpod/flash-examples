@@ -1,4 +1,3 @@
-
 import asyncio
 import logging
 
@@ -14,6 +13,7 @@ gpu_config = LiveServerless(
     idleTimeout=30,  # Keep workers running for n seconds before scaling back down
 )
 
+
 @remote(
     resource_config=gpu_config,
     dependencies=["vllm"],  # Extra package(s) installed in the worker image at runtime.
@@ -22,7 +22,7 @@ class MinimalVLLM:
     _instance = None
 
     def __new__(cls):
-        if cls._instance == None:
+        if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
@@ -33,11 +33,14 @@ class MinimalVLLM:
             "Keep original meaning. Keep it concise. Output only the rewritten text."
         )
 
-        from vllm import LLM, SamplingParams
-        from transformers import AutoTokenizer
         import os
 
-        os.environ["VLLM_WORKER_MULTIPROC_METHOD"] = "spawn"  # Safer multiprocessing mode for CUDA workers.
+        from transformers import AutoTokenizer
+        from vllm import LLM, SamplingParams
+
+        os.environ["VLLM_WORKER_MULTIPROC_METHOD"] = (
+            "spawn"  # Safer multiprocessing mode for CUDA workers.
+        )
 
         self.llm = LLM(
             model=self.MODEL,  # Hugging Face model id loaded by vLLM.
