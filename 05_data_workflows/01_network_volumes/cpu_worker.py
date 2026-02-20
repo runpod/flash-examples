@@ -1,22 +1,21 @@
 # CPU worker with network volume for listing and serving generated images.
 # Run with: flash run
 # Test directly: python cpu_worker.py
-from runpod_flash import CpuLiveServerless, NetworkVolume, remote
+from runpod_flash import CpuLiveLoadBalancer, NetworkVolume, remote
 
 volume = NetworkVolume(
     name="flash-05-volume",
     size=50,
 )
 
-cpu_config = CpuLiveServerless(
-    name="cpu_worker",
-    workersMin=0,
-    workersMax=2,
+cpu_config = CpuLiveLoadBalancer(
+    name="05_01_cpu_worker",
+    workersMin=1,
     networkVolume=volume,
 )
 
 
-@remote(resource_config=cpu_config)
+@remote(resource_config=cpu_config, path="/images", method="GET")
 async def list_images_in_volume() -> dict:
     """List generated images from the shared volume."""
     import os
@@ -30,13 +29,13 @@ async def list_images_in_volume() -> dict:
     }
 
 
-@remote(resource_config=cpu_config)
-async def get_image_from_volume(file_id: str) -> dict:
+@remote(resource_config=cpu_config, path="/images/{file_name}", method="GET")
+async def get_image_from_volume(file_name: str) -> dict:
     """Get image metadata from the shared volume."""
     import base64
     from pathlib import Path
 
-    image_path = Path(f"/runpod-volume/generated_images/{file_id}")
+    image_path = Path(f"/runpod-volume/generated_images/{file_name}")
 
     if not image_path.is_file():
         return {"status": "error", "error": "file not found"}

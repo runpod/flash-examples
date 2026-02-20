@@ -15,7 +15,7 @@ volume = NetworkVolume(
 )
 
 gpu_config = LiveServerless(
-    name="gpu_worker",
+    name="05_01_gpu_worker",
     gpus=[GpuGroup.ANY],
     workersMin=0,
     workersMax=3,
