@@ -52,6 +52,8 @@ async def get_image_from_volume(file_name: str) -> dict:
 if __name__ == "__main__":
     import asyncio
 
-    print("Checking cpu worker by listing image files in /runpod-volume/generated_images/")
+    print(
+        "Checking cpu worker by listing image files in /runpod-volume/generated_images/"
+    )
     result = asyncio.run(list_images_in_volume())
     print(f"Result: {result}")

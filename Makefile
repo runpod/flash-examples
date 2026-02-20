@@ -1,4 +1,4 @@
-.PHONY: help venv-info setup dev verify-setup consolidate-deps check-deps sync-deps update-deps clean clean-venv lint lint-fix format format-check typecheck quality-check quality-check-strict ci-quality-github
+.PHONY: help venv-info setup dev verify-setup clean clean-venv lint lint-fix format format-check quality-check ci-quality-github
 
 # ============================================================================
 # Environment Manager Auto-Detection
@@ -235,61 +235,6 @@ endif
 dev: setup # Alias for 'make setup' (backward compatibility)
 
 # ============================================================================
-# Dependency File Generation
-# ============================================================================
-
-requirements.txt: # Generate requirements.txt from pyproject.toml
-	@echo "Generating requirements.txt from pyproject.toml..."
-ifeq ($(PKG_MANAGER),uv)
-	uv pip compile pyproject.toml -o requirements.txt
-else ifdef HAS_UV
-	uv pip compile pyproject.toml -o requirements.txt
-else
-	@echo "runpod-flash" > requirements.txt
-	@echo "✓ Basic requirements.txt created (install 'uv' for dependency resolution)"
-endif
-
-environment.yml: # Generate conda environment.yml from pyproject.toml
-	@echo "Generating environment.yml for conda..."
-	@echo "name: flash-examples" > environment.yml
-	@echo "channels:" >> environment.yml
-	@echo "  - conda-forge" >> environment.yml
-	@echo "  - defaults" >> environment.yml
-	@echo "dependencies:" >> environment.yml
-	@echo "  - python>=3.11" >> environment.yml
-	@echo "  - pip" >> environment.yml
-	@echo "  - pip:" >> environment.yml
-	@echo "    - runpod-flash" >> environment.yml
-	@echo "✓ environment.yml created"
-
-consolidate-deps: # Consolidate example dependencies to root pyproject.toml
-	@echo "Consolidating example dependencies..."
-	$(PYTHON) scripts/sync_example_deps.py
-
-check-deps: # Verify example dependencies are consolidated (CI mode)
-	@echo "Verifying dependencies are consolidated..."
-	$(PYTHON) scripts/sync_example_deps.py --check
-
-sync-deps: requirements.txt environment.yml # Generate all dependency files
-	@echo "✓ All dependency files synced"
-
-update-deps: # Update dependencies to latest versions
-	@echo "Updating dependencies with $(PKG_MANAGER)..."
-ifeq ($(PKG_MANAGER),uv)
-	uv sync --upgrade
-	uv pip compile --upgrade pyproject.toml -o requirements.txt
-else ifeq ($(PKG_MANAGER),poetry)
-	poetry update
-else ifeq ($(PKG_MANAGER),pipenv)
-	pipenv update
-else ifeq ($(PKG_MANAGER),conda)
-	conda run -p ./.venv pip install --upgrade runpod-flash
-else ifeq ($(PKG_MANAGER),pip)
-	.venv/bin/pip install --upgrade runpod-flash
-endif
-	@echo "✓ Dependencies updated"
-
-# ============================================================================
 # Cleanup
 # ============================================================================
 
@@ -309,7 +254,7 @@ clean-venv: # Remove virtual environment directory
 	fi
 
 # ============================================================================
-# Code Quality - Linting
+# Code Quality
 # ============================================================================
 
 lint: # Check code with ruff
@@ -320,10 +265,6 @@ lint-fix: # Fix code issues with ruff
 	@echo "Fixing code issues with ruff..."
 	$(PYTHON_RUN) ruff check . --fix
 
-# ============================================================================
-# Code Quality - Formatting
-# ============================================================================
-
 format: # Format code with ruff
 	@echo "Formatting code with ruff..."
 	$(PYTHON_RUN) ruff format .
@@ -332,27 +273,8 @@ format-check: # Check code formatting
 	@echo "Checking code formatting..."
 	$(PYTHON_RUN) ruff format --check .
 
-# ============================================================================
-# Code Quality - Type Checking
-# ============================================================================
-
-typecheck: # Check types with mypy
-	@echo "Running mypy type checker..."
-	@$(PYTHON_RUN) mypy . || { [ $$? -eq 2 ] && echo "No Python files found for type checking"; }
-
-# ============================================================================
-# Quality Gates (used in CI)
-# ============================================================================
-
 quality-check: format-check lint # Essential quality gate for CI
 	@echo "✓ Quality checks passed"
-
-quality-check-strict: format-check lint typecheck check-deps # Strict quality gate with type checking
-	@echo "✓ Strict quality checks passed"
-
-# ============================================================================
-# GitHub Actions Specific
-# ============================================================================
 
 ci-quality-github: # Quality checks with GitHub Actions formatting
 	@echo "::group::Code formatting check"

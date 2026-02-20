@@ -56,7 +56,9 @@ class SimpleSD:
         torch.cuda.empty_cache()
 
         self.logger.info("Compact Stable Diffusion initialized successfully!")
-        self.logger.info(f"Model weights stored in {model_path}: {os.listdir(model_path)}")
+        self.logger.info(
+            f"Model weights stored in {model_path}: {os.listdir(model_path)}"
+        )
 
     async def generate_image(self, prompt: str) -> dict:
         """Generate a single image from prompt."""
@@ -102,4 +104,6 @@ if __name__ == "__main__":
     test_payload = {"message": "Testing GPU worker"}
     logger.info(f"Testing GPU worker with payload: {test_payload}")
     sd = SimpleSD()
-    asyncio.run(sd.generate_image("make an image of a cute labrador retriever surfing a wave"))
+    asyncio.run(
+        sd.generate_image("make an image of a cute labrador retriever surfing a wave")
+    )
