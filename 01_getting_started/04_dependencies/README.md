@@ -8,7 +8,6 @@ Learn how to manage Python packages and system dependencies in Flash workers.
 - **System dependencies** - Installing apt packages (ffmpeg, libgl1, etc.)
 - **Version pinning** - Reproducible builds with exact versions
 - **Dependency optimization** - Minimizing cold start time
-- **Input validation** - Using Pydantic field validators for data quality
 
 ## Quick Start
 
@@ -75,10 +74,10 @@ Install apt packages:
 async def process_video(data: dict) -> dict:
     import cv2
     import subprocess
-    
+
     # FFmpeg available
     subprocess.run(["ffmpeg", "-version"])
-    
+
     # OpenCV works (needs libgl1)
     cap = cv2.VideoCapture("video.mp4")
 ```
@@ -96,293 +95,6 @@ async def simple_function(data: dict) -> dict:
     from datetime import datetime
     return {"result": "processed"}
 ```
-
-## Input Validation with Pydantic
-
-Flash uses FastAPI and Pydantic for request validation. Validate inputs at the API layer before they reach your worker functions.
-
-### Why Validate?
-
-- **Prevent errors** - Catch invalid data before processing
-- **Better error messages** - Clear feedback to API consumers
-- **Type safety** - Enforce data structure and types
-- **Documentation** - Pydantic models auto-generate API docs
-
-### Basic Validation
-
-Define request models with type hints:
-
-```python
-from pydantic import BaseModel
-
-class DataRequest(BaseModel):
-    """Request model with automatic validation."""
-    data: list[list[int]]  # List of lists of integers
-    threshold: float = 0.5   # Optional with default
-```
-
-FastAPI automatically:
-- Validates types (returns 422 if invalid)
-- Generates OpenAPI docs
-- Provides helpful error messages
-
-### Field Validators
-
-Use `@field_validator` for custom validation logic:
-
-```python
-from pydantic import BaseModel, field_validator
-
-class DataRequest(BaseModel):
-    data: list[list[int]]
-
-    @field_validator("data")
-    @classmethod
-    def validate_two_columns(cls, v):
-        if not v:
-            raise ValueError("Data cannot be empty")
-
-        # Require at least 2 rows for statistics
-        if len(v) < 2:
-            raise ValueError(
-                f"Need at least 2 rows to compute statistics, got {len(v)}. "
-                f'Example: {{"data": [[1, 2], [3, 4]]}}'
-            )
-
-        # Check each row has exactly 2 columns
-        for i, row in enumerate(v):
-            if len(row) != 2:
-                raise ValueError(
-                    f"Row {i} has {len(row)} columns, expected exactly 2. "
-                    f'Example: {{"data": [[1, 2], [3, 4]]}}'
-                )
-
-        return v
-```
-
-This example (from `workers/cpu/__init__.py:14-30`) validates:
-1. Data is not empty
-2. At least 2 rows (prevents NaN in statistics)
-3. Each row has exactly 2 columns
-
-### Validation in FastAPI Router
-
-Connect request models to endpoints:
-
-```python
-from fastapi import APIRouter
-from pydantic import BaseModel, field_validator
-
-router = APIRouter()
-
-class DataRequest(BaseModel):
-    data: list[list[int]]
-
-    @field_validator("data")
-    @classmethod
-    def validate_structure(cls, v):
-        # Custom validation logic
-        return v
-
-@router.post("/data")
-async def process_endpoint(request: DataRequest):
-    """FastAPI validates request automatically."""
-    result = await process_data({"data": request.data})
-    return result
-```
-
-### Testing Validation
-
-Valid requests:
-```bash
-curl -X POST http://localhost:8888/cpu/data \
-  -H "Content-Type: application/json" \
-  -d '{"data": [[1, 2], [3, 4], [5, 6]]}'
-```
-
-Invalid requests return 422 with helpful errors:
-
-```bash
-# Too few rows
-curl -X POST http://localhost:8888/cpu/data \
-  -H "Content-Type: application/json" \
-  -d '{"data": [[1, 2]]}'
-
-# Response:
-{
-  "detail": [
-    {
-      "type": "value_error",
-      "msg": "Value error, Need at least 2 rows to compute statistics, got 1. Example: {\"data\": [[1, 2], [3, 4]]}"
-    }
-  ]
-}
-```
-
-```bash
-# Wrong column count
-curl -X POST http://localhost:8888/cpu/data \
-  -H "Content-Type: application/json" \
-  -d '{"data": [[1, 2, 3], [4, 5, 6]]}'
-
-# Response:
-{
-  "detail": [
-    {
-      "type": "value_error",
-      "msg": "Value error, Row 0 has 3 columns, expected exactly 2. Example: {\"data\": [[1, 2], [3, 4]]}"
-    }
-  ]
-}
-```
-
-### Validation Best Practices
-
-**1. Validate early** - At the API layer, not in worker functions
-
-```python
-# ✅ GOOD - Validation in Pydantic model
-class DataRequest(BaseModel):
-    data: list[list[int]]
-
-    @field_validator("data")
-    @classmethod
-    def validate_data(cls, v):
-        # Validation logic here
-        return v
-
-@router.post("/process")
-async def endpoint(request: DataRequest):
-    result = await worker(request.data)  # Already validated
-    return result
-
-# ❌ BAD - Validation in worker function
-@remote(resource_config=config)
-async def worker(input_data: dict):
-    data = input_data["data"]
-    if not data or not all(len(row) == 2 for row in data):
-        return {"status": "error", "error": "Invalid data"}
-    # Process data...
-```
-
-**2. Provide helpful error messages**
-
-```python
-# ✅ GOOD - Clear, actionable message
-raise ValueError(
-    f"Row {i} has {len(row)} columns, expected exactly 2. "
-    f'Example: {{"data": [[1, 2], [3, 4]]}}'
-)
-
-# ❌ BAD - Vague message
-raise ValueError("Invalid data format")
-```
-
-**3. Validate constraints, not just types**
-
-```python
-from pydantic import BaseModel, field_validator, Field
-
-class ImageRequest(BaseModel):
-    width: int = Field(gt=0, le=4096)    # 1-4096
-    height: int = Field(gt=0, le=4096)   # 1-4096
-    quality: int = Field(ge=1, le=100)   # 1-100
-
-    @field_validator("width", "height")
-    @classmethod
-    def validate_dimensions(cls, v):
-        if v % 8 != 0:
-            raise ValueError(f"Dimension must be divisible by 8, got {v}")
-        return v
-```
-
-**4. Use multiple validators for complex validation**
-
-```python
-class DataRequest(BaseModel):
-    data: list[list[float]]
-    normalize: bool = False
-
-    @field_validator("data")
-    @classmethod
-    def validate_not_empty(cls, v):
-        if not v:
-            raise ValueError("Data cannot be empty")
-        return v
-
-    @field_validator("data")
-    @classmethod
-    def validate_dimensions(cls, v):
-        # Check all rows have same length
-        if len(set(len(row) for row in v)) > 1:
-            raise ValueError("All rows must have same length")
-        return v
-```
-
-### Common Validation Patterns
-
-**Range validation:**
-```python
-from pydantic import Field
-
-class Request(BaseModel):
-    temperature: float = Field(ge=0.0, le=1.0)  # 0.0 to 1.0
-    max_tokens: int = Field(gt=0, le=4096)      # 1 to 4096
-```
-
-**String validation:**
-```python
-from pydantic import field_validator
-import re
-
-class TextRequest(BaseModel):
-    text: str
-
-    @field_validator("text")
-    @classmethod
-    def validate_text(cls, v):
-        if len(v) < 10:
-            raise ValueError("Text must be at least 10 characters")
-        if len(v) > 10000:
-            raise ValueError("Text must not exceed 10,000 characters")
-        return v
-```
-
-**List validation:**
-```python
-class BatchRequest(BaseModel):
-    items: list[str]
-
-    @field_validator("items")
-    @classmethod
-    def validate_batch_size(cls, v):
-        if len(v) == 0:
-            raise ValueError("Batch cannot be empty")
-        if len(v) > 100:
-            raise ValueError("Batch size cannot exceed 100 items")
-        return v
-```
-
-**Enum validation:**
-```python
-from enum import Enum
-from pydantic import BaseModel
-
-class OutputFormat(str, Enum):
-    JSON = "json"
-    CSV = "csv"
-    PARQUET = "parquet"
-
-class ExportRequest(BaseModel):
-    data: list[dict]
-    format: OutputFormat  # Only accepts "json", "csv", or "parquet"
-```
-
-### Resources
-
-- [Pydantic Documentation](https://docs.pydantic.dev/)
-- [FastAPI Request Validation](https://fastapi.tiangolo.com/tutorial/body/)
-- [Field Validators Guide](https://docs.pydantic.dev/latest/concepts/validators/)
 
 ## Version Constraints
 
@@ -485,14 +197,14 @@ system_dependencies=["ffmpeg", "libgl1", "wget"]
 ### 1. Pin Versions for Production
 
 ```python
-# ✅ GOOD - Reproducible
+# Good - Reproducible
 dependencies=[
     "torch==2.1.0",
     "transformers==4.35.2",
     "numpy==1.26.2",
 ]
 
-# ❌ BAD - Unpredictable
+# Bad - Unpredictable
 dependencies=[
     "torch",  # Version changes over time
     "transformers",
@@ -503,7 +215,7 @@ dependencies=[
 ### 2. Minimize Dependencies
 
 ```python
-# ✅ GOOD - Only what's needed
+# Good - Only what's needed
 @remote(
     dependencies=["requests"]  # Just one package
 )
@@ -511,7 +223,7 @@ async def fetch_data(url: str):
     import requests
     return requests.get(url).json()
 
-# ❌ BAD - Unnecessary bloat
+# Bad - Unnecessary bloat
 @remote(
     dependencies=[
         "requests",
@@ -529,8 +241,8 @@ async def fetch_data(url: str):
 
 ```bash
 # Test locally first
-python -m workers.gpu.endpoint
-python -m workers.cpu.endpoint
+python gpu_worker.py
+python cpu_worker.py
 ```
 
 ### 4. Document Dependencies

@@ -12,12 +12,11 @@ The simplest Flash application with GPU workers
 - Creating GPU workers
 - Using the `@remote` decorator
 - Running Flash applications locally
-- Testing endpoints with FastAPI docs
+- Testing endpoints with Swagger docs
 
 **Concepts:**
 - `LiveServerless` configuration for GPU workers
 - Worker auto-scaling (min/max workers)
-- FastAPI router integration
 
 ### [02_cpu_worker](./02_cpu_worker/)
 CPU-only worker example for non-GPU workloads.
@@ -35,14 +34,11 @@ Mixed GPU/CPU workers for cost-effective ML pipelines.
 - Mixed worker architecture (CPU preprocessing → GPU inference → CPU postprocessing)
 - Cost optimization (85% savings vs GPU-only pipeline)
 - Pipeline orchestration patterns
-- Pydantic input validation at each stage
 - Fail-fast validation before expensive GPU operations
-- Remote serialization with .model_dump()
 
 **Concepts:**
 - `CpuLiveServerless` for preprocessing and postprocessing
-- Pipeline orchestration with FastAPI
-- Validation patterns for production APIs
+- Pipeline orchestration with load-balanced endpoints
 
 ### [04_dependencies](./04_dependencies/)
 Managing Python packages and system dependencies.
@@ -50,7 +46,6 @@ Managing Python packages and system dependencies.
 **What you'll learn:**
 - Python dependency versioning and constraints
 - System package installation (ffmpeg, libgl1)
-- Input validation with Pydantic field validators
 - Version constraints (==, >=, <, ~=)
 - Minimizing cold start time
 - Best practices for reproducible builds
@@ -59,7 +54,6 @@ Managing Python packages and system dependencies.
 - `dependencies` parameter for Python packages
 - `system_dependencies` parameter for apt packages
 - Version pinning for reproducibility
-- Pydantic `@field_validator` for request validation
 - Dependency optimization strategies
 
 ## Learning Path
