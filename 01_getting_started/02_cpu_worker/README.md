@@ -38,8 +38,6 @@ curl -X POST http://localhost:8888/cpu_worker/run_sync \
   -d '{"name": "Flash User"}'
 ```
 
-Visit **http://localhost:8000/docs** for interactive API documentation.
-
 ### Full CLI Documentation
 
 For complete CLI usage including deployment, environment management, and troubleshooting:

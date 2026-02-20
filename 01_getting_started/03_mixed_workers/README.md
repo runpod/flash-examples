@@ -15,7 +15,7 @@ Learn the production pattern of combining CPU and GPU workers for cost-effective
 User Request
     |
 CPU Worker (Preprocessing)
-- Input validation
+- Text normalization
 - Text cleaning
 - Tokenization
     |

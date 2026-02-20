@@ -21,11 +21,12 @@ async def list_images_in_volume() -> dict:
     import os
 
     image_dir = "/runpod-volume/generated_images"
-    images = os.listdir(image_dir)
+    if not os.path.isdir(image_dir):
+        return {"status": "success", "images": []}
 
     return {
         "status": "success",
-        "images": images,
+        "images": os.listdir(image_dir),
     }
 
 
