@@ -1,3 +1,6 @@
+# CPU workers demonstrating data science and zero-dependency patterns.
+# Run with: flash run
+# Test directly: python cpu_worker.py
 from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
 
 # Worker with data science dependencies
@@ -118,10 +121,6 @@ async def minimal_process(input_data: dict) -> dict:
 
 if __name__ == "__main__":
     import asyncio
-
-    from dotenv import find_dotenv, load_dotenv
-
-    load_dotenv(find_dotenv())  # Find and load root .env file
 
     async def test():
         print("\n=== Testing Data Dependencies ===")

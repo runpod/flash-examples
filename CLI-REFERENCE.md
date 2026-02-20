@@ -101,8 +101,6 @@ flash init my-api --force
 
 ### What It Creates
 
-- `main.py` - FastAPI application entry point
-- `mothership.py` - Mothership endpoint configuration
 - `gpu_worker.py` - GPU worker template with `@remote` decorator
 - `pyproject.toml` - Project dependencies
 - `.env.example` - Environment variable template
@@ -177,8 +175,8 @@ flash run
 
 ### What It Does
 
-1. Loads `main.py` FastAPI application
-2. Discovers all `@remote` decorated functions
+1. Discovers all `.py` files (excluding `.venv/`, `.flash/`, `.runpod/`, `__init__.py`) and finds `@remote` decorated functions via AST parsing
+2. Generates a FastAPI application with routes for each discovered function
 3. Starts uvicorn development server with hot reload
 4. Provides interactive API documentation at `/docs`
 5. Optionally provisions remote resources if `--auto-provision` is enabled

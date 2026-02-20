@@ -8,26 +8,25 @@ Learn the production pattern of combining CPU and GPU workers for cost-effective
 - **Cost optimization** - Using GPU only when necessary
 - **Pipeline orchestration** - Coordinating multiple worker types
 - **Production patterns** - Real-world ML service architecture
-- **Input validation** - Pydantic validation at each pipeline stage
 
 ## Architecture
 
 ```
 User Request
-    ↓
+    |
 CPU Worker (Preprocessing)
-- Input validation
-- Text cleaning  
+- Text normalization
+- Text cleaning
 - Tokenization
-    ↓
+    |
 GPU Worker (Inference)
 - ML model inference
 - Classification
-    ↓
+    |
 CPU Worker (Postprocessing)
 - Result formatting
 - Aggregation
-    ↓
+    |
 Response
 ```
 
@@ -76,11 +75,11 @@ curl -X POST http://localhost:8888/classify \
   -d '{"text": "This product is amazing! I love it!"}'
 
 # Individual stages
-curl -X POST http://localhost:8888/cpu/preprocess \
+curl -X POST http://localhost:8888/cpu_worker/run_sync \
   -H "Content-Type: application/json" \
   -d '{"text": "Test message"}'
 
-curl -X POST http://localhost:8888/gpu/inference \
+curl -X POST http://localhost:8888/gpu_worker/run_sync \
   -H "Content-Type: application/json" \
   -d '{"cleaned_text": "Test message", "word_count": 2}'
 ```
@@ -96,7 +95,7 @@ For complete CLI usage including deployment, environment management, and trouble
 
 ## Why This Pattern?
 
-### GPU-Only Pipeline (❌ Expensive)
+### GPU-Only Pipeline (Expensive)
 ```
 Every operation on GPU = $0.0015/sec
 - Preprocessing: $0.0015/sec
@@ -105,7 +104,7 @@ Every operation on GPU = $0.0015/sec
 Total: $0.0045/sec
 ```
 
-### Mixed Pipeline (✅ Cost-Effective)
+### Mixed Pipeline (Cost-Effective)
 ```
 Use right tool for each job
 - Preprocessing: $0.0002/sec (CPU)
@@ -116,235 +115,17 @@ Total: $0.0019/sec
 
 ## When to Use This Pattern
 
-✅ **Use mixed workers when:**
+**Use mixed workers when:**
 - ML inference is only part of your workflow
 - You have preprocessing/postprocessing logic
 - You want to minimize GPU costs
 - You need input validation before expensive operations
 - You process data after inference
 
-❌ **Don't use when:**
+**Don't use when:**
 - Your entire workflow needs GPU (image processing, video, etc.)
 - Overhead of orchestration > cost savings
 - Very simple operations (single worker is fine)
-
-## Input Validation
-
-This example demonstrates production-grade input validation using Pydantic at each pipeline stage.
-
-### Why Validation in Pipelines?
-
-**Key principle: Fail fast before expensive operations**
-
-- Catch errors **before** GPU inference (saves money)
-- Validate at API layer (prevents bad data reaching workers)
-- Provide clear error messages (better developer experience)
-- Type-safe data structures (prevent runtime errors)
-
-### Validation at Each Stage
-
-**1. Pipeline Endpoint (/classify)**
-
-```python
-class ClassifyRequest(BaseModel):
-    text: str
-
-    @field_validator("text")
-    @classmethod
-    def validate_text(cls, v):
-        if not v or not v.strip():
-            raise ValueError("Text cannot be empty")
-        if len(v) < 3:
-            raise ValueError("Text too short (minimum 3 characters)")
-        if len(v) > 10000:
-            raise ValueError("Text too long (maximum 10,000 characters)")
-        return v
-```
-
-**2. Preprocessing Endpoint (/cpu/preprocess)**
-
-```python
-class PreprocessRequest(BaseModel):
-    text: str  # Same validation as ClassifyRequest
-```
-
-Validates:
-- Text is not empty or whitespace
-- Minimum 3 characters
-- Maximum 10,000 characters
-
-**3. Inference Endpoint (/gpu/inference)**
-
-```python
-class InferenceRequest(BaseModel):
-    cleaned_text: str
-    word_count: int = Field(ge=0)  # >= 0
-
-    @field_validator("cleaned_text")
-    @classmethod
-    def validate_text_not_empty(cls, v):
-        if not v or not v.strip():
-            raise ValueError("Cleaned text cannot be empty")
-        return v
-```
-
-Validates:
-- Cleaned text is not empty
-- Word count is non-negative
-
-**4. Postprocessing Endpoint (/cpu/postprocess)**
-
-```python
-class Prediction(BaseModel):
-    label: str
-    confidence: float
-
-    @field_validator("confidence")
-    @classmethod
-    def validate_confidence(cls, v):
-        if not 0.0 <= v <= 1.0:
-            raise ValueError(f"Confidence must be between 0.0 and 1.0")
-        return v
-
-class PostprocessRequest(BaseModel):
-    predictions: list[Prediction]  # Validates structure!
-    original_text: str
-    metadata: dict
-```
-
-Validates:
-- Predictions is a list of `Prediction` objects
-- Each prediction has `label` (str) and `confidence` (float 0.0-1.0)
-- Rejects invalid structures like `["string"]`
-
-### Remote Serialization Pattern
-
-**Problem:** Pydantic models can't be directly serialized for remote workers.
-
-**Solution:** Convert models to dicts using `.model_dump()`:
-
-```python
-# ❌ BAD - Pydantic models cause serialization errors
-result = await postprocess_results({
-    "predictions": request.predictions,  # List[Prediction] objects
-})
-
-# ✅ GOOD - Convert to dicts first
-result = await postprocess_results({
-    "predictions": [pred.model_dump() for pred in request.predictions],
-})
-```
-
-This pattern:
-1. Validates at API layer (type safety + error messages)
-2. Converts to plain dicts before remote call (avoids serialization issues)
-3. Remote worker receives clean, validated data
-
-### Testing Validation
-
-**Valid requests:**
-
-```bash
-# Pipeline endpoint
-curl -X POST http://localhost:8888/classify \
-  -H "Content-Type: application/json" \
-  -d '{"text": "This product is amazing!"}'
-
-# Postprocessing endpoint
-curl -X POST http://localhost:8888/cpu/postprocess \
-  -H "Content-Type: application/json" \
-  -d '{
-    "predictions": [
-      {"label": "positive", "confidence": 0.9},
-      {"label": "negative", "confidence": 0.1}
-    ],
-    "original_text": "This is great!",
-    "metadata": {"word_count": 3}
-  }'
-```
-
-**Invalid requests (rejected with 422):**
-
-```bash
-# Too short
-curl -X POST http://localhost:8888/classify \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Hi"}'
-# Error: Text too short (minimum 3 characters)
-
-# Invalid predictions structure
-curl -X POST http://localhost:8888/cpu/postprocess \
-  -H "Content-Type: application/json" \
-  -d '{
-    "predictions": ["string"],
-    "original_text": "Test",
-    "metadata": {}
-  }'
-# Error: Input should be a valid dictionary or instance of Prediction
-
-# Confidence out of range
-curl -X POST http://localhost:8888/cpu/postprocess \
-  -H "Content-Type: application/json" \
-  -d '{
-    "predictions": [{"label": "test", "confidence": 1.5}],
-    "original_text": "Test",
-    "metadata": {}
-  }'
-# Error: Confidence must be between 0.0 and 1.0
-```
-
-### Validation Best Practices
-
-**1. Validate early** - At API layer, not in worker functions
-
-```python
-# ✅ GOOD - Validation in Pydantic model
-class Request(BaseModel):
-    text: str
-
-    @field_validator("text")
-    @classmethod
-    def validate_text(cls, v):
-        if len(v) < 3:
-            raise ValueError("Too short")
-        return v
-
-# ❌ BAD - Validation in worker function
-@remote(resource_config=config)
-async def process(data: dict) -> dict:
-    if len(data["text"]) < 3:
-        return {"error": "Too short"}  # Wastes remote call
-```
-
-**2. Save costs** - Reject bad requests before GPU operations
-
-```python
-# Pipeline validates input → rejects early → GPU never called → money saved
-```
-
-**3. Clear errors** - Help API consumers fix issues
-
-```python
-# ✅ GOOD
-raise ValueError("Text too long (maximum 10,000 characters). Got 15000 characters.")
-
-# ❌ BAD
-raise ValueError("Invalid text")
-```
-
-**4. Type safety** - Use structured models, not raw dicts
-
-```python
-# ✅ GOOD - Type-safe, validated
-predictions: list[Prediction]
-
-# ❌ BAD - No validation, error-prone
-predictions: list
-```
-
-### Resources
-
-See also: [04_dependencies](../04_dependencies/) for more validation patterns
 
 ## Worker Configurations
 
@@ -392,28 +173,32 @@ postprocess_config = CpuLiveServerless(
 
 ## Pipeline Orchestration
 
-The `/classify` endpoint orchestrates all workers:
+The `/classify` load-balanced endpoint orchestrates all workers:
 
 ```python
-@app.post("/classify")
-async def classify_text(request: ClassifyRequest):
-    # Stage 1: CPU Preprocessing
-    preprocess_result = await preprocess_text({"text": request.text})
-    
-    # Stage 2: GPU Inference
-    gpu_result = await gpu_inference({
-        "cleaned_text": preprocess_result["cleaned_text"],
-        "word_count": preprocess_result["word_count"],
-    })
-    
-    # Stage 3: CPU Postprocessing
-    final_result = await postprocess_results({
-        "predictions": gpu_result["predictions"],
-        "original_text": request.text,
-        "metadata": metadata,
-    })
-    
-    return final_result
+@remote(resource_config=pipeline_config, method="POST", path="/classify")
+async def classify(text: str) -> dict:
+    """Complete ML pipeline: CPU preprocess -> GPU inference -> CPU postprocess."""
+    preprocess_result = await preprocess_text({"text": text})
+
+    gpu_result = await gpu_inference(
+        {
+            "cleaned_text": preprocess_result["cleaned_text"],
+            "word_count": preprocess_result["word_count"],
+        }
+    )
+
+    return await postprocess_results(
+        {
+            "predictions": gpu_result["predictions"],
+            "original_text": text,
+            "metadata": {
+                "word_count": preprocess_result["word_count"],
+                "sentence_count": preprocess_result["sentence_count"],
+                "model": gpu_result["model_info"],
+            },
+        }
+    )
 ```
 
 ## Cost Analysis
@@ -427,15 +212,15 @@ Assumptions:
 
 **Mixed Pipeline:**
 ```
-Preprocessing: 0.05 × $0.0002 × 10,000 = $0.10/day
-Inference: 0.2 × $0.0015 × 10,000 = $3.00/day
-Postprocessing: 0.03 × $0.0002 × 10,000 = $0.06/day
+Preprocessing: 0.05 x $0.0002 x 10,000 = $0.10/day
+Inference: 0.2 x $0.0015 x 10,000 = $3.00/day
+Postprocessing: 0.03 x $0.0002 x 10,000 = $0.06/day
 Total: $3.16/day = $94.80/month
 ```
 
 **GPU-Only Pipeline:**
 ```
-All stages: 0.28 × $0.0015 × 10,000 = $4.20/day
+All stages: 0.28 x $0.0015 x 10,000 = $4.20/day
 Total: $126/month
 ```
 
@@ -445,31 +230,7 @@ For higher volumes, savings multiply significantly.
 
 ## Production Best Practices
 
-### 1. Input Validation
-
-Always validate input at API layer **before** pipeline execution:
-
-```python
-class ClassifyRequest(BaseModel):
-    text: str
-
-    @field_validator("text")
-    @classmethod
-    def validate_text(cls, v):
-        # Validation happens here - fails fast before GPU
-        if not v or len(v) < 3 or len(v) > 10000:
-            raise ValueError("Invalid text")
-        return v
-
-@app.post("/classify")
-async def classify(request: ClassifyRequest):
-    # Input already validated by Pydantic
-    # GPU won't be called for invalid requests
-    result = await run_pipeline(request.text)
-    return result
-```
-
-### 2. Error Handling
+### 1. Error Handling
 
 ```python
 try:
@@ -488,18 +249,18 @@ except Exception as e:
     raise HTTPException(status_code=500, detail=str(e))
 ```
 
-### 3. Timeouts
+### 2. Timeouts
 
 Set appropriate timeouts for each stage:
 ```python
 # CPU stages: short timeouts
 preprocess_config.executionTimeout = 30  # seconds
 
-# GPU stage: longer timeout  
+# GPU stage: longer timeout
 gpu_config.executionTimeout = 120  # seconds
 ```
 
-### 4. Monitoring
+### 3. Monitoring
 
 Track costs per stage:
 ```python
@@ -517,51 +278,6 @@ flash deploy new production
 
 # Deploy
 flash deploy send production
-```
-
-## Advanced Patterns
-
-### Conditional GPU Usage
-
-Only use GPU when necessary:
-
-```python
-@app.post("/classify-smart")
-async def smart_classify(request: ClassifyRequest):
-    # Preprocess
-    preprocess_result = await preprocess_text({"text": request.text})
-    
-    # Check if GPU is needed
-    if preprocess_result["word_count"] < 5:
-        # Simple rule-based classification (no GPU)
-        return {"classification": "neutral", "method": "rules"}
-    
-    # Use GPU for complex cases
-    gpu_result = await gpu_inference(preprocess_result)
-    return await postprocess_results(gpu_result)
-```
-
-### Batch Processing
-
-Process multiple inputs together:
-
-```python
-@app.post("/classify-batch")
-async def batch_classify(requests: list[ClassifyRequest]):
-    # Preprocess all on CPU
-    preprocessed = await asyncio.gather(*[
-        preprocess_text({"text": r.text}) for r in requests
-    ])
-    
-    # Batch GPU inference
-    gpu_results = await gpu_batch_inference(preprocessed)
-    
-    # Postprocess all on CPU
-    final_results = await asyncio.gather(*[
-        postprocess_results(r) for r in gpu_results
-    ])
-    
-    return final_results
 ```
 
 ## Troubleshooting

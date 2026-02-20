@@ -44,9 +44,9 @@ All examples must meet these standards:
 - [ ] All endpoints return correct responses
 - [ ] Error handling is implemented
 - [ ] Environment variables are documented
-- [ ] Dependencies are pinned in pyproject.toml
-- [ ] Dependencies consolidated to root with `make consolidate-deps`
-- [ ] Example loads in unified app (`flash run` from root)
+- [ ] Dependencies are declared in pyproject.toml
+- [ ] Runtime deps declared in `@remote(dependencies=[...])`
+- [ ] Example discovered by `flash run` from project root
 
 ### 2. Code Quality
 - [ ] Clear, readable code
@@ -130,26 +130,17 @@ flash run
 # Test all endpoints
 ```
 
-### 5. Consolidate Dependencies to Root
+### 5. Verify Discovery
 
-**Important**: The unified app loads all examples dynamically, so all example dependencies must be available in the root environment.
-
-After adding your example with its dependencies, consolidate them to the root:
+`flash run` auto-discovers all `.py` files containing `@remote` functions. Verify your example loads:
 
 ```bash
 # From the repository root
-make consolidate-deps  # Consolidates your example's deps to root pyproject.toml
-uv sync                # Installs the new dependencies
+flash run
+# Check http://localhost:8888/docs for your new endpoints
 ```
 
-The consolidation script:
-- Automatically scans your example's `pyproject.toml`
-- Merges all dependencies into the root configuration
-- Lets pip/uv handle version resolution
-
-If pip/uv reports version conflicts, resolve them manually in the root `pyproject.toml`.
-
-**Verification**: Run `flash run` from the repository root to ensure your example loads without import errors.
+Runtime dependencies (torch, transformers, etc.) are declared in `@remote(dependencies=[...])` and installed on the remote worker, not locally.
 
 ### 6. Create Pull Request
 
@@ -170,69 +161,28 @@ Create a PR with:
 
 ### Standard Structure
 
+Each example is a flat directory with self-contained worker files (named `*_worker.py` by convention):
+
 ```
 your_example/
 ├── README.md              # Required: comprehensive documentation
-├── main.py               # Required: FastAPI application
-├── workers/              # Required: remote worker functions
-│   ├── gpu/
-│   │   ├── __init__.py
-│   │   └── endpoint.py
-│   └── cpu/
-│       ├── __init__.py
-│       └── endpoint.py
-├── requirements.txt      # Required: pinned dependencies
-├── pyproject.toml        # Required: project metadata
-├── .env.example          # Required: environment template
-├── .gitignore           # Required: ignore .env, .venv, etc.
-├── .flashignore         # Optional: files to exclude from deployment
-├── tests/               # Recommended: test files
-│   ├── test_endpoints.py
+├── gpu_worker.py          # Required: GPU worker with @remote decorator
+├── cpu_worker.py          # Optional: CPU worker with @remote decorator
+├── pyproject.toml         # Required: project metadata and dependencies
+├── .flashignore           # Optional: files to exclude from deployment
+├── tests/                 # Recommended: test files
+│   ├── test_workers.py
 │   └── conftest.py
-└── assets/              # Optional: images, diagrams, etc.
+└── assets/                # Optional: images, diagrams, etc.
     └── architecture.png
 ```
 
-### Minimal main.py
+`flash run` discovers all `.py` files with `@remote` functions automatically -- no `main.py`, no `workers/` directories, no router wiring.
+
+### Minimal Worker (`gpu_worker.py`)
 
 ```python
-from fastapi import FastAPI
-from workers.gpu import gpu_router
-from workers.cpu import cpu_router
-
-app = FastAPI(
-    title="Your Example",
-    description="Brief description",
-    version="0.1.0",
-)
-
-app.include_router(gpu_router, prefix="/gpu", tags=["GPU Workers"])
-app.include_router(cpu_router, prefix="/cpu", tags=["CPU Workers"])
-
-@app.get("/")
-def home():
-    return {
-        "message": "Your Example API",
-        "docs": "/docs",
-    }
-
-@app.get("/health")
-def health():
-    return {"status": "healthy"}
-
-if __name__ == "__main__":
-    import uvicorn
-    import os
-
-    host = os.getenv("FLASH_HOST", "localhost")
-    port = int(os.getenv("FLASH_PORT", 8888))
-    uvicorn.run(app, host=host, port=port)
-```
-
-### Minimal Worker (endpoint.py)
-
-```python
-from runpod_flash import remote, LiveServerless, GpuGroup
+from runpod_flash import remote, LiveServerless
 
 config = LiveServerless(name="your_worker")
 
@@ -377,8 +327,8 @@ Two debug configurations are available:
 - **Python Debugger: Current File** - Debug any Python file
 - **Flash Worker: Debug Endpoint** - Debug worker endpoint files with async support
 
-To debug an endpoint:
-1. Open any `endpoint.py` file (e.g., `01_getting_started/01_hello_world/workers/gpu/endpoint.py`)
+To debug a worker:
+1. Open any `*_worker.py` file (e.g., `01_getting_started/01_hello_world/hello_worker.py`)
 2. Set breakpoints in your worker functions
 3. Press F5 or select "Debug: Start Debugging"
 4. Choose the appropriate debug configuration
@@ -391,9 +341,9 @@ The `.env` file is automatically loaded, so your `RUNPOD_API_KEY` is available d
 Add tests for your worker functions:
 
 ```python
-# tests/test_endpoints.py
+# tests/test_workers.py
 import pytest
-from workers.gpu.endpoint import your_function
+from your_example.gpu_worker import your_function
 
 @pytest.mark.asyncio
 async def test_your_function():
@@ -457,67 +407,51 @@ RUNPOD_API_KEY = "hardcoded_key"  # Never do this!
 ### Error Handling
 
 ```python
-# Good
-from fastapi import HTTPException
+# Good - handle errors within @remote functions
+from runpod_flash import remote, LiveServerless
 
-@router.post("/process")
-async def process(data: dict):
+config = LiveServerless(name="processor")
+
+@remote(resource_config=config)
+async def process(data: dict) -> dict:
     try:
-        result = await worker_function(data)
-        return result
+        result = do_work(data)
+        return {"status": "success", "result": result}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        return {"status": "error", "detail": str(e)}
 
 # Bad
-@router.post("/process")
-async def process(data: dict):
-    result = await worker_function(data)  # No error handling
+@remote(resource_config=config)
+async def process(data: dict) -> dict:
+    result = do_work(data)  # No error handling
     return result
 ```
 
 ## Dependencies
 
-### Requirements.txt
-
-Pin all dependencies:
-
-```txt
-runpod_flash==1.2.3
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-torch==2.1.0
-transformers==4.35.0
-```
-
-Generate with:
-```bash
-pip freeze > requirements.txt
-```
-
 ### pyproject.toml
 
-Include project metadata:
+Each example declares only its local development dependencies in `pyproject.toml`. Runtime deps needed on the GPU (torch, transformers, etc.) go in `@remote(dependencies=[...])`:
 
 ```toml
 [project]
 name = "your-example"
 version = "0.1.0"
 description = "Brief description"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "runpod-flash",
 ]
 ```
 
+The root `requirements.txt` is a generated lockfile -- do not add per-example `requirements.txt` files.
+
 ## Security Best Practices
 
 1. **Never commit secrets**
    - Use `.env` files (gitignored)
-   - Provide `.env.example` templates
-   - Document all required environment variables
+   - The root `.env.example` documents required variables
+   - Do not add per-example `.env.example` files
 
 2. **Validate inputs**
    - Use Pydantic models

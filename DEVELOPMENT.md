@@ -451,32 +451,31 @@ Then review and test changes before committing.
 
 ### Creating New Examples
 
-**1. Create directory structure:**
+**1. Create directory and worker files:**
 
 ```bash
-mkdir -p 01_getting_started/05_new_example/workers/{gpu,cpu}
+mkdir 01_getting_started/05_new_example
 cd 01_getting_started/05_new_example
 ```
 
 **2. Create files:**
 
 ```bash
-touch README.md main.py .env.example
-touch workers/gpu/__init__.py workers/gpu/endpoint.py
-touch workers/cpu/__init__.py workers/cpu/endpoint.py
+touch README.md gpu_worker.py pyproject.toml
 ```
 
-**3. Generate dependencies:**
+Each worker file (named `*_worker.py` by convention) is self-contained with `@remote` decorated functions. `flash run` discovers all `.py` files with `@remote` functions automatically -- no `main.py`, no `workers/` directories needed.
+
+**3. Declare dependencies:**
+
+Add a `pyproject.toml` with `runpod-flash` as the only local dependency. Runtime deps (torch, etc.) go in `@remote(dependencies=[...])`.
+
+**4. Verify discovery:**
 
 ```bash
-# Create pyproject.toml with dependencies
-# Then generate requirements.txt
 cd ../../  # Back to root
-make requirements.txt
-cp requirements.txt 01_getting_started/05_new_example/
+flash run  # Discovers all .py files with @remote functions
 ```
-
-**4. Follow example structure** (see README.md)
 
 ### Cleaning Up
 

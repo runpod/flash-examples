@@ -1,3 +1,7 @@
+# Qwen3-TTS text-to-speech GPU worker.
+# Run with: flash run
+# Test directly: python gpu_worker.py
+
 from runpod_flash import GpuGroup, LiveServerless, remote
 
 # GPU config for Qwen3-TTS - needs 24GB+ VRAM for 1.7B model
@@ -162,7 +166,7 @@ async def get_voices(input_data: dict) -> dict:
     }
 
 
-# Test locally with: python -m workers.gpu.endpoint
+# Test locally with: python gpu_worker.py
 if __name__ == "__main__":
     import asyncio
 

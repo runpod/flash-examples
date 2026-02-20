@@ -81,15 +81,6 @@ curl -X POST http://localhost:8888/05_load_balancer/cpu/transform \
   -d '{"text": "hello", "operation": "uppercase"}'
 ```
 
-### 5. Run Standalone (for this example only)
-
-```bash
-cd 03_advanced_workers/05_load_balancer
-python main.py
-```
-
-This runs the example on **http://localhost:8000** (default standalone port) without the example name prefix. The unified app uses port 8888, but standalone mode defaults to 8000 unless FLASH_PORT is set.
-
 ## How Load-Balancer Endpoints Work
 
 ### Defining Routes with @remote Decorator
@@ -160,17 +151,11 @@ The following paths are reserved and cannot be used:
 
 ```
 05_load_balancer/
-├── main.py                    # FastAPI application
-├── workers/
-│   ├── gpu/                  # GPU load-balancer endpoints
-│   │   ├── __init__.py       # Router with endpoints
-│   │   └── endpoint.py       # @remote functions
-│   └── cpu/                  # CPU load-balancer endpoints
-│       ├── __init__.py       # Router with endpoints
-│       └── endpoint.py       # @remote functions
-├── .env.example              # Environment template
-├── requirements.txt          # Dependencies
-└── README.md                 # This file
+├── gpu_lb.py            # GPU load-balancer endpoints with @remote
+├── cpu_lb.py            # CPU load-balancer endpoints with @remote
+├── .env.example         # Environment template
+├── requirements.txt     # Dependencies
+└── README.md            # This file
 ```
 
 ## GPU Service Endpoints
@@ -334,10 +319,10 @@ async def process(data: dict) -> dict:
 
 ```bash
 # Test GPU worker
-python -m workers.gpu.endpoint
+python gpu_lb.py
 
 # Test CPU worker
-python -m workers.cpu.endpoint
+python cpu_lb.py
 ```
 
 ## Deployment
@@ -427,7 +412,7 @@ RUNPOD_API_KEY=your_api_key_here
 
 # Optional
 FLASH_HOST=localhost     # Server host (default: localhost)
-FLASH_PORT=8000         # Server port (default: 8000)
+FLASH_PORT=8888         # Server port (default: 8888)
 LOG_LEVEL=INFO          # Logging level (default: INFO)
 ```
 
@@ -484,14 +469,6 @@ For current pricing, see [RunPod Pricing](https://www.runpod.io/pricing).
 - First request to a cold worker will be slower (initialization)
 - Adjust `workersMin` to keep workers warm if consistent low latency is critical
 - Consider using `idleTimeout` to reduce cold starts
-
-### Endpoint discovery not working
-
-**Problem**: Example doesn't load in unified app with `flash run`
-- Ensure routers are named `gpu_router` and `cpu_router`
-- Verify routers are properly exported in `__init__.py` files
-- Check that `main.py` includes routers with `app.include_router()`
-- Run `flash run` from the repository root, not the example directory
 
 ## Next Steps
 

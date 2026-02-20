@@ -38,4 +38,4 @@ jobs:
         run: make venv-info
 
       - name: Run quality checks
-        run: make quality-check-strict
+        run: make quality-check

@@ -34,25 +34,24 @@ Server starts at `http://localhost:8888`
 
 ### 4. Test the API
 
+**Generate an image (GPU worker):**
 ```bash
-# Health check
-curl http://localhost:8888/ping
-
-# Generate an image on the GPU worker
-curl -X POST http://localhost:8888/gpu/generate \
+curl -X POST http://localhost:8888/gpu_worker/run_sync \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "a lighthouse on a cliff at sunrise"}'
+  -d '{"prompt": "a sunset over mountains"}'
+```
 
-# List generated images from the CPU worker
-curl http://localhost:8888/cpu/image
+**List generated images (CPU worker):**
+```bash
+curl http://localhost:8888/images
+```
 
-# Fetch a single image by filename
-curl http://localhost:8888/cpu/image/<file_id> --output image.png
+**Get a specific image (CPU worker):**
+```bash
+curl http://localhost:8888/images/sd_generated_20240101_120000.png
 ```
 
 Visit `http://localhost:8888/docs` for interactive API documentation.
-
-Browse the image gallery at `http://localhost:8888/cpu/`.
 
 ## What You'll Learn
 
@@ -69,26 +68,21 @@ Browse the image gallery at `http://localhost:8888/cpu/`.
 
 ```
 01_network_volumes/
-├── main.py
-├── workers/
-│   ├── __init__.py           # Network volume definition
-│   ├── gpu/
-│   │   ├── __init__.py       # GPU router
-│   │   └── endpoint.py       # Stable Diffusion worker
-│   └── cpu/
-│       ├── __init__.py       # CPU router
-│       └── endpoint.py       # List and serve images
+├── gpu_worker.py        # Stable Diffusion worker with @remote
+├── cpu_worker.py        # List and serve images with @remote
 ├── requirements.txt
 └── README.md
 ```
 
 ## API Endpoints
 
-### POST /gpu/generate
+### POST /gpu_worker/run_sync
+
+GPU worker (QB, class-based `@remote`). Generates an image and saves it to the shared volume.
 
 **Request**:
 ```json
-{ "prompt": "string" }
+{ "prompt": "a sunset over mountains" }
 ```
 
 **Response**:
@@ -107,20 +101,22 @@ Browse the image gallery at `http://localhost:8888/cpu/`.
 }
 ```
 
-### GET /cpu/image
+### GET /images
+
+CPU worker (LB, explicit path). Lists all generated images on the shared volume.
 
 **Response**:
 ```json
-{ "status": "success", "images": ["file.png"] }
+{ "status": "success", "images": ["sd_generated_20240101_120000.png"] }
 ```
 
-### GET /cpu/image/{file_id}
+### GET /images/{file_name}
 
-Returns the PNG file as `image/png`.
+CPU worker (LB, explicit path). Returns metadata and base64-encoded content for a single image.
 
 ## Notes
 
-- The network volume is defined in `workers/__init__.py` and attached to both workers.
+- The network volume is defined inline in each worker file and attached to both workers.
 - Stable Diffusion weights are cached in the volume so cold starts are faster after the first run.
 
 ## Deployment

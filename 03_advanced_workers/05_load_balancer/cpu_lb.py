@@ -1,3 +1,6 @@
+# CPU load-balanced endpoints with custom HTTP routes.
+# Run with: flash run
+# Test directly: python cpu_lb.py
 from runpod_flash import CpuLiveLoadBalancer, remote
 
 cpu_config = CpuLiveLoadBalancer(
@@ -95,7 +98,6 @@ async def transform_data(text: str, operation: str = "uppercase") -> dict:
     }
 
 
-# Test locally with: python -m workers.cpu.endpoint
 if __name__ == "__main__":
     import asyncio
 
