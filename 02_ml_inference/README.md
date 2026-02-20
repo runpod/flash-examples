@@ -4,21 +4,22 @@ Deploy machine learning models as production-ready APIs. Learn how to serve LLMs
 
 ## Examples
 
-### 01_text_generation _(coming soon)_
-LLM inference API with streaming support.
+### 01_text_to_speech
+Text-to-speech API using Qwen3-TTS on serverless GPU workers.
+
+### 02_text_generation
+vLLM-based text generation API with a cached Qwen model.
 
 **What you'll learn:**
-- Loading and serving LLMs (Llama, Mistral, etc.)
-- Streaming text generation
-- Model quantization for efficiency
-- Memory management for large models
+- Loading and serving LLMs with vLLM
+- Prompt templating for chat-style generation
+- Worker-level model caching for lower latency
+- Input validation and generation controls
 
 **Models covered:**
-- Llama 3, Llama 3.1, Llama 3.2
-- Mistral, Mixtral
-- Qwen, Phi, Gemma
+- Qwen/Qwen2.5-3B-Instruct
 
-### 02_image_generation _(coming soon)_
+### 03_image_generation _(coming soon)_
 Stable Diffusion image generation API.
 
 **What you'll learn:**
@@ -32,7 +33,7 @@ Stable Diffusion image generation API.
 - SDXL Turbo
 - ControlNet integration
 
-### 03_embeddings _(coming soon)_
+### 04_embeddings _(coming soon)_
 Text embedding API for semantic search and RAG.
 
 **What you'll learn:**
@@ -46,7 +47,7 @@ Text embedding API for semantic search and RAG.
 - OpenAI-compatible embeddings
 - Multilingual models
 
-### 04_multimodal _(coming soon)_
+### 05_multimodal _(coming soon)_
 Vision-language models (CLIP, LLaVA, etc.).
 
 **What you'll learn:**
