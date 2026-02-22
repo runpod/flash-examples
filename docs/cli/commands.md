@@ -1217,7 +1217,7 @@ curl -X POST https://abcd1234-my-api-gpu.runpod.io/run \
   -H "Content-Type: application/json" \
   -d '{
     "input": {
-      "input_data": {"message": "test"}
+      "payload": {"message": "test"}
     }
   }'
 ```

@@ -74,13 +74,13 @@ gpu_config = LiveServerless(
 )
 
 @remote(resource_config=gpu_config)
-async def process_request(input_data: dict) -> dict:
+async def process_request(payload: dict) -> dict:
     """Example GPU worker that processes requests."""
     # Your GPU processing logic here
     return {
         "status": "success",
         "message": "Hello from Flash GPU worker!",
-        "input_received": input_data
+        "input_received": payload
     }
 ```
 
@@ -127,7 +127,7 @@ You'll see FastAPI's interactive Swagger UI with your endpoint.
 3. Enter test JSON:
    ```json
    {
-     "input_data": {"message": "test"}
+     "payload": {"message": "test"}
    }
    ```
 4. Click "Execute"
@@ -149,7 +149,7 @@ You'll see FastAPI's interactive Swagger UI with your endpoint.
 ```bash
 curl -X POST http://localhost:8888/process \
   -H "Content-Type: application/json" \
-  -d '{"input_data": {"message": "test"}}'
+  -d '{"payload": {"message": "test"}}'
 ```
 
 ---
@@ -228,7 +228,7 @@ Test your endpoint:
   curl -X POST https://abcd1234-hello-flash-gpu.runpod.io/run \
     -H "Authorization: Bearer $RUNPOD_API_KEY" \
     -H "Content-Type: application/json" \
-    -d '{"input": {"input_data": {"message": "production test"}}}'
+    -d '{"input": {"payload": {"message": "production test"}}}'
 ```
 
 **What happened:**
@@ -249,7 +249,7 @@ Use the curl command from the deployment output:
 curl -X POST https://abcd1234-hello-flash-gpu.runpod.io/run \
   -H "Authorization: Bearer $RUNPOD_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"input": {"input_data": {"message": "production test"}}}'
+  -d '{"input": {"payload": {"message": "production test"}}}'
 ```
 
 **Expected response:**

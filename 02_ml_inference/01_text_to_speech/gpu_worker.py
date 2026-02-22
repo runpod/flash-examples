@@ -23,7 +23,7 @@ gpu_config = LiveServerless(
         "soundfile",
     ],
 )
-async def generate_speech(input_data: dict) -> dict:
+async def generate_speech(payload: dict) -> dict:
     """
     Generate speech using Qwen3-TTS-12Hz-1.7B-CustomVoice model.
 
@@ -72,10 +72,10 @@ async def generate_speech(input_data: dict) -> dict:
         "Auto",
     ]
 
-    text = input_data.get("text", "Hello, this is a test.")
-    speaker = input_data.get("speaker", "Ryan")
-    language = input_data.get("language", "Auto")
-    instruct = input_data.get("instruct", "")
+    text = payload.get("text", "Hello, this is a test.")
+    speaker = payload.get("speaker", "Ryan")
+    language = payload.get("language", "Auto")
+    instruct = payload.get("instruct", "")
 
     if speaker not in valid_speakers:
         return {
@@ -133,7 +133,7 @@ async def generate_speech(input_data: dict) -> dict:
 
 
 @remote(resource_config=gpu_config, dependencies=["qwen-tts"])
-async def get_voices(input_data: dict) -> dict:
+async def get_voices(payload: dict) -> dict:
     """Get available voices and languages."""
     speakers = {
         "Vivian": "Bright, slightly edgy young female voice (Chinese native)",

@@ -187,12 +187,12 @@ from runpod_flash import remote, LiveServerless
 config = LiveServerless(name="your_worker")
 
 @remote(resource_config=config, dependencies=["torch"])
-async def your_function(input_data: dict) -> dict:
+async def your_function(payload: dict) -> dict:
     """
     Clear docstring explaining what this function does.
 
     Args:
-        input_data: Description of expected input
+        payload: Description of expected input
 
     Returns:
         Description of output format
@@ -200,7 +200,7 @@ async def your_function(input_data: dict) -> dict:
     import torch
 
     # Your implementation
-    result = process(input_data)
+    result = process(payload)
 
     return {"status": "success", "result": result}
 
@@ -347,8 +347,8 @@ from your_example.gpu_worker import your_function
 
 @pytest.mark.asyncio
 async def test_your_function():
-    input_data = {"key": "value"}
-    result = await your_function(input_data)
+    payload = {"key": "value"}
+    result = await your_function(payload)
 
     assert result["status"] == "success"
     assert "result" in result

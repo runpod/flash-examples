@@ -32,7 +32,7 @@ gpu_config = LiveServerless(
 )
 
 @remote(resource_config=gpu_config)
-async def my_function(input_data: dict) -> dict:
+async def my_function(payload: dict) -> dict:
     """All imports inside the function body."""
     import torch
     # implementation

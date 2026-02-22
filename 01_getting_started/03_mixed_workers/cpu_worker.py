@@ -12,12 +12,12 @@ cpu_config = CpuLiveServerless(
 
 
 @remote(resource_config=cpu_config)
-async def preprocess_text(input_data: dict) -> dict:
+async def preprocess_text(payload: dict) -> dict:
     """Preprocess text: cleaning and tokenization (cheap CPU work)."""
     import re
     from datetime import datetime
 
-    text = input_data.get("text", "")
+    text = payload.get("text", "")
 
     cleaned_text = text.strip()
     cleaned_text = re.sub(r"\s+", " ", cleaned_text)
@@ -39,13 +39,13 @@ async def preprocess_text(input_data: dict) -> dict:
 
 
 @remote(resource_config=cpu_config)
-async def postprocess_results(input_data: dict) -> dict:
+async def postprocess_results(payload: dict) -> dict:
     """Postprocess GPU results: formatting and aggregation (cheap CPU work)."""
     from datetime import datetime
 
-    predictions = input_data.get("predictions", [])
-    original_text = input_data.get("original_text", "")
-    metadata = input_data.get("metadata", {})
+    predictions = payload.get("predictions", [])
+    original_text = payload.get("original_text", "")
+    metadata = payload.get("metadata", {})
 
     if predictions:
         top_prediction = max(predictions, key=lambda x: x["confidence"])

@@ -100,10 +100,10 @@ Edit your worker files (e.g., `gpu_worker.py`):
 
 ```python
 @remote(resource_config=gpu_config)
-async def process_request(input_data: dict) -> dict:
+async def process_request(payload: dict) -> dict:
     """Updated function with new logic."""
     # Add new feature here
-    result = perform_processing(input_data)
+    result = perform_processing(payload)
     return {"status": "success", "result": result}
 ```
 
@@ -120,7 +120,7 @@ async def process_request(input_data: dict) -> dict:
 4. Enter test data:
    ```json
    {
-     "input_data": {"test": "value"}
+     "payload": {"test": "value"}
    }
    ```
 5. Click "Execute"
@@ -131,7 +131,7 @@ async def process_request(input_data: dict) -> dict:
 ```bash
 curl -X POST http://localhost:8888/process \
   -H "Content-Type: application/json" \
-  -d '{"input_data": {"test": "value"}}'
+  -d '{"payload": {"test": "value"}}'
 ```
 
 **Validation:** Response matches expected output
@@ -348,7 +348,7 @@ curl -X POST https://abcd1234-my-api-gpu.runpod.io/run \
   -H "Content-Type: application/json" \
   -d '{
     "input": {
-      "input_data": {"test": "production"}
+      "payload": {"test": "production"}
     }
   }'
 ```
@@ -787,7 +787,7 @@ Press Ctrl+C to stop preview
 ```bash
 curl -X POST http://localhost:8000/run \
   -H "Content-Type: application/json" \
-  -d '{"input": {"input_data": {"test": "preview"}}}'
+  -d '{"input": {"payload": {"test": "preview"}}}'
 ```
 
 **3. Validate Response:**
@@ -1589,11 +1589,11 @@ gpu_config = LiveServerless(
 _model = None
 
 @remote(resource_config=gpu_config)
-async def infer(input_data: dict) -> dict:
+async def infer(payload: dict) -> dict:
     global _model
     if _model is None:
         _model = load_model()  # Only load once
-    return _model.predict(input_data)
+    return _model.predict(payload)
 ```
 
 **C. Increase worker capacity:**
