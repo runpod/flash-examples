@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # See: https://github.com/runpod-workers/worker-vllm
 llama_config = ServerlessEndpoint(
     name="02_02_vllm_llama",
-    dockerImage="runpod/worker-v1-vllm-v1:stable-cuda12.8.1",
+    dockerImage="runpod/worker-v1-vllm:stable-cuda12.1.0",
     gpuIds=["NVIDIA GeForce RTX 4090"],
     workersMin=0,
     workersMax=3,
@@ -78,7 +78,7 @@ async def llama_chat(input_data: dict) -> dict:
 # Demonstrates deploying a second model with different configuration.
 mistral_config = ServerlessEndpoint(
     name="02_02_vllm_mistral",
-    dockerImage="runpod/worker-v1-vllm-v1:stable-cuda12.8.1",
+    dockerImage="runpod/worker-v1-vllm:stable-cuda12.1.0",
     gpuIds=["NVIDIA GeForce RTX 4090"],
     workersMin=0,
     workersMax=2,

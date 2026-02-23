@@ -113,7 +113,6 @@ async def batch_endpoint_calls(input_data: dict) -> dict:
     Returns:
         List of results from all concurrent endpoint calls
     """
-    import asyncio
     import time
 
     import runpod
@@ -133,38 +132,32 @@ async def batch_endpoint_calls(input_data: dict) -> dict:
 
     endpoint = runpod.Endpoint(endpoint_id)
 
-    # Submit all jobs asynchronously
+    # Submit all jobs asynchronously using endpoint.run()
     start = time.perf_counter()
     jobs = []
     for prompt in prompts:
         job = endpoint.run({"input": {"prompt": prompt, "max_tokens": max_tokens}})
-        jobs.append({"job_id": job.job_id, "prompt": prompt})
+        jobs.append({"job": job, "prompt": prompt})
 
-    # Poll for all results
+    # Collect results using Job.output() which blocks until complete
     results = []
     for job_info in jobs:
         try:
-            status = endpoint.status(job_info["job_id"])
-            # Simple polling loop
-            poll_count = 0
-            while status.status not in ("COMPLETED", "FAILED") and poll_count < 60:
-                await asyncio.sleep(2)
-                status = endpoint.status(job_info["job_id"])
-                poll_count += 1
-
+            job = job_info["job"]
+            output = job.output()
             results.append(
                 {
                     "prompt": job_info["prompt"],
-                    "job_id": job_info["job_id"],
-                    "status": status.status,
-                    "output": status.output if hasattr(status, "output") else None,
+                    "job_id": job.job_id,
+                    "status": "COMPLETED",
+                    "output": output,
                 }
             )
         except Exception as e:
             results.append(
                 {
                     "prompt": job_info["prompt"],
-                    "job_id": job_info["job_id"],
+                    "job_id": job_info["job"].job_id,
                     "status": "error",
                     "error": str(e),
                 }

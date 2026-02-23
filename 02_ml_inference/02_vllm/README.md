@@ -10,7 +10,7 @@ vLLM is a high-throughput LLM inference engine with:
 - **OpenAI-compatible API** (`/v1/chat/completions`, `/v1/completions`)
 - **Tensor parallelism** for multi-GPU models
 
-This example deploys vLLM using RunPod's pre-built Docker image (`runpod/worker-v1-vllm-v1`), configured entirely through environment variables. No custom Docker image build required.
+This example deploys vLLM using RunPod's pre-built Docker image (`runpod/worker-v1-vllm`), configured entirely through environment variables. No custom Docker image build required.
 
 ## What You'll Learn
 
@@ -90,7 +90,7 @@ curl -X POST http://localhost:8888/gpu_worker/run_sync \
 Flash CLI (flash run / flash deploy)
     │
     ├─ ServerlessEndpoint config
-    │   ├─ dockerImage: runpod/worker-v1-vllm-v1:stable-cuda12.8.1
+    │   ├─ dockerImage: runpod/worker-v1-vllm:stable-cuda12.1.0
     │   ├─ env: MODEL_NAME, MAX_MODEL_LEN, DTYPE, ...
     │   └─ gpuIds, workers, idleTimeout
     │
@@ -122,7 +122,7 @@ Configure the vLLM server via `env` in `ServerlessEndpoint`:
 | `DTYPE` | Data type (`half`, `bfloat16`, `auto`) | `auto` |
 | `GPU_MEMORY_UTILIZATION` | GPU memory fraction (0.0-1.0) | `0.90` |
 | `TENSOR_PARALLEL_SIZE` | Number of GPUs for parallelism | `1` |
-| `DEFAULT_BATCH_SIZE` | Default batch size | `1` |
+| `DEFAULT_BATCH_SIZE` | Token streaming batch size | `50` |
 | `HF_TOKEN` | HuggingFace token for gated models | - |
 | `QUANTIZATION` | Quantization method (`awq`, `gptq`, `squeezellm`) | - |
 | `TRUST_REMOTE_CODE` | Allow custom model code | `false` |
@@ -144,7 +144,7 @@ For models that don't fit on a single GPU:
 ```python
 large_model_config = ServerlessEndpoint(
     name="vllm_70b",
-    dockerImage="runpod/worker-v1-vllm-v1:stable-cuda12.8.1",
+    dockerImage="runpod/worker-v1-vllm:stable-cuda12.1.0",
     gpuIds=["NVIDIA A100 80GB PCIe"],
     workersMin=0,
     workersMax=1,

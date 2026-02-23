@@ -66,7 +66,7 @@ async def gpu_inference_managed(input_data: dict) -> dict:
 # See: https://github.com/runpod/runpod-python
 docker_config = ServerlessEndpoint(
     name="03_02_docker_custom",
-    dockerImage="runpod/worker-v1-vllm-v1:stable-cuda12.8.1",
+    dockerImage="runpod/worker-v1-vllm:stable-cuda12.1.0",
     gpuIds=["NVIDIA GeForce RTX 4090"],
     workersMin=0,
     workersMax=3,

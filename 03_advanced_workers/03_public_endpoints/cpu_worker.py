@@ -88,12 +88,14 @@ async def call_llm_endpoint(input_data: dict) -> dict:
         return {"status": "error", "error": str(e)}
 
 
-@remote(resource_config=cpu_config, dependencies=["runpod"])
+@remote(resource_config=cpu_config, dependencies=["httpx"])
 async def check_job_status(input_data: dict) -> dict:
     """
     Check the status of an async job on a RunPod endpoint.
 
     Use this after submitting a job with mode="async" to poll for results.
+    Uses the RunPod REST API directly since the SDK's Job object is not
+    available across separate function calls.
 
     Input:
         endpoint_id: str - RunPod endpoint ID
@@ -101,13 +103,11 @@ async def check_job_status(input_data: dict) -> dict:
     Returns:
         Job status and output (if completed)
     """
-    import runpod
+    import httpx
 
     api_key = os.getenv("RUNPOD_API_KEY")
     if not api_key:
         return {"status": "error", "error": "RUNPOD_API_KEY not set"}
-
-    runpod.api_key = api_key
 
     endpoint_id = input_data.get("endpoint_id", "")
     job_id = input_data.get("job_id", "")
@@ -115,16 +115,20 @@ async def check_job_status(input_data: dict) -> dict:
     if not endpoint_id or not job_id:
         return {"status": "error", "error": "endpoint_id and job_id are required"}
 
-    endpoint = runpod.Endpoint(endpoint_id)
+    url = f"https://api.runpod.ai/v2/{endpoint_id}/status/{job_id}"
+    headers = {"Authorization": f"Bearer {api_key}"}
 
     try:
-        status = endpoint.status(job_id)
-        return {
-            "status": "success",
-            "job_id": job_id,
-            "job_status": status.status,
-            "output": status.output if hasattr(status, "output") else None,
-        }
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return {
+                "status": "success",
+                "job_id": job_id,
+                "job_status": data.get("status"),
+                "output": data.get("output"),
+            }
     except Exception as e:
         logger.error("Status check failed", exc_info=True)
         return {"status": "error", "error": str(e)}

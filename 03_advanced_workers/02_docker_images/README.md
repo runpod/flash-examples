@@ -128,8 +128,10 @@ RunPod provides official images for common workloads:
 | Image | Use Case |
 |-------|----------|
 | `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04` | PyTorch with CUDA |
-| `runpod/worker-v1-vllm-v1:stable-cuda12.8.1` | vLLM inference server |
-| `runpod/stable-diffusion:web-automatic` | Stable Diffusion (Automatic1111) |
+| `runpod/worker-v1-vllm:stable-cuda12.1.0` | vLLM LLM inference |
+| `runpod/worker-comfyui:<version>-base` | ComfyUI workflow API |
+| `runpod/worker-faster_whisper` | Whisper speech transcription |
+| `runpod/worker-sglang` | SGLang LLM/VLM serving |
 
 Browse all images at [Docker Hub: runpod](https://hub.docker.com/u/runpod) or [GitHub: runpod-workers](https://github.com/runpod-workers).
 
