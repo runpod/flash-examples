@@ -4,6 +4,30 @@ Deploy machine learning models as production-ready APIs. Learn how to serve LLMs
 
 ## Examples
 
+### 01_text_to_speech
+Text-to-Speech API using Qwen3-TTS on RunPod serverless GPUs.
+
+**What you'll learn:**
+- Running a HuggingFace model with `@remote` on GPU workers
+- Returning binary audio data (WAV) from API endpoints
+- Using `bfloat16` precision for memory-efficient inference
+- Input validation inside self-contained `@remote` functions
+
+### 02_vllm
+vLLM inference endpoints using RunPod's official Docker image.
+
+**What you'll learn:**
+- Deploying vLLM with `ServerlessEndpoint` and `dockerImage`
+- Configuring models via environment variables (MODEL_NAME, MAX_MODEL_LEN, etc.)
+- OpenAI-compatible chat completions (Llama 3.1, Mistral)
+- Raw text completions for code generation
+- Running multiple models with different configurations
+
+**Models covered:**
+- Llama 3.1 8B Instruct
+- Mistral 7B Instruct v0.3
+- Any HuggingFace model compatible with vLLM
+
 ### 01_text_generation _(coming soon)_
 LLM inference API with streaming support.
 

@@ -1,0 +1,8 @@
+[project]
+name = "02-docker-images"
+version = "0.1.0"
+description = "Using custom Docker images for RunPod serverless workers with Flash"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash",
+]

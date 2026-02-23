@@ -4,6 +4,45 @@ Production-ready worker patterns for building robust, scalable applications.
 
 ## Examples
 
+### 02_docker_images
+Using custom Docker images for RunPod serverless workers.
+
+**What you'll learn:**
+- Using `ServerlessEndpoint` with `dockerImage` for custom containers
+- Comparing managed (`LiveServerless`) vs custom Docker deployment
+- Configuring environment variables for Docker-based workers
+- Using RunPod's official Docker images (PyTorch, vLLM, etc.)
+
+**Use cases:**
+- Specific CUDA versions
+- Pre-built model caches
+- Specialized ML frameworks
+- RunPod worker images (vLLM, TGI, etc.)
+
+**Resources:**
+- `ServerlessEndpoint` - Custom Docker images
+- `LiveServerless` - Managed infrastructure (comparison)
+
+### 03_public_endpoints
+Calling RunPod serverless endpoints from Flash workers.
+
+**What you'll learn:**
+- Using the `runpod` Python SDK to call serverless endpoints
+- Synchronous vs asynchronous endpoint invocation
+- Job status polling and webhook patterns
+- Building GPU pipelines that chain endpoint calls
+- Concurrent batch processing
+
+**Use cases:**
+- Orchestrating multiple AI services
+- GPU preprocessing + remote LLM inference
+- Calling community or public endpoints
+- Fire-and-forget job submission
+
+**Resources:**
+- `CpuLiveServerless` - CPU orchestration workers
+- `LiveServerless` - GPU pipeline workers
+
 ### 05_load_balancer
 Load-balancer endpoints with custom HTTP routes.
 
@@ -65,19 +104,8 @@ Model and result caching strategies.
 - Multi-level caching
 - Cache-aside pattern
 
-### 04_custom_images _(coming soon)_
-Using custom Docker images for specialized environments.
-
-**What you'll learn:**
-- Creating custom Docker images
-- Adding system dependencies
-- Multi-stage builds
-- Image optimization
-
-**Use cases:**
-- Specialized ML frameworks
-- Custom CUDA versions
-- Pre-built model caches
+### 04_custom_images
+See [02_docker_images](02_docker_images/) for custom Docker image examples.
 
 ## Design Principles
 

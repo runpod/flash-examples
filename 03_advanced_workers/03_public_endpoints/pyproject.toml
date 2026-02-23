@@ -1,0 +1,8 @@
+[project]
+name = "03-public-endpoints"
+version = "0.1.0"
+description = "Calling RunPod serverless endpoints from Flash workers"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash",
+]
