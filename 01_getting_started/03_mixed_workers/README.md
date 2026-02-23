@@ -75,11 +75,11 @@ curl -X POST http://localhost:8888/classify \
   -d '{"text": "This product is amazing! I love it!"}'
 
 # Individual stages
-curl -X POST http://localhost:8888/cpu_worker/run_sync \
+curl -X POST http://localhost:8888/cpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"text": "Test message"}'
 
-curl -X POST http://localhost:8888/gpu_worker/run_sync \
+curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"cleaned_text": "Test message", "word_count": 2}'
 ```

@@ -17,17 +17,17 @@ Server starts at http://localhost:8888 -- visit http://localhost:8888/docs for i
 
 ```bash
 # Scale-to-zero GPU worker
-curl -X POST http://localhost:8888/gpu_worker/run_sync \
+curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"matrix_size": 512}'
 
 # Always-on GPU worker (same payload, different endpoint)
-curl -X POST http://localhost:8888/gpu_worker/run_sync \
+curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"matrix_size": 512}'
 
 # CPU scale-to-zero
-curl -X POST http://localhost:8888/cpu_worker/run_sync \
+curl -X POST http://localhost:8888/cpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello autoscaling"}'
 ```
@@ -135,13 +135,13 @@ Use `load_test.py` to observe scaling behavior:
 python load_test.py
 
 # Target a specific endpoint
-python load_test.py --endpoint /gpu_worker/run_sync --requests 50
+python load_test.py --endpoint /gpu_worker/runsync --requests 50
 
 # Longer pause to observe scale-down
 python load_test.py --pause 60 --concurrency 20
 
 # Test CPU workers
-python load_test.py --endpoint /cpu_worker/run_sync --requests 100 --concurrency 50
+python load_test.py --endpoint /cpu_worker/runsync --requests 100 --concurrency 50
 ```
 
 **Requires:** `pip install aiohttp`

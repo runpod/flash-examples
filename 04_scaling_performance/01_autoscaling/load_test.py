@@ -9,7 +9,7 @@ Sends concurrent requests in phases to observe scaling behavior:
 Usage:
     python load_test.py
     python load_test.py --url http://localhost:8888 --concurrency 10 --requests 50
-    python load_test.py --endpoint /gpu_worker/run_sync --pause 30
+    python load_test.py --endpoint /gpu_worker/runsync --pause 30
 """
 
 import argparse
@@ -20,7 +20,7 @@ import time
 import aiohttp
 
 DEFAULT_URL = "http://localhost:8888"
-DEFAULT_ENDPOINT = "/gpu_worker/run_sync"
+DEFAULT_ENDPOINT = "/gpu_worker/runsync"
 DEFAULT_PAYLOAD = {"matrix_size": 256}
 
 

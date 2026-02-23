@@ -43,14 +43,14 @@ Visit http://localhost:8888/docs for interactive API documentation. QB endpoints
 
 **Generate speech (JSON with base64 audio):**
 ```bash
-curl -X POST http://localhost:8888/gpu_worker/run_sync \
+curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello world!", "speaker": "Ryan", "language": "English"}'
 ```
 
 **List available voices:**
 ```bash
-curl -X POST http://localhost:8888/gpu_worker/run_sync \
+curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
