@@ -4,7 +4,7 @@ Optimize Flash applications for production workloads. Learn autoscaling, GPU opt
 
 ## Examples
 
-### 01_autoscaling _(coming soon)_
+### [01_autoscaling](01_autoscaling/)
 Worker autoscaling configuration and strategies.
 
 **What you'll learn:**
