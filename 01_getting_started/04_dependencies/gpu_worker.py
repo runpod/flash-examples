@@ -29,7 +29,7 @@ system_deps_config = LiveServerless(
         "numpy<2.0.0",  # Maximum version constraint
     ],
 )
-async def process_with_ml_libs(input_data: dict) -> dict:
+async def process_with_ml_libs(payload: dict) -> dict:
     """
     Worker with versioned Python dependencies.
 
@@ -74,7 +74,7 @@ async def process_with_ml_libs(input_data: dict) -> dict:
     dependencies=["opencv-python", "requests"],
     system_dependencies=["ffmpeg", "libgl1"],  # System packages via apt
 )
-async def process_with_system_deps(input_data: dict) -> dict:
+async def process_with_system_deps(payload: dict) -> dict:
     """
     Worker with system-level dependencies.
 

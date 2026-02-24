@@ -34,3 +34,12 @@ async def classify(text: str) -> dict:
             },
         }
     )
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    test_text = "This is a test message for the classification pipeline."
+    print(f"Testing classify with text: {test_text}")
+    result = asyncio.run(classify(test_text))
+    print(f"Result: {result}")

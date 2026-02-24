@@ -13,12 +13,12 @@ cpu_config = CpuLiveServerless(
 
 
 @remote(resource_config=cpu_config)
-async def cpu_hello(input_data: dict) -> dict:
+async def cpu_hello(payload: dict) -> dict:
     """Simple CPU worker that returns a greeting."""
     import platform
     from datetime import datetime
 
-    message = f"Hello, {input_data.get('name', 'Anonymous Panda')}!"
+    message = f"Hello, {payload.get('name', 'Anonymous Panda')}!"
 
     return {
         "status": "success",

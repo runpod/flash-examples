@@ -13,7 +13,7 @@ gpu_config = LiveServerless(
 
 
 @remote(resource_config=gpu_config)
-async def gpu_hello(input_data: dict) -> dict:
+async def gpu_hello(payload: dict) -> dict:
     """Simple GPU worker that returns GPU hardware info."""
     import platform
     from datetime import datetime
@@ -25,7 +25,7 @@ async def gpu_hello(input_data: dict) -> dict:
     gpu_count = torch.cuda.device_count()
     gpu_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
 
-    message = input_data.get("message", "Hello from GPU worker!")
+    message = payload.get("message", "Hello from GPU worker!")
 
     return {
         "status": "success",

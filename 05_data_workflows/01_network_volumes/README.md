@@ -36,7 +36,7 @@ Server starts at `http://localhost:8888`
 
 **Generate an image (GPU worker):**
 ```bash
-curl -X POST http://localhost:8888/gpu_worker/run_sync \
+curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"prompt": "a sunset over mountains"}'
 ```
@@ -76,7 +76,7 @@ Visit `http://localhost:8888/docs` for interactive API documentation.
 
 ## API Endpoints
 
-### POST /gpu_worker/run_sync
+### POST /gpu_worker/runsync
 
 GPU worker (QB, class-based `@remote`). Generates an image and saves it to the shared volume.
 

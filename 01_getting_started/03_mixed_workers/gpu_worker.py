@@ -14,15 +14,15 @@ gpu_config = LiveServerless(
 
 
 @remote(resource_config=gpu_config, dependencies=["torch"])
-async def gpu_inference(input_data: dict) -> dict:
+async def gpu_inference(payload: dict) -> dict:
     """GPU inference: mock sentiment classification."""
     import random
     from datetime import datetime
 
     import torch
 
-    cleaned_text = input_data.get("cleaned_text", "")
-    word_count = input_data.get("word_count", 0)
+    cleaned_text = payload.get("cleaned_text", "")
+    word_count = payload.get("word_count", 0)
 
     gpu_available = torch.cuda.is_available()
     if gpu_available:

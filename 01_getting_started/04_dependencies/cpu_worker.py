@@ -29,7 +29,7 @@ minimal_config = CpuLiveServerless(
         "matplotlib",
     ],
 )
-async def process_data(input_data: dict) -> dict:
+async def process_data(payload: dict) -> dict:
     """
     Worker with data science dependencies.
 
@@ -46,7 +46,7 @@ async def process_data(input_data: dict) -> dict:
     import pandas as pd
     import scipy
 
-    data = input_data.get("data", [[1, 2], [3, 4], [5, 6]])
+    data = payload.get("data", [[1, 2], [3, 4], [5, 6]])
 
     # Create DataFrame and compute statistics
     df = pd.DataFrame(data, columns=["A", "B"])
@@ -80,7 +80,7 @@ async def process_data(input_data: dict) -> dict:
 
 
 @remote(resource_config=minimal_config)  # No dependencies!
-async def minimal_process(input_data: dict) -> dict:
+async def minimal_process(payload: dict) -> dict:
     """
     Worker with NO external dependencies.
 
@@ -93,7 +93,7 @@ async def minimal_process(input_data: dict) -> dict:
     import re
     from datetime import datetime
 
-    text = input_data.get("text", "")
+    text = payload.get("text", "")
 
     # Built-in operations only
     word_count = len(text.split())
