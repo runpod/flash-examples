@@ -1,32 +1,17 @@
-# GPU workers demonstrating Python and system dependency management.
-# Run with: flash run
-# Test directly: python gpu_worker.py
-from runpod_flash import GpuGroup, LiveServerless, remote
+# gpu workers demonstrating Python and system dependency management.
+# run with: flash run
+# test directly: python gpu_worker.py
+from runpod_flash import Endpoint, GpuGroup
 
-# Worker with ML dependencies (versioned)
-ml_config = LiveServerless(
+@Endpoint(
     name="01_04_deps_ml",
-    gpus=[GpuGroup.ADA_32_PRO],
-    workersMin=0,
-    workersMax=2,
-)
-
-# Worker with system dependencies
-system_deps_config = LiveServerless(
-    name="01_04_deps_system",
-    gpus=[GpuGroup.AMPERE_16],
-    workersMin=0,
-    workersMax=2,
-)
-
-
-@remote(
-    resource_config=ml_config,
+    gpu=GpuGroup.ADA_32_PRO,
+    workers=(0, 2),
     dependencies=[
-        "torch==2.1.0",  # Pin specific version
+        "torch==2.1.0",
         "torchvision",
-        "Pillow>=10.0.0",  # Minimum version
-        "numpy<2.0.0",  # Maximum version constraint
+        "Pillow>=10.0.0",
+        "numpy<2.0.0",
     ],
 )
 async def process_with_ml_libs(payload: dict) -> dict:
@@ -45,7 +30,6 @@ async def process_with_ml_libs(payload: dict) -> dict:
     import torchvision
     from PIL import Image
 
-    # Show installed versions
     versions = {
         "torch": torch.__version__,
         "torchvision": torchvision.__version__,
@@ -53,7 +37,6 @@ async def process_with_ml_libs(payload: dict) -> dict:
         "numpy": np.__version__,
     }
 
-    # Simple tensor operation to verify GPU
     if torch.cuda.is_available():
         tensor = torch.randn(100, 100, device="cuda")
         result = tensor.sum().item()
@@ -69,10 +52,12 @@ async def process_with_ml_libs(payload: dict) -> dict:
     }
 
 
-@remote(
-    resource_config=system_deps_config,
+@Endpoint(
+    name="01_04_deps_system",
+    gpu=GpuGroup.AMPERE_16,
+    workers=(0, 2),
     dependencies=["opencv-python", "requests"],
-    system_dependencies=["ffmpeg", "libgl1"],  # System packages via apt
+    system_dependencies=["ffmpeg", "libgl1"],
 )
 async def process_with_system_deps(payload: dict) -> dict:
     """
@@ -87,7 +72,6 @@ async def process_with_system_deps(payload: dict) -> dict:
 
     import cv2
 
-    # Check FFmpeg installation
     try:
         ffmpeg_version = (
             subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT)
@@ -97,7 +81,6 @@ async def process_with_system_deps(payload: dict) -> dict:
     except Exception as e:
         ffmpeg_version = f"Error: {e}"
 
-    # Check OpenCV (requires libgl1)
     opencv_version = cv2.__version__
 
     return {

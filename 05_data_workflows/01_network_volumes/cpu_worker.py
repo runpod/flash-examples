@@ -1,21 +1,22 @@
-# CPU worker with network volume for listing and serving generated images.
-# Run with: flash run
-# Test directly: python cpu_worker.py
-from runpod_flash import CpuLiveLoadBalancer, NetworkVolume, remote
+# cpu worker with network volume for listing and serving generated images.
+# run with: flash run
+# test directly: python cpu_worker.py
+from runpod_flash import Endpoint, NetworkVolume
 
 volume = NetworkVolume(
     name="flash-05-volume",
     size=50,
 )
 
-cpu_config = CpuLiveLoadBalancer(
+api = Endpoint(
     name="05_01_cpu_worker",
-    workersMin=1,
-    networkVolume=volume,
+    cpu="cpu3c-1-2",
+    workers=(1, 3),
+    volume=volume,
 )
 
 
-@remote(resource_config=cpu_config, path="/images", method="GET")
+@api.get("/images")
 async def list_images_in_volume() -> dict:
     """List generated images from the shared volume."""
     import os
@@ -30,7 +31,7 @@ async def list_images_in_volume() -> dict:
     }
 
 
-@remote(resource_config=cpu_config, path="/images/{file_name}", method="GET")
+@api.get("/images/{file_name}")
 async def get_image_from_volume(file_name: str) -> dict:
     """Get image metadata from the shared volume."""
     import base64

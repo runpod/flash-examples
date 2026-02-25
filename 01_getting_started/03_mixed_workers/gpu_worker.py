@@ -1,28 +1,25 @@
-# GPU worker for ML inference (sentiment classification).
-# Part of the mixed CPU/GPU pipeline example.
-# Run with: flash run
-# Test directly: python gpu_worker.py
-from runpod_flash import GpuGroup, LiveServerless, remote
+# gpu worker for ML inference (sentiment classification).
+# part of the mixed CPU/GPU pipeline example.
+# run with: flash run
+# test directly: python gpu_worker.py
+from runpod_flash import Endpoint, GpuGroup
 
-gpu_config = LiveServerless(
+@Endpoint(
     name="01_03_mixed_inference",
-    gpus=[GpuGroup.ADA_24],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
+    gpu=GpuGroup.ADA_24,
+    workers=(0, 3),
+    idle_timeout=5,
+    dependencies=["torch"],
 )
-
-
-@remote(resource_config=gpu_config, dependencies=["torch"])
-async def gpu_inference(payload: dict) -> dict:
+async def gpu_inference(input_data: dict) -> dict:
     """GPU inference: mock sentiment classification."""
     import random
     from datetime import datetime
 
     import torch
 
-    cleaned_text = payload.get("cleaned_text", "")
-    word_count = payload.get("word_count", 0)
+    cleaned_text = input_data.get("cleaned_text", "")
+    word_count = input_data.get("word_count", 0)
 
     gpu_available = torch.cuda.is_available()
     if gpu_available:
@@ -33,15 +30,7 @@ async def gpu_inference(payload: dict) -> dict:
         gpu_memory = 0
 
     predictions = []
-    positive_words = [
-        "good",
-        "great",
-        "excellent",
-        "love",
-        "best",
-        "happy",
-        "wonderful",
-    ]
+    positive_words = ["good", "great", "excellent", "love", "best", "happy", "wonderful"]
     negative_words = ["bad", "terrible", "worst", "hate", "poor", "awful", "horrible"]
     text_lower = cleaned_text.lower()
 
@@ -85,9 +74,7 @@ async def gpu_inference(payload: dict) -> dict:
             "gpu_memory_gb": round(gpu_memory, 2) if gpu_memory else 0,
         },
         "input_stats": {
-            "cleaned_text": cleaned_text[:100] + "..."
-            if len(cleaned_text) > 100
-            else cleaned_text,
+            "cleaned_text": cleaned_text[:100] + "..." if len(cleaned_text) > 100 else cleaned_text,
             "word_count": word_count,
         },
         "timestamp": datetime.now().isoformat(),

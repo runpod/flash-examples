@@ -1,29 +1,16 @@
 # Qwen3-TTS text-to-speech GPU worker.
-# Run with: flash run
-# Test directly: python gpu_worker.py
+# run with: flash run
+# test directly: python gpu_worker.py
+from runpod_flash import Endpoint, GpuGroup
 
-from runpod_flash import GpuGroup, LiveServerless, remote
-
-# GPU config for Qwen3-TTS - needs 24GB+ VRAM for 1.7B model
-# Naming convention: {category}_{example}_{worker_type}
-gpu_config = LiveServerless(
+@Endpoint(
     name="02_01_text_to_speech_gpu",
-    gpus=[GpuGroup.ADA_24],  # RTX 4090 or similar with 24GB
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
+    gpu=GpuGroup.ADA_24,
+    workers=(0, 3),
+    idle_timeout=5,
+    dependencies=["qwen-tts", "torch", "soundfile"],
 )
-
-
-@remote(
-    resource_config=gpu_config,
-    dependencies=[
-        "qwen-tts",
-        "torch",
-        "soundfile",
-    ],
-)
-async def generate_speech(payload: dict) -> dict:
+async def generate_speech(input_data: dict) -> dict:
     """
     Generate speech using Qwen3-TTS-12Hz-1.7B-CustomVoice model.
 
@@ -46,7 +33,6 @@ async def generate_speech(payload: dict) -> dict:
     import soundfile as sf
     import torch
 
-    # Must be defined inside function for remote execution
     valid_speakers = [
         "Vivian",
         "Serena",
@@ -72,10 +58,10 @@ async def generate_speech(payload: dict) -> dict:
         "Auto",
     ]
 
-    text = payload.get("text", "Hello, this is a test.")
-    speaker = payload.get("speaker", "Ryan")
-    language = payload.get("language", "Auto")
-    instruct = payload.get("instruct", "")
+    text = input_data.get("text", "Hello, this is a test.")
+    speaker = input_data.get("speaker", "Ryan")
+    language = input_data.get("language", "Auto")
+    instruct = input_data.get("instruct", "")
 
     if speaker not in valid_speakers:
         return {
@@ -132,8 +118,12 @@ async def generate_speech(payload: dict) -> dict:
         }
 
 
-@remote(resource_config=gpu_config, dependencies=["qwen-tts"])
-async def get_voices(payload: dict) -> dict:
+@Endpoint(
+    name="02_01_text_to_speech_gpu",
+    gpu=GpuGroup.ADA_24,
+    dependencies=["qwen-tts"],
+)
+async def get_voices(input_data: dict) -> dict:
     """Get available voices and languages."""
     speakers = {
         "Vivian": "Bright, slightly edgy young female voice (Chinese native)",
@@ -166,16 +156,13 @@ async def get_voices(payload: dict) -> dict:
     }
 
 
-# Test locally with: python gpu_worker.py
 if __name__ == "__main__":
     import asyncio
 
-    # Test get_voices
     print("Available voices:")
     result = asyncio.run(get_voices({}))
     print(result)
 
-    # Test speech generation (requires GPU)
     test_payload = {
         "text": "Hello! This is a test of the Qwen3 text to speech system.",
         "speaker": "Ryan",
