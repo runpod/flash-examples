@@ -1,8 +1,6 @@
 # Classification pipeline: CPU preprocess -> GPU inference -> CPU postprocess.
 # Demonstrates cross-worker orchestration via a load-balanced endpoint.
 # Run with: flash run
-from cpu_worker import postprocess_results, preprocess_text
-from gpu_worker import gpu_inference
 from runpod_flash import CpuLiveLoadBalancer, remote
 
 pipeline_config = CpuLiveLoadBalancer(
@@ -14,6 +12,9 @@ pipeline_config = CpuLiveLoadBalancer(
 @remote(resource_config=pipeline_config, method="POST", path="/classify")
 async def classify(text: str) -> dict:
     """Complete ML pipeline: CPU preprocess -> GPU inference -> CPU postprocess."""
+    from cpu_worker import postprocess_results, preprocess_text
+    from gpu_worker import gpu_inference
+
     preprocess_result = await preprocess_text({"text": text})
 
     gpu_result = await gpu_inference(
