@@ -4,14 +4,20 @@
 # Test directly: python cpu_worker.py
 from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
 
-cpu_config = CpuLiveServerless(
-    name="01_03_mixed_workers_cpu",
+cpu_preprocess_config = CpuLiveServerless(
+    name="01_03_mixed_workers_cpu_preprocess",
+    instanceIds=[CpuInstanceType.CPU3G_2_8],
+    idleTimeout=3,
+)
+
+cpu_postprocess_config = CpuLiveServerless(
+    name="01_03_mixed_workers_cpu_postprocess",
     instanceIds=[CpuInstanceType.CPU3G_2_8],
     idleTimeout=3,
 )
 
 
-@remote(resource_config=cpu_config)
+@remote(resource_config=cpu_preprocess_config)
 async def preprocess_text(payload: dict) -> dict:
     """Preprocess text: cleaning and tokenization (cheap CPU work)."""
     import re
@@ -38,7 +44,7 @@ async def preprocess_text(payload: dict) -> dict:
     }
 
 
-@remote(resource_config=cpu_config)
+@remote(resource_config=cpu_postprocess_config)
 async def postprocess_results(payload: dict) -> dict:
     """Postprocess GPU results: formatting and aggregation (cheap CPU work)."""
     from datetime import datetime
