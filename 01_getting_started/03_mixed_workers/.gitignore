@@ -41,7 +41,6 @@ dist/
 
 # Flash generated files (should not be committed)
 flash_manifest.json
-uv.lock
 
 # OS
 .DS_Store
