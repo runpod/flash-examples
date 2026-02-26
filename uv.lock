@@ -2408,7 +2408,7 @@ wheels = [
 
 [[package]]
 name = "runpod-flash"
-version = "1.3.0"
+version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cloudpickle" },
@@ -2421,9 +2421,9 @@ dependencies = [
     { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a5/38/56d720d7ecd083e81c2acda2a76d6e86e5bc56c2703a37d89fa6ed185a28/runpod_flash-1.3.0.tar.gz", hash = "sha256:3f337e080bbc6c8ffbd9ddbfc479a513f19ec646fe23e7c8af5c6925f8b0a5b6", size = 202436 }
+sdist = { url = "https://files.pythonhosted.org/packages/50/1c/af089b457dfdf2aed0a9cc6fae6c02c4e0183cbe2d66c7bff2307b84084a/runpod_flash-1.4.0.tar.gz", hash = "sha256:b0bbee1a8ce5a1668307f63a0c23de022d5b18f3b2f874a4173321cb8fb1326e", size = 200703 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/ed/56972690566df39d76ec42e719b576eeeefc955544e664a7ec51b726d722/runpod_flash-1.3.0-py3-none-any.whl", hash = "sha256:8ad7f25b6c5c9ac7e1913ce5ebcd07b1ebc1ab4730d4c8f0ec2aa0464af23380", size = 216315 },
+    { url = "https://files.pythonhosted.org/packages/cb/b8/21b64d49928f6c220658eb39cb31ddc0d9b6667f018ea7f0b99b650c3b1a/runpod_flash-1.4.0-py3-none-any.whl", hash = "sha256:ad9082dab5c177f60c33d152611b6f6d90d3aad83f0ca476c6ce61a817077153", size = 212485 },
 ]
 
 [[package]]
@@ -2440,7 +2440,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "runpod-flash" }]
+requires-dist = [{ name = "runpod-flash", specifier = ">=1.4.0" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.8.0" }]

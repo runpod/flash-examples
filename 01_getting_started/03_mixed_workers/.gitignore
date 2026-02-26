@@ -46,3 +46,4 @@ uv.lock
 # OS
 .DS_Store
 Thumbs.db
+.flash/
