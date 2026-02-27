@@ -35,29 +35,21 @@ class TextToVideoWorker:
             torch_dtype=torch.float16,
         )
         self.pipe.enable_attention_slicing()
-        if hasattr(self.pipe, "vae"):
-            if hasattr(self.pipe.vae, "enable_slicing"):
-                try:
-                    self.pipe.vae.enable_slicing()
-                except NotImplementedError:
-                    pass
-                except Exception:
-                    pass
-            if hasattr(self.pipe.vae, "enable_tiling"):
-                try:
-                    self.pipe.vae.enable_tiling()
-                except NotImplementedError:
-                    pass
-                except Exception:
-                    pass
+        vae = getattr(self.pipe, "vae", None)
+        if vae:
+            for attr in ("enable_slicing", "enable_tiling"):
+                fn = getattr(vae, attr, None)
+                if callable(fn):
+                    try:
+                        fn()
+                    except Exception:
+                        pass
 
         if torch.cuda.is_available():
             try:
-                # Prefer CPU offload for better reliability on 24GB GPUs.
                 self.pipe.enable_model_cpu_offload()
                 self._using_cpu_offload = True
             except Exception:
-                # Fallback to full-GPU placement if offload is unavailable.
                 self.pipe = self.pipe.to("cuda")
         else:
             self.pipe = self.pipe.to("cpu")
@@ -109,10 +101,8 @@ class TextToVideoWorker:
             if self._torch.cuda.is_available():
                 self._torch.cuda.empty_cache()
 
-        if frames is None:
-            return {"status": "error", "error": "Model returned no frames"}
-        frames = list(frames)
-        if len(frames) == 0:
+        frames = list(frames) if frames else []
+        if not frames:
             return {"status": "error", "error": "Model returned no frames"}
         if not hasattr(frames[0], "save"):
             from PIL import Image
@@ -125,7 +115,6 @@ class TextToVideoWorker:
                 converted_frames.append(Image.fromarray(arr))
             frames = converted_frames
 
-        # GIF timing is quantized in milliseconds; clamp to 25 FPS max and report actual output FPS.
         effective_fps = min(max(fps, 1), 25)
         duration_ms = int(1000 / effective_fps)
 
@@ -190,6 +179,6 @@ class TextToVideoRequest(BaseModel):
 @gpu_router.post("/generate")
 async def generate(request: TextToVideoRequest):
     result = await get_worker().generate(request.model_dump())
-    if result.get("status") != "success":
+    if result["status"] != "success":
         raise HTTPException(status_code=400, detail=result.get("error", "Video generation failed"))
     return result

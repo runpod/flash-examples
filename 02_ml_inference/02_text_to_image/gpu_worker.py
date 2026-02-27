@@ -1,17 +1,9 @@
-"""Flux Text-to-Image — GPU Worker
-
-One warm worker. Cached FLUX pipeline.
-"""
-
 import os
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from runpod_flash import GpuGroup, LiveServerless, remote
 
-# ── GPU Configuration ────────────────────────────────────────────────
-# FLUX.1-schnell is a fast distilled model (~12GB VRAM).
-# ADA_24 gives us an RTX 4090-class GPU with 24GB — plenty of room.
 gpu_config = LiveServerless(
     name="02_02_flux_schnell",
     gpus=[GpuGroup.ADA_24],
@@ -33,8 +25,6 @@ gpu_config = LiveServerless(
     ],
 )
 class FluxWorker:
-    """Warm FLUX worker that caches the pipeline between requests."""
-
     def __init__(self):
         import torch
 
@@ -93,7 +83,6 @@ class FluxWorker:
         }
 
 
-# ── FastAPI Router ───────────────────────────────────────────────────
 gpu_router = APIRouter()
 worker: FluxWorker | None = None
 
@@ -121,7 +110,6 @@ class ImageRequest(BaseModel):
 
 @gpu_router.post("/generate")
 async def generate(request: ImageRequest):
-    """Generate an image from a text prompt using FLUX.1-schnell."""
     hf_token = request.hf_token.strip() or os.environ.get("HF_TOKEN", "")
     result = await get_worker().generate(
         {

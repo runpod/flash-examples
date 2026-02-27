@@ -132,14 +132,12 @@ class ImageToImageRequest(BaseModel):
 @gpu_router.post("/transform")
 async def transform(request: ImageToImageRequest):
     payload = request.model_dump()
-    if not payload.get("image_base64"):
+    if not payload["image_base64"]:
         try:
             payload["image_base64"] = load_default_image_base64()
         except FileNotFoundError as exc:
             raise HTTPException(status_code=500, detail=f"Default image not found: {exc}") from exc
     result = await get_worker().transform(payload)
-    if result.get("status") != "success":
-        raise HTTPException(
-            status_code=400, detail=result.get("error", "Image transformation failed")
-        )
+    if result["status"] != "success":
+        raise HTTPException(status_code=400, detail=result.get("error", "Image transformation failed"))
     return result

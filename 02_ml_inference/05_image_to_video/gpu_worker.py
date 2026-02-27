@@ -46,21 +46,15 @@ class ImageToVideoWorker:
             variant="fp16",
         )
         self.pipe.enable_attention_slicing()
-        if hasattr(self.pipe, "vae"):
-            if hasattr(self.pipe.vae, "enable_slicing"):
-                try:
-                    self.pipe.vae.enable_slicing()
-                except NotImplementedError:
-                    pass
-                except Exception:
-                    pass
-            if hasattr(self.pipe.vae, "enable_tiling"):
-                try:
-                    self.pipe.vae.enable_tiling()
-                except NotImplementedError:
-                    pass
-                except Exception:
-                    pass
+        vae = getattr(self.pipe, "vae", None)
+        if vae:
+            for attr in ("enable_slicing", "enable_tiling"):
+                fn = getattr(vae, attr, None)
+                if callable(fn):
+                    try:
+                        fn()
+                    except Exception:
+                        pass
 
         if torch.cuda.is_available():
             try:
@@ -123,10 +117,8 @@ class ImageToVideoWorker:
             if self._torch.cuda.is_available():
                 self._torch.cuda.empty_cache()
 
-        if frames is None:
-            return {"status": "error", "error": "Model returned no frames"}
-        frames = list(frames)
-        if len(frames) == 0:
+        frames = list(frames) if frames else []
+        if not frames:
             return {"status": "error", "error": "Model returned no frames"}
         if not hasattr(frames[0], "save"):
             converted_frames = []
@@ -137,7 +129,6 @@ class ImageToVideoWorker:
                 converted_frames.append(Image.fromarray(arr))
             frames = converted_frames
 
-        # GIF timing is quantized in milliseconds; clamp to 25 FPS max and report actual output FPS.
         effective_fps = min(max(fps, 1), 25)
         duration_ms = int(1000 / effective_fps)
 
@@ -204,12 +195,12 @@ class ImageToVideoRequest(BaseModel):
 @gpu_router.post("/animate")
 async def animate(request: ImageToVideoRequest):
     payload = request.model_dump()
-    if not payload.get("image_base64"):
+    if not payload["image_base64"]:
         try:
             payload["image_base64"] = load_default_image_base64()
         except FileNotFoundError as exc:
             raise HTTPException(status_code=500, detail=f"Default image not found: {exc}") from exc
     result = await get_worker().animate(payload)
-    if result.get("status") != "success":
+    if result["status"] != "success":
         raise HTTPException(status_code=400, detail=result.get("error", "Image animation failed"))
     return result

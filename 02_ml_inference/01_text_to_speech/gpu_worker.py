@@ -10,11 +10,9 @@ from runpod_flash import (
     remote,
 )
 
-# GPU config for Qwen3-TTS - needs 24GB+ VRAM for 1.7B model
-# Naming convention: {category}_{example}_{worker_type}
 gpu_config = LiveServerless(
     name="02_01_text_to_speech_gpu",
-    gpus=[GpuGroup.ADA_24],  # RTX 4090 or similar with 24GB
+    gpus=[GpuGroup.ADA_24],
     workersMin=0,
     workersMax=3,
     idleTimeout=5,
@@ -38,21 +36,7 @@ voices_config = CpuLiveServerless(
     ],
 )
 async def generate_speech(payload: dict) -> dict:
-    """
-    Generate speech using Qwen3-TTS-12Hz-1.7B-CustomVoice model.
-
-    Input:
-        text: str - The text to synthesize
-        speaker: str - Voice to use (default: Ryan)
-        language: str - Target language (default: Auto)
-        instruct: str (optional) - Emotion/style instruction
-
-    Returns:
-        audio_base64: str - Base64 encoded WAV audio
-        sample_rate: int - Audio sample rate
-        speaker: str - Speaker used
-        language: str - Language used
-    """
+    """Generate speech using Qwen3-TTS-12Hz-1.7B-CustomVoice."""
     import base64
     import io
     from datetime import datetime
@@ -60,7 +44,6 @@ async def generate_speech(payload: dict) -> dict:
     import soundfile as sf
     import torch
 
-    # Must be defined inside function for remote execution
     valid_speakers = [
         "Vivian",
         "Serena",
@@ -112,15 +95,10 @@ async def generate_speech(payload: dict) -> dict:
             dtype=torch.bfloat16,
         )
 
-        generate_kwargs = {
-            "text": text,
-            "language": language,
-            "speaker": speaker,
-        }
+        kwargs = {"text": text, "language": language, "speaker": speaker}
         if instruct:
-            generate_kwargs["instruct"] = instruct
-
-        wavs, sr = model.generate_custom_voice(**generate_kwargs)
+            kwargs["instruct"] = instruct
+        wavs, sr = model.generate_custom_voice(**kwargs)
 
         buffer = io.BytesIO()
         sf.write(buffer, wavs[0], sr, format="WAV")
@@ -180,25 +158,17 @@ async def get_voices(payload: dict = {}) -> dict:
     }
 
 
-# Test locally with: python gpu_worker.py
 if __name__ == "__main__":
     import asyncio
 
-    # Test get_voices
     print("Available voices:")
-    result = asyncio.run(get_voices({}))
-    print(result)
+    print(asyncio.run(get_voices({})))
 
-    # Test speech generation (requires GPU)
     test_payload = {
         "text": "Hello! This is a test of the Qwen3 text to speech system.",
         "speaker": "Ryan",
         "language": "English",
         "instruct": "Speak in a friendly, warm tone.",
     }
-    print(f"\nTesting TTS with payload: {test_payload}")
     result = asyncio.run(generate_speech(test_payload))
-    if result["status"] == "success":
-        print(f"Success! Audio generated, {len(result['audio_base64'])} bytes (base64)")
-    else:
-        print(f"Error: {result}")
+    print("Success!" if result["status"] == "success" else f"Error: {result}")
