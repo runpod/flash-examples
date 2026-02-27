@@ -4,6 +4,7 @@
 # test directly: python gpu_worker.py
 from runpod_flash import Endpoint, GpuGroup
 
+
 @Endpoint(
     name="01_03_mixed_inference",
     gpu=GpuGroup.ADA_24,
@@ -30,7 +31,15 @@ async def gpu_inference(input_data: dict) -> dict:
         gpu_memory = 0
 
     predictions = []
-    positive_words = ["good", "great", "excellent", "love", "best", "happy", "wonderful"]
+    positive_words = [
+        "good",
+        "great",
+        "excellent",
+        "love",
+        "best",
+        "happy",
+        "wonderful",
+    ]
     negative_words = ["bad", "terrible", "worst", "hate", "poor", "awful", "horrible"]
     text_lower = cleaned_text.lower()
 
@@ -74,7 +83,9 @@ async def gpu_inference(input_data: dict) -> dict:
             "gpu_memory_gb": round(gpu_memory, 2) if gpu_memory else 0,
         },
         "input_stats": {
-            "cleaned_text": cleaned_text[:100] + "..." if len(cleaned_text) > 100 else cleaned_text,
+            "cleaned_text": cleaned_text[:100] + "..."
+            if len(cleaned_text) > 100
+            else cleaned_text,
             "word_count": word_count,
         },
         "timestamp": datetime.now().isoformat(),

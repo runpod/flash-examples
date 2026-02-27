@@ -43,22 +43,23 @@ flash run
 
 ### 1. Python Dependencies
 
-Specified in `@remote` decorator:
+Specified in the `Endpoint` decorator:
 
 ```python
-@remote(
-    resource_config=config,
+@Endpoint(
+    name="my-worker",
+    gpu=GpuGroup.ADA_24,
     dependencies=[
         "torch==2.1.0",      # Exact version
         "Pillow>=10.0.0",    # Minimum version
         "numpy<2.0.0",       # Maximum version
         "requests",          # Latest version
-    ]
+    ],
 )
 async def my_function(data: dict) -> dict:
     import torch
     import PIL
-    # Your code here
+    # your code here
 ```
 
 ### 2. System Dependencies
@@ -66,10 +67,11 @@ async def my_function(data: dict) -> dict:
 Install apt packages:
 
 ```python
-@remote(
-    resource_config=config,
+@Endpoint(
+    name="my-worker",
+    gpu=GpuGroup.AMPERE_16,
     dependencies=["opencv-python"],
-    system_dependencies=["ffmpeg", "libgl1", "graphviz"]
+    system_dependencies=["ffmpeg", "libgl1", "graphviz"],
 )
 async def process_video(data: dict) -> dict:
     import cv2
@@ -87,9 +89,9 @@ async def process_video(data: dict) -> dict:
 Fastest cold start:
 
 ```python
-@remote(resource_config=config)  # No dependencies!
+@Endpoint(name="my-worker", cpu="cpu3c-1-2")
 async def simple_function(data: dict) -> dict:
-    # Only Python stdlib
+    # only Python stdlib
     import json
     import re
     from datetime import datetime
@@ -198,39 +200,42 @@ system_dependencies=["ffmpeg", "libgl1", "wget"]
 
 ```python
 # Good - Reproducible
-dependencies=[
-    "torch==2.1.0",
-    "transformers==4.35.2",
-    "numpy==1.26.2",
-]
+@Endpoint(
+    name="worker",
+    gpu=GpuGroup.ADA_24,
+    dependencies=[
+        "torch==2.1.0",
+        "transformers==4.35.2",
+        "numpy==1.26.2",
+    ],
+)
 
 # Bad - Unpredictable
-dependencies=[
-    "torch",  # Version changes over time
-    "transformers",
-    "numpy",
-]
+@Endpoint(
+    name="worker",
+    gpu=GpuGroup.ADA_24,
+    dependencies=[
+        "torch",
+        "transformers",
+        "numpy",
+    ],
+)
 ```
 
 ### 2. Minimize Dependencies
 
 ```python
 # Good - Only what's needed
-@remote(
-    dependencies=["requests"]  # Just one package
-)
+@Endpoint(name="fetcher", cpu="cpu3c-1-2", dependencies=["requests"])
 async def fetch_data(url: str):
     import requests
     return requests.get(url).json()
 
 # Bad - Unnecessary bloat
-@remote(
-    dependencies=[
-        "requests",
-        "pandas",  # Not used
-        "numpy",   # Not used
-        "scipy",   # Not used
-    ]
+@Endpoint(
+    name="fetcher",
+    cpu="cpu3c-1-2",
+    dependencies=["requests", "pandas", "numpy", "scipy"],
 )
 async def fetch_data(url: str):
     import requests
@@ -248,13 +253,14 @@ python cpu_worker.py
 ### 4. Document Dependencies
 
 ```python
-@remote(
-    resource_config=config,
+@Endpoint(
+    name="worker",
+    gpu=GpuGroup.ADA_24,
     dependencies=[
         "torch==2.1.0",      # GPU operations
         "Pillow>=10.0.0",    # Image processing
         "requests",          # API calls
-    ]
+    ],
 )
 async def process_image(data: dict):
     """Process image with PyTorch and Pillow."""
@@ -307,7 +313,7 @@ Dependencies take long to install?
 **Solutions:**
 1. Minimize dependencies
 2. Use custom Docker image (advanced)
-3. Keep workers warm (workersMin=1)
+3. Keep workers warm (`workers=(1, 3)`)
 
 ## Cold Start Times
 
@@ -330,28 +336,24 @@ Pillow>=10.0.0
 numpy==1.26.2
 ```
 
-**Note:** Worker dependencies in `@remote` decorator are deployed automatically. `requirements.txt` is for local development only.
+**Note:** Worker dependencies in the `Endpoint` decorator are deployed automatically. `requirements.txt` is for local development only.
 
-## Advanced: Custom Docker Images
+## Advanced: External Docker Images
 
-For complex dependencies, consider custom images:
+For complex dependencies, deploy a pre-built image:
 
 ```python
-from runpod_flash import ServerlessEndpoint
+from runpod_flash import Endpoint, GpuGroup
 
-custom_config = ServerlessEndpoint(
-    name="custom_image_worker",
-    dockerImage="myregistry/my-image:v1.0",
-    gpuIds=["NVIDIA GeForce RTX 4090"],
+vllm = Endpoint(
+    name="vllm-service",
+    image="vllm/vllm-openai:latest",
+    gpu=GpuGroup.ADA_24,
 )
 
-@remote(resource_config=custom_config)
-async def process(data: dict):
-    # All dependencies pre-installed in image
-    pass
+# call it as an API client
+result = await vllm.post("/v1/completions", {"prompt": "hello"})
 ```
-
-See [02_ml_inference/04_custom_images](../../02_ml_inference/04_custom_images/) for details.
 
 ## Next Steps
 

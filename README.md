@@ -285,9 +285,9 @@ The root [main.py](main.py) provides a programmatic discovery system that automa
 **Discovery Process**:
 1. Scans all example category directories (`01_getting_started/`, `02_ml_inference/`, etc.)
 2. Detects two patterns:
-   - **Single-file workers**: `gpu_worker.py`, `cpu_worker.py` with `APIRouter` exports
-   - **Directory-based workers**: `workers/gpu/__init__.py`, `workers/cpu/__init__.py` with `APIRouter` exports
-3. Dynamically imports and registers all routers with unique prefixes (e.g., `/01_hello_world/gpu/`)
+   - **Queue-based workers**: `@Endpoint(...)` decorated functions
+   - **Load-balanced workers**: `Endpoint` instances with `.get()/.post()` route decorators
+3. Dynamically imports and registers all endpoints with unique prefixes (e.g., `/01_hello_world/gpu/`)
 4. Generates metadata and documentation automatically
 
 **Benefits**:
@@ -303,17 +303,11 @@ Each example follows this structure:
 ```
 example_name/
 ├── README.md              # Documentation and deployment guide
-├── main.py               # FastAPI application entry point
-├── workers/              # Remote worker functions
-│   ├── gpu/              # GPU workers
-│   │   ├── __init__.py   # FastAPI router
-│   │   └── endpoint.py   # @remote decorated functions
-│   └── cpu/              # CPU workers
-│       ├── __init__.py
-│       └── endpoint.py
-├── requirements.txt      # Python dependencies
-├── pyproject.toml        # Project configuration
-└── .env.example          # Environment variable template
+├── gpu_worker.py          # GPU worker with @Endpoint decorator
+├── cpu_worker.py          # CPU worker with @Endpoint decorator
+├── requirements.txt       # Python dependencies
+├── pyproject.toml         # Project configuration
+└── .env.example           # Environment variable template
 ```
 
 ### Dependency Management
@@ -349,35 +343,57 @@ This automation ensures that `flash run` from the root directory always has acce
 
 ## Key Concepts
 
-### Remote Workers
+### Endpoint
 
-The `@remote` decorator marks functions for execution on Runpod's serverless infrastructure:
+The `Endpoint` class configures functions for execution on Runpod's serverless infrastructure:
+
+**Queue-based (one function = one endpoint):**
 
 ```python
-from runpod_flash import remote, LiveServerless, GpuGroup
+from runpod_flash import Endpoint, GpuGroup
 
-config = LiveServerless(
-    name="my_worker",
-    gpus=[GpuGroup.ADA_24],  # RTX 4090
-    workersMin=0,            # Scale to zero when idle
-    workersMax=3,            # Maximum concurrent workers
-)
-
-@remote(resource_config=config, dependencies=["torch"])
+@Endpoint(name="my-worker", gpu=GpuGroup.ADA_24, workers=(0, 3), dependencies=["torch"])
 async def process(data: dict) -> dict:
     import torch
-    # This code runs on Runpod GPUs
+    # this code runs on Runpod GPUs
     return {"result": "processed"}
+```
+
+**Load-balanced (multiple routes, shared workers):**
+
+```python
+from runpod_flash import Endpoint
+
+api = Endpoint(name="my-api", cpu="cpu3c-1-2", workers=(1, 3))
+
+@api.get("/health")
+async def health():
+    return {"status": "ok"}
+
+@api.post("/compute")
+async def compute(data: dict) -> dict:
+    return {"result": data}
+```
+
+**Client mode (connect to an existing endpoint):**
+
+```python
+from runpod_flash import Endpoint
+
+ep = Endpoint(id="ep-abc123")
+job = await ep.run({"prompt": "hello"})
+await job.wait()
+print(job.output)
 ```
 
 ### Resource Types
 
-**GPU Workers** (`LiveServerless`):
+**GPU Workers** (`gpu=`):
 - `GpuGroup.ADA_24` - RTX 4090 (24GB)
 - `GpuGroup.ADA_48_PRO` - RTX 6000 Ada, L40 (48GB)
 - `GpuGroup.AMPERE_80` - A100 (80GB)
 
-**CPU Workers** (`CpuLiveServerless`):
+**CPU Workers** (`cpu=`):
 - `CpuInstanceType.CPU3G_2_8` - 2 vCPU, 8GB RAM
 - `CpuInstanceType.CPU3C_4_8` - 4 vCPU, 8GB RAM (Compute)
 - `CpuInstanceType.CPU5G_4_16` - 4 vCPU, 16GB RAM (Latest)
@@ -385,9 +401,9 @@ async def process(data: dict) -> dict:
 ### Auto-Scaling
 
 Workers automatically scale based on demand:
-- `workersMin=0` - Scale to zero when idle (cost-efficient)
-- `workersMax=N` - Maximum concurrent workers
-- `idleTimeout=5` - Minutes before scaling down
+- `workers=(0, 3)` - Scale from 0 to 3 workers (cost-efficient)
+- `workers=(1, 5)` - Keep 1 warm, scale up to 5
+- `idle_timeout=5` - Minutes before scaling down
 
 ## Contributing
 

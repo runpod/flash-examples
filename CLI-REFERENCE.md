@@ -101,7 +101,7 @@ flash init my-api --force
 
 ### What It Creates
 
-- `gpu_worker.py` - GPU worker template with `@remote` decorator
+- `gpu_worker.py` - GPU worker template with `@Endpoint` decorator
 - `pyproject.toml` - Project dependencies
 - `.env.example` - Environment variable template
 - `.gitignore` - Git ignore patterns
@@ -175,7 +175,7 @@ flash run
 
 ### What It Does
 
-1. Discovers all `.py` files (excluding `.venv/`, `.flash/`, `.runpod/`, `__init__.py`) and finds `@remote` decorated functions via AST parsing
+1. Discovers all `.py` files (excluding `.venv/`, `.flash/`, `.runpod/`, `__init__.py`) and finds `@Endpoint` decorated functions via AST parsing
 2. Generates a FastAPI application with routes for each discovered function
 3. Starts uvicorn development server with hot reload
 4. Provides interactive API documentation at `/docs`
@@ -258,7 +258,7 @@ flash build --use-local-flash
 1. Creates `.build/` directory (kept for inspection)
 2. Installs dependencies via pip for Linux x86_64
 3. Generates `flash_manifest.json` with resource configurations
-4. Creates handler files for each `@remote` function
+4. Creates handler files for each `@Endpoint` function
 5. Packages everything into `artifact.tar.gz`
 6. Reports archive size (max 500MB for deployment)
 

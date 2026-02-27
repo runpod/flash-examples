@@ -48,9 +48,9 @@ cd hello-flash
 **What happened:**
 - Created `hello-flash/` directory
 - Generated project structure:
-  - `main.py` - FastAPI application
-  - `mothership.py` - Mothership endpoint config
   - `gpu_worker.py` - GPU worker template
+  - `cpu_worker.py` - CPU worker template
+  - `lb_worker.py` - Load-balanced worker template
   - `pyproject.toml` - Dependencies
   - `.env.example` - Environment variables template
 
@@ -63,20 +63,12 @@ cd hello-flash
 Open `gpu_worker.py` to see your first remote function:
 
 ```python
-from runpod_flash import remote, LiveServerless, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
-gpu_config = LiveServerless(
-    name="hello_flash_gpu",
-    gpus=[GpuGroup.ANY],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=300,
-)
-
-@remote(resource_config=gpu_config)
+@Endpoint(name="gpu_worker", gpu=GpuType.ANY, dependencies=["torch"])
 async def process_request(payload: dict) -> dict:
     """Example GPU worker that processes requests."""
-    # Your GPU processing logic here
+    # your GPU processing logic here
     return {
         "status": "success",
         "message": "Hello from Flash GPU worker!",
@@ -85,8 +77,9 @@ async def process_request(payload: dict) -> dict:
 ```
 
 **Key concepts:**
-- `@remote` decorator marks functions to be run in the Runpod cloud
-- `LiveServerless` configures GPU resources for the function to be run on
+- `@Endpoint` decorator marks functions to be run in the Runpod cloud
+- `gpu=` configures the GPU type, `workers=` sets scaling bounds
+- `dependencies=` specifies runtime Python packages
 
 ---
 
@@ -107,7 +100,7 @@ INFO: Application startup complete
 
 **Checkpoint:** Server is running at http://localhost:8888
 
-**What's happening:** Your FastAPI app runs locally on your machine, but when you call a `@remote` function, it executes on Runpod Serverless. This hybrid architecture gives you hot-reload for rapid development while testing real GPU/CPU workloads in the cloud. Endpoints created during `flash run` are prefixed with `live-` to keep them separate from production.
+**What's happening:** Your FastAPI app runs locally on your machine, but when you call an `@Endpoint` function, it executes on Runpod Serverless. This hybrid architecture gives you hot-reload for rapid development while testing real GPU/CPU workloads in the cloud. Endpoints created during `flash run` are prefixed with `live-` to keep them separate from production.
 
 ---
 

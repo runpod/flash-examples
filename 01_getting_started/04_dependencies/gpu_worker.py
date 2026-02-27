@@ -3,6 +3,7 @@
 # test directly: python gpu_worker.py
 from runpod_flash import Endpoint, GpuGroup
 
+
 @Endpoint(
     name="01_04_deps_ml",
     gpu=GpuGroup.ADA_32_PRO,

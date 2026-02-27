@@ -14,6 +14,7 @@ volume = NetworkVolume(
     size=50,
 )
 
+
 @Endpoint(
     name="05_01_gpu_worker",
     gpu=GpuGroup.ANY,

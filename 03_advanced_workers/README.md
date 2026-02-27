@@ -21,7 +21,7 @@ Load-balancer endpoints with custom HTTP routes.
 
 **Resources:**
 - `LiveLoadBalancer` - Local development
-- `LoadBalancerSlsResource` - Production deployment
+- `Endpoint` with route decorators for LB endpoints
 
 ### 01_streaming _(coming soon)_
 Streaming responses with Server-Sent Events (SSE) and WebSockets.

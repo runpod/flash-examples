@@ -3,6 +3,7 @@
 # test directly: python gpu_worker.py
 from runpod_flash import Endpoint, GpuGroup
 
+
 @Endpoint(
     name="02_01_text_to_speech_gpu",
     gpu=GpuGroup.ADA_24,

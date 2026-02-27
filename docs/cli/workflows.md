@@ -99,10 +99,9 @@ INFO: Application startup complete.
 Edit your worker files (e.g., `gpu_worker.py`):
 
 ```python
-@remote(resource_config=gpu_config)
+@Endpoint(name="my-worker", gpu=GpuGroup.ANY)
 async def process_request(payload: dict) -> dict:
-    """Updated function with new logic."""
-    # Add new feature here
+    """Process incoming requests on GPU."""
     result = perform_processing(payload)
     return {"status": "success", "result": result}
 ```
@@ -598,24 +597,24 @@ flash deploy --env production
 
 **dev environment** (`dev_worker.py`):
 ```python
-dev_gpu_config = LiveServerless(
+@Endpoint(
     name="myapi_dev_gpu",
-    gpus=[GpuGroup.ANY],  # Any GPU is fine
-    workersMin=0,         # Scale to zero when idle
-    workersMax=2,         # Small max for cost
-    idleTimeout=60,       # Quick shutdown
+    gpu=GpuGroup.ANY,      # any GPU is fine
+    workers=(0, 2),        # scale to zero, small max for cost
+    idle_timeout=1,        # quick shutdown
 )
+async def process(payload: dict) -> dict: ...
 ```
 
 **production environment** (`prod_worker.py`):
 ```python
-prod_gpu_config = LiveServerless(
+@Endpoint(
     name="myapi_prod_gpu",
-    gpus=[GpuGroup.A100],  # Specific GPU for consistency
-    workersMin=1,          # Always have one ready
-    workersMax=10,         # Handle load spikes
-    idleTimeout=300,       # Keep warm longer
+    gpu=GpuGroup.A100,     # specific GPU for consistency
+    workers=(1, 10),       # always have one ready, handle load spikes
+    idle_timeout=5,        # keep warm longer
 )
+async def process(payload: dict) -> dict: ...
 ```
 
 **Use environment variables:**
@@ -1054,9 +1053,9 @@ Deployed Endpoints:
 ┌──────────────────────────┬─────────────────────┬──────────────────────┬────────────┐
 │ Name                     │ Type                │ Environment          │ Status     │
 ├──────────────────────────┼─────────────────────┼──────────────────────┼────────────┤
-│ my-api-gpu               │ LiveServerless      │ production           │ Active     │
-│ test-feature-gpu         │ LiveServerless      │ dev                  │ Idle       │
-│ old-worker-v1            │ LiveServerless      │ staging              │ Inactive   │
+│ my-api-gpu               │ Endpoint            │ production           │ Active     │
+│ test-feature-gpu         │ Endpoint            │ dev                  │ Idle       │
+│ old-worker-v1            │ Endpoint            │ staging              │ Inactive   │
 └──────────────────────────┴─────────────────────┴──────────────────────┴────────────┘
 ```
 
@@ -1154,19 +1153,12 @@ flash env get production
 
 **Before (high cost):**
 ```python
-expensive_config = LiveServerless(
-    workersMin=5,  # Always 5 running
-    workersMax=10
-)
+@Endpoint(name="worker", gpu=GpuGroup.ANY, workers=(5, 10))  # always 5 running
 ```
 
 **After (optimized):**
 ```python
-optimized_config = LiveServerless(
-    workersMin=0,   # Scale to zero
-    workersMax=10,  # Handle spikes
-    idleTimeout=60  # Quick shutdown
-)
+@Endpoint(name="worker", gpu=GpuGroup.ANY, workers=(0, 10), idle_timeout=1)  # scale to zero
 ```
 
 Redeploy with optimized config:
@@ -1456,15 +1448,11 @@ cat gpu_worker.py
 
 **A. Change GPU type:**
 ```python
-# Before (specific GPU)
-gpu_config = LiveServerless(
-    gpus=[GpuGroup.A100]  # May not be available
-)
+# before (specific GPU, may not be available)
+@Endpoint(name="worker", gpu=GpuGroup.A100)
 
-# After (more flexible)
-gpu_config = LiveServerless(
-    gpus=[GpuGroup.ANY]  # Any available GPU
-)
+# after (more flexible)
+@Endpoint(name="worker", gpu=GpuGroup.ANY)
 ```
 
 Redeploy:
@@ -1479,10 +1467,9 @@ sleep 300
 flash deploy --env production
 ```
 
-**C. Choose different region:**
-Modify config to try different GPU types:
+**C. Choose different GPU type:**
 ```python
-gpus=[GpuGroup.RTX_4090]  # More common
+@Endpoint(name="worker", gpu=GpuGroup.RTX_4090)  # more common
 ```
 
 #### Issue 5: Runtime Errors
@@ -1545,10 +1532,7 @@ RuntimeError: CUDA not available
 
 Solution: Verify GPU configuration:
 ```python
-gpu_config = LiveServerless(
-    gpus=[GpuGroup.ANY],  # Ensure GPU specified
-    ...
-)
+@Endpoint(name="worker", gpu=GpuGroup.ANY)
 ```
 
 #### Issue 6: Performance Issues
@@ -1571,11 +1555,12 @@ flash env get production
 
 **A. Reduce cold starts:**
 ```python
-# Increase workersMin to keep workers warm
-gpu_config = LiveServerless(
-    workersMin=1,  # Was 0
-    workersMax=5,
-    idleTimeout=300  # Keep alive longer
+# keep workers warm with workers=(1, N)
+@Endpoint(
+    name="worker",
+    gpu=GpuGroup.ANY,
+    workers=(1, 5),       # keep 1 warm
+    idle_timeout=5,       # keep alive longer
 )
 ```
 
@@ -1585,24 +1570,21 @@ gpu_config = LiveServerless(
 - Cache model loading
 
 ```python
-# Lazy loading example
+# lazy loading example
 _model = None
 
-@remote(resource_config=gpu_config)
+@Endpoint(name="worker", gpu=GpuGroup.ANY)
 async def infer(payload: dict) -> dict:
     global _model
     if _model is None:
-        _model = load_model()  # Only load once
+        _model = load_model()  # only load once
     return _model.predict(payload)
 ```
 
 **C. Increase worker capacity:**
 ```python
-# Handle more concurrent requests
-gpu_config = LiveServerless(
-    workersMax=10,  # Was 3
-    ...
-)
+# handle more concurrent requests
+@Endpoint(name="worker", gpu=GpuGroup.ANY, workers=(0, 10))
 ```
 
 ### General Debugging Approach

@@ -3,6 +3,7 @@
 # test directly: python cpu_worker.py
 from runpod_flash import CpuInstanceType, Endpoint
 
+
 # worker with data science dependencies
 @Endpoint(
     name="01_04_deps_data",

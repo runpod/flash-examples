@@ -4,6 +4,7 @@
 # test directly: python cpu_worker.py
 from runpod_flash import CpuInstanceType, Endpoint
 
+
 @Endpoint(
     name="01_03_mixed_workers_cpu",
     cpu=CpuInstanceType.CPU3G_2_8,
@@ -63,7 +64,9 @@ async def postprocess_results(input_data: dict) -> dict:
 
     return {
         "status": "success",
-        "text_preview": original_text[:100] + "..." if len(original_text) > 100 else original_text,
+        "text_preview": original_text[:100] + "..."
+        if len(original_text) > 100
+        else original_text,
         "classification": {
             "label": top_prediction["label"] if top_prediction else "unknown",
             "confidence": top_prediction["confidence"] if top_prediction else 0,

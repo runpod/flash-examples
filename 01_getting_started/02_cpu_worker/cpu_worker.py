@@ -3,6 +3,7 @@
 # test directly: python cpu_worker.py
 from runpod_flash import CpuInstanceType, Endpoint
 
+
 @Endpoint(
     name="01_02_cpu_worker",
     cpu=CpuInstanceType.CPU3C_1_2,
