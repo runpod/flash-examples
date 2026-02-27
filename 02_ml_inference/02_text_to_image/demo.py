@@ -98,7 +98,6 @@ def main():
     print(f"  Server:  {API_URL}")
     print()
 
-    # Build request
     hf_token = os.environ.get("HF_TOKEN", "")
     payload = json.dumps({"prompt": prompt, "hf_token": hf_token}).encode()
     req = urllib.request.Request(
@@ -107,7 +106,6 @@ def main():
         headers={"Content-Type": "application/json"},
     )
 
-    # Send request with timing
     print("  Sending to RunPod GPU worker...", end="", flush=True)
     t0 = time.time()
 
@@ -126,7 +124,6 @@ def main():
         print(f"\n\n  Error from worker: {result}")
         sys.exit(1)
 
-    # Decode image
     image_bytes = base64.b64decode(result["image_base64"])
     size_kb = len(image_bytes) / 1024
 
@@ -134,13 +131,11 @@ def main():
     print(f"  Image:   {result.get('width')}x{result.get('height')}px, {size_kb:.0f}KB")
     print()
 
-    # Save to disk
     with open(OUTPUT_FILE, "wb") as f:
         f.write(image_bytes)
     print(f"  Saved to {OUTPUT_FILE}")
     print()
 
-    # Display in terminal
     display_image(image_bytes)
     print()
 

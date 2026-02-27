@@ -33,6 +33,8 @@ gpu_config = LiveServerless(
     ],
 )
 class ImageToImageWorker:
+    """Stable Diffusion v1.5 img2img worker."""
+
     def __init__(self):
         import torch
         from diffusers import StableDiffusionImg2ImgPipeline
@@ -77,15 +79,18 @@ class ImageToImageWorker:
         if seed is not None:
             generator = self._torch.Generator(device="cuda").manual_seed(int(seed))
 
-        output_image = self.pipe(
-            prompt=prompt,
-            negative_prompt=negative_prompt if negative_prompt else None,
-            image=input_image,
-            strength=strength,
-            guidance_scale=guidance_scale,
-            num_inference_steps=num_steps,
-            generator=generator,
-        ).images[0]
+        try:
+            output_image = self.pipe(
+                prompt=prompt,
+                negative_prompt=negative_prompt if negative_prompt else None,
+                image=input_image,
+                strength=strength,
+                guidance_scale=guidance_scale,
+                num_inference_steps=num_steps,
+                generator=generator,
+            ).images[0]
+        except Exception as exc:
+            return {"status": "error", "error": f"Image transformation failed: {exc}"}
 
         output_buffer = io.BytesIO()
         output_image.save(output_buffer, format="PNG")

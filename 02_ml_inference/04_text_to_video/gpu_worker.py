@@ -23,10 +23,14 @@ gpu_config = LiveServerless(
     ],
 )
 class TextToVideoWorker:
+    """Text-to-video worker using damo-vilab/text-to-video-ms-1.7b."""
+
     def __init__(self):
+        import logging
         import torch
         from diffusers import DiffusionPipeline
 
+        log = logging.getLogger(__name__)
         self._torch = torch
         self.model = "damo-vilab/text-to-video-ms-1.7b"
         self._using_cpu_offload = False
@@ -35,6 +39,8 @@ class TextToVideoWorker:
             torch_dtype=torch.float16,
         )
         self.pipe.enable_attention_slicing()
+
+        # Enable VAE memory optimizations when available.
         vae = getattr(self.pipe, "vae", None)
         if vae:
             for attr in ("enable_slicing", "enable_tiling"):
@@ -42,14 +48,16 @@ class TextToVideoWorker:
                 if callable(fn):
                     try:
                         fn()
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        log.debug("VAE %s unavailable: %s", attr, exc)
 
+        # Prefer CPU offload for large models; fall back to full GPU placement.
         if torch.cuda.is_available():
             try:
                 self.pipe.enable_model_cpu_offload()
                 self._using_cpu_offload = True
-            except Exception:
+            except Exception as exc:
+                log.info("CPU offload unavailable, using full GPU: %s", exc)
                 self.pipe = self.pipe.to("cuda")
         else:
             self.pipe = self.pipe.to("cpu")
@@ -76,6 +84,7 @@ class TextToVideoWorker:
 
         generator = None
         if seed is not None:
+            # Generator device must match pipeline (CPU when using CPU offload).
             generator_device = "cpu" if self._using_cpu_offload else "cuda"
             if not self._torch.cuda.is_available():
                 generator_device = "cpu"
@@ -104,6 +113,7 @@ class TextToVideoWorker:
         frames = list(frames) if frames else []
         if not frames:
             return {"status": "error", "error": "Model returned no frames"}
+        # Handle numpy arrays when diffusers returns non-PIL frames.
         if not hasattr(frames[0], "save"):
             from PIL import Image
 
@@ -115,6 +125,7 @@ class TextToVideoWorker:
                 converted_frames.append(Image.fromarray(arr))
             frames = converted_frames
 
+        # GIF duration is per-frame in ms; clamp FPS to valid GIF range.
         effective_fps = min(max(fps, 1), 25)
         duration_ms = int(1000 / effective_fps)
 

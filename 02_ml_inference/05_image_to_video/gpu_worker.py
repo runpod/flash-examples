@@ -33,10 +33,14 @@ gpu_config = LiveServerless(
     ],
 )
 class ImageToVideoWorker:
+    """Stable Video Diffusion img2vid-xt worker."""
+
     def __init__(self):
+        import logging
         import torch
         from diffusers import StableVideoDiffusionPipeline
 
+        log = logging.getLogger(__name__)
         self._torch = torch
         self.model = "stabilityai/stable-video-diffusion-img2vid-xt"
         self._using_cpu_offload = False
@@ -46,6 +50,8 @@ class ImageToVideoWorker:
             variant="fp16",
         )
         self.pipe.enable_attention_slicing()
+
+        # Enable VAE memory optimizations when available.
         vae = getattr(self.pipe, "vae", None)
         if vae:
             for attr in ("enable_slicing", "enable_tiling"):
@@ -53,14 +59,16 @@ class ImageToVideoWorker:
                 if callable(fn):
                     try:
                         fn()
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        log.debug("VAE %s unavailable: %s", attr, exc)
 
+        # Prefer CPU offload for large models; fall back to full GPU placement.
         if torch.cuda.is_available():
             try:
                 self.pipe.enable_model_cpu_offload()
                 self._using_cpu_offload = True
-            except Exception:
+            except Exception as exc:
+                log.info("CPU offload unavailable, using full GPU: %s", exc)
                 self.pipe = self.pipe.to("cuda")
         else:
             self.pipe = self.pipe.to("cpu")
@@ -89,10 +97,12 @@ class ImageToVideoWorker:
         except Exception as exc:
             return {"status": "error", "error": f"Invalid input image: {exc}"}
 
+        # SVD expects 1024x576 input resolution.
         resized_image = input_image.resize((1024, 576))
 
         generator = None
         if seed is not None:
+            # Generator device must match pipeline (CPU when using CPU offload).
             generator_device = "cpu" if self._using_cpu_offload else "cuda"
             if not self._torch.cuda.is_available():
                 generator_device = "cpu"
@@ -120,6 +130,7 @@ class ImageToVideoWorker:
         frames = list(frames) if frames else []
         if not frames:
             return {"status": "error", "error": "Model returned no frames"}
+        # Handle numpy arrays when diffusers returns non-PIL frames.
         if not hasattr(frames[0], "save"):
             converted_frames = []
             for frame in frames:
@@ -129,6 +140,7 @@ class ImageToVideoWorker:
                 converted_frames.append(Image.fromarray(arr))
             frames = converted_frames
 
+        # GIF duration is per-frame in ms; clamp FPS to valid GIF range.
         effective_fps = min(max(fps, 1), 25)
         duration_ms = int(1000 / effective_fps)
 

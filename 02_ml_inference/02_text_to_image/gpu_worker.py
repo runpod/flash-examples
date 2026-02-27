@@ -25,6 +25,8 @@ gpu_config = LiveServerless(
     ],
 )
 class FluxWorker:
+    """Warm FLUX.1-schnell worker — caches the pipeline between requests."""
+
     def __init__(self):
         import torch
 
@@ -60,6 +62,7 @@ class FluxWorker:
 
         try:
             self._ensure_pipeline(hf_token=hf_token)
+            # FLUX schnell uses flow-matching; guidance_scale=0.0 disables CFG.
             image = self._pipe(
                 prompt,
                 num_inference_steps=num_steps,
@@ -101,7 +104,7 @@ class ImageRequest(BaseModel):
     )
     width: int = Field(default=512, description="Image width in pixels")
     height: int = Field(default=512, description="Image height in pixels")
-    num_steps: int = Field(default=4, description="Number of diffusion steps (1-8)")
+    num_steps: int = Field(default=4, ge=1, le=8, description="Number of diffusion steps (1-8)")
     hf_token: str = Field(
         default="",
         description="Optional Hugging Face token. Uses HF_TOKEN env var when omitted.",
