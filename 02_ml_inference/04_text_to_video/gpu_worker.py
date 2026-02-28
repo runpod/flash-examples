@@ -80,7 +80,10 @@ class TextToVideoWorker:
         if not prompt:
             return {"status": "error", "error": "prompt is required"}
         if width % 8 != 0 or height % 8 != 0:
-            return {"status": "error", "error": "width and height must be divisible by 8"}
+            return {
+                "status": "error",
+                "error": "width and height must be divisible by 8",
+            }
 
         generator = None
         if seed is not None:
@@ -88,7 +91,9 @@ class TextToVideoWorker:
             generator_device = "cpu" if self._using_cpu_offload else "cuda"
             if not self._torch.cuda.is_available():
                 generator_device = "cpu"
-            generator = self._torch.Generator(device=generator_device).manual_seed(int(seed))
+            generator = self._torch.Generator(device=generator_device).manual_seed(
+                int(seed)
+            )
 
         try:
             with self._torch.inference_mode():
@@ -148,7 +153,9 @@ class TextToVideoWorker:
             "status": "success",
             "video_base64": base64.b64encode(gif_buffer.read()).decode("utf-8"),
             "video_mime_type": "image/gif",
-            "preview_image_base64": base64.b64encode(preview_buffer.read()).decode("utf-8"),
+            "preview_image_base64": base64.b64encode(preview_buffer.read()).decode(
+                "utf-8"
+            ),
             "preview_image_mime_type": "image/png",
             "model": self.model,
             "prompt": prompt,
@@ -177,7 +184,9 @@ def get_worker() -> TextToVideoWorker:
 
 class TextToVideoRequest(BaseModel):
     prompt: str = Field(description="Prompt that describes the video to generate")
-    negative_prompt: str = Field(default="", description="What to avoid in the generated video")
+    negative_prompt: str = Field(
+        default="", description="What to avoid in the generated video"
+    )
     num_frames: int = Field(default=12, ge=8, le=24)
     num_steps: int = Field(default=18, ge=5, le=40)
     guidance_scale: float = Field(default=7.0, ge=1.0, le=20.0)
@@ -191,5 +200,7 @@ class TextToVideoRequest(BaseModel):
 async def generate(request: TextToVideoRequest):
     result = await get_worker().generate(request.model_dump())
     if result["status"] != "success":
-        raise HTTPException(status_code=400, detail=result.get("error", "Video generation failed"))
+        raise HTTPException(
+            status_code=400, detail=result.get("error", "Video generation failed")
+        )
     return result

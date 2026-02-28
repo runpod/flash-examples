@@ -71,7 +71,9 @@ class ImageToImageWorker:
 
         try:
             image_bytes = base64.b64decode(image_base64)
-            input_image = Image.open(io.BytesIO(image_bytes)).convert("RGB").resize((512, 512))
+            input_image = (
+                Image.open(io.BytesIO(image_bytes)).convert("RGB").resize((512, 512))
+            )
         except Exception as exc:
             return {"status": "error", "error": f"Invalid input image: {exc}"}
 
@@ -127,7 +129,9 @@ class ImageToImageRequest(BaseModel):
         description="Input image encoded as base64. If omitted, defaults to poddy.jpg.",
     )
     prompt: str = Field(description="Prompt that describes how to transform the image")
-    negative_prompt: str = Field(default="", description="What to avoid in the output image")
+    negative_prompt: str = Field(
+        default="", description="What to avoid in the output image"
+    )
     strength: float = Field(default=0.65, ge=0.1, le=1.0)
     guidance_scale: float = Field(default=7.5, ge=0.0, le=20.0)
     num_steps: int = Field(default=25, ge=1, le=50)
@@ -141,8 +145,12 @@ async def transform(request: ImageToImageRequest):
         try:
             payload["image_base64"] = load_default_image_base64()
         except FileNotFoundError as exc:
-            raise HTTPException(status_code=500, detail=f"Default image not found: {exc}") from exc
+            raise HTTPException(
+                status_code=500, detail=f"Default image not found: {exc}"
+            ) from exc
     result = await get_worker().transform(payload)
     if result["status"] != "success":
-        raise HTTPException(status_code=400, detail=result.get("error", "Image transformation failed"))
+        raise HTTPException(
+            status_code=400, detail=result.get("error", "Image transformation failed")
+        )
     return result

@@ -104,7 +104,9 @@ class ImageRequest(BaseModel):
     )
     width: int = Field(default=512, description="Image width in pixels")
     height: int = Field(default=512, description="Image height in pixels")
-    num_steps: int = Field(default=4, ge=1, le=8, description="Number of diffusion steps (1-8)")
+    num_steps: int = Field(
+        default=4, ge=1, le=8, description="Number of diffusion steps (1-8)"
+    )
     hf_token: str = Field(
         default="",
         description="Optional Hugging Face token. Uses HF_TOKEN env var when omitted.",
@@ -124,5 +126,7 @@ async def generate(request: ImageRequest):
         }
     )
     if result.get("status") != "success":
-        raise HTTPException(status_code=400, detail=result.get("error", "Image generation failed"))
+        raise HTTPException(
+            status_code=400, detail=result.get("error", "Image generation failed")
+        )
     return result

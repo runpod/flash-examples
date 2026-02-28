@@ -19,7 +19,9 @@ DEFAULT_OUTPUT = "image_to_video.gif"
 
 
 def main() -> None:
-    input_path = Path(sys.argv[1]).expanduser().resolve() if len(sys.argv) > 1 else DEFAULT_IMAGE
+    input_path = (
+        Path(sys.argv[1]).expanduser().resolve() if len(sys.argv) > 1 else DEFAULT_IMAGE
+    )
     output_path = Path(sys.argv[2] if len(sys.argv) > 2 else DEFAULT_OUTPUT).resolve()
 
     if not input_path.exists():

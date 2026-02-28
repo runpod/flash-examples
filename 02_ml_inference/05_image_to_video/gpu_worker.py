@@ -106,7 +106,9 @@ class ImageToVideoWorker:
             generator_device = "cpu" if self._using_cpu_offload else "cuda"
             if not self._torch.cuda.is_available():
                 generator_device = "cpu"
-            generator = self._torch.Generator(device=generator_device).manual_seed(int(seed))
+            generator = self._torch.Generator(device=generator_device).manual_seed(
+                int(seed)
+            )
 
         try:
             with self._torch.inference_mode():
@@ -163,7 +165,9 @@ class ImageToVideoWorker:
             "status": "success",
             "video_base64": base64.b64encode(gif_buffer.read()).decode("utf-8"),
             "video_mime_type": "image/gif",
-            "preview_image_base64": base64.b64encode(preview_buffer.read()).decode("utf-8"),
+            "preview_image_base64": base64.b64encode(preview_buffer.read()).decode(
+                "utf-8"
+            ),
             "preview_image_mime_type": "image/png",
             "model": self.model,
             "input_width": input_image.width,
@@ -211,8 +215,12 @@ async def animate(request: ImageToVideoRequest):
         try:
             payload["image_base64"] = load_default_image_base64()
         except FileNotFoundError as exc:
-            raise HTTPException(status_code=500, detail=f"Default image not found: {exc}") from exc
+            raise HTTPException(
+                status_code=500, detail=f"Default image not found: {exc}"
+            ) from exc
     result = await get_worker().animate(payload)
     if result["status"] != "success":
-        raise HTTPException(status_code=400, detail=result.get("error", "Image animation failed"))
+        raise HTTPException(
+            status_code=400, detail=result.get("error", "Image animation failed")
+        )
     return result
