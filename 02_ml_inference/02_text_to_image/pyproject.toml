@@ -1,0 +1,10 @@
+[project]
+name = "flash-flux-text-to-image"
+version = "0.1.0"
+description = "Generate images with FLUX.1-schnell via RunPod Flash"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash",
+    "fastapi>=0.104.0",
+    "pillow>=10.0.0",
+]
