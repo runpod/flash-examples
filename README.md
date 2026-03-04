@@ -2,6 +2,29 @@
 
 A collection of example applications showcasing Runpod Flash - a framework for building production-ready AI applications with distributed GPU and CPU computing.
 
+## What is Flash?
+
+Flash is a Python framework that lets you run functions on Runpod's Serverless infrastructure with a single decorator. Write code locally, deploy globally—Flash handles provisioning, scaling, and routing automatically.
+
+```python
+@remote(resource_config=gpu_config)
+async def generate_image(prompt: str) -> bytes:
+    # This runs on a cloud GPU, not your laptop
+    ...
+```
+
+**Key features:**
+- **`@remote` decorator**: Mark any async function to run on serverless infrastructure
+- **Auto-scaling**: Scale to zero when idle, scale up under load
+- **Local development**: `flash run` starts a local server with hot reload
+- **One-command deploy**: `flash deploy` packages and ships your code
+
+## Prerequisites
+
+- **Python 3.10+**
+- **uv**: Install with `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **Runpod account**: [Sign up here](https://runpod.io/console/signup)
+
 ## Quick Start
 
 ```bash
@@ -19,7 +42,7 @@ uv run flash run
 
 Open **http://localhost:8888/docs** to explore all endpoints.
 
-> **Don't have uv?** Install it with `curl -LsSf https://astral.sh/uv/install.sh | sh` or see [DEVELOPMENT.md](./DEVELOPMENT.md) for pip/poetry/conda alternatives.
+> **Using pip, poetry, or conda?** See [DEVELOPMENT.md](./DEVELOPMENT.md) for alternative setups.
 
 ## Examples
 
