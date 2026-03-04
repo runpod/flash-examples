@@ -155,6 +155,45 @@ Virtual Environment: Active (.venv exists)
 Python Version: Python 3.12.10
 ```
 
+### Running Flash with Different Package Managers
+
+After `make setup` completes, you can run Flash in two ways:
+
+**Option A: Using Package Manager Prefix (recommended for uv/poetry/pipenv/conda)**
+
+Run commands with the package manager prefix without activation:
+
+```bash
+# With uv
+uv run flash run
+
+# With poetry
+poetry run flash run
+
+# With pipenv
+pipenv run flash run
+
+# With conda
+conda run -p ./.venv flash run
+```
+
+**Option B: Activate Virtual Environment (works with all managers)**
+
+Alternatively, activate the virtual environment first:
+
+```bash
+# Unix/macOS
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
+# Then run normally
+flash run
+```
+
+Once activated, you can run Flash and other commands directly without a prefix.
+
 ## Makefile Commands
 
 ### Help
@@ -216,6 +255,14 @@ Shows all available commands with your detected environment manager.
 ## Flash CLI Usage
 
 The Flash CLI provides commands for local development, building, and deployment.
+
+### Authentication
+
+```bash
+flash login                  # Authenticate with Runpod (opens browser)
+```
+
+Or set `RUNPOD_API_KEY` in your `.env` file.
 
 ### Development Commands
 
@@ -493,6 +540,66 @@ make clean-venv
 ```bash
 make clean-venv
 make setup
+```
+
+## Unified App Architecture
+
+The root directory provides a programmatic discovery system that automatically finds and loads all examples when you run `flash run` from the project root.
+
+### Discovery Process
+
+1. Scans all example category directories (`01_getting_started/`, `02_ml_inference/`, etc.)
+2. Detects `@remote` decorated functions in `.py` files via AST parsing
+3. Dynamically generates routes with unique prefixes (e.g., `/01_hello_world/gpu/`)
+4. Generates metadata and documentation automatically
+
+### Benefits
+
+- Add new examples without modifying any central configuration
+- Consistent routing across all examples
+- Single entry point for exploring all functionality
+- Automatic discovery eliminates manual registration
+
+### Example Structure
+
+Each example follows this flat-file pattern:
+
+```
+example_name/
+├── README.md              # Documentation and deployment guide
+├── gpu_worker.py          # @remote decorated functions (GPU)
+├── cpu_worker.py          # @remote decorated functions (CPU, optional)
+├── pyproject.toml         # Project dependencies
+└── .gitignore             # Git ignore patterns
+```
+
+### Example Dependency Syncing
+
+The unified app requires all example dependencies to be installed in the root environment for discovery to work.
+
+**Automatic Dependency Syncing:**
+
+When adding a new example with additional dependencies:
+
+1. Define dependencies in your example's `pyproject.toml`
+2. Run `make sync-example-deps` to update the root dependencies
+3. Run `uv sync --all-groups` (or `make setup`) to install new packages
+4. Run `make requirements.txt` to regenerate the lockfile
+
+The sync script automatically:
+- Scans all example directories for `pyproject.toml` files
+- Merges dependencies into the root configuration
+- Filters out transitive dependencies already provided by `runpod-flash`
+- Detects version conflicts and uses the most permissive constraint
+- Preserves essential root dependencies (numpy, torch, runpod-flash)
+
+**Example:**
+
+```bash
+# After adding a new example with pillow and structlog dependencies
+make sync-example-deps  # Syncs example deps to root pyproject.toml
+uv sync --all-groups    # Installs new dependencies
+make requirements.txt   # Regenerates lockfile
 ```
 
 ## Troubleshooting

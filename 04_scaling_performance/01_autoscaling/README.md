@@ -4,7 +4,7 @@ Configure Flash worker autoscaling for different workload patterns. This example
 
 ## Quick Start
 
-**Prerequisites**: Complete the [repository setup](../../README.md#quick-start) first (clone, `make dev`, set API key).
+**Prerequisites**: Complete the [repository setup](../../README.md#quick-start) first, or run `flash login` to authenticate.
 
 ```bash
 cd 04_scaling_performance/01_autoscaling

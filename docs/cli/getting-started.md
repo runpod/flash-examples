@@ -7,30 +7,34 @@ Complete your first Flash project in under 10 minutes. This guide walks you thro
 Before starting, ensure you have:
 
 - **Python 3.10 or higher** - Check with `python --version`
+- **uv** - Install with `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - **Runpod API Key** - Get from https://runpod.io/console/user/settings
-- **Flash installed** - Install with `pip install runpod-flash`
 
 ### Verify Installation
 
 ```bash
-flash --version
+uv run flash --version
 # Should output: flash, version X.Y.Z
 ```
 
-### Configure API Key
+### Authenticate
 
-Set your Runpod API key as an environment variable:
+The easiest way to authenticate is with `flash login`:
 
 ```bash
-export RUNPOD_API_KEY=your-key-here
+uv run flash login
 ```
 
-Or add to `.env` file:
+This opens a browser for authentication and saves your credentials.
+
+**Alternative:** Set your Runpod API key manually:
 ```bash
+export RUNPOD_API_KEY=your-key-here
+# Or add to .env file:
 echo "RUNPOD_API_KEY=your-key-here" > .env
 ```
 
-**Checkpoint:** Running `echo $RUNPOD_API_KEY` should display your key.
+**Checkpoint:** Running `uv run flash login` or `echo $RUNPOD_API_KEY` confirms authentication.
 
 ---
 
@@ -41,7 +45,7 @@ echo "RUNPOD_API_KEY=your-key-here" > .env
 Create a new Flash project with the CLI:
 
 ```bash
-flash init hello-flash
+uv run flash init hello-flash
 cd hello-flash
 ```
 
@@ -95,7 +99,7 @@ async def process_request(payload: dict) -> dict:
 Start the development server:
 
 ```bash
-flash run
+uv run flash run
 ```
 
 **Expected output:**
@@ -159,7 +163,7 @@ curl -X POST http://localhost:8888/process \
 Stop the development server (Ctrl+C), then create a deployment environment:
 
 ```bash
-flash env create dev
+uv run flash env create dev
 ```
 
 **Expected output:**
@@ -171,7 +175,7 @@ Environment 'dev' created successfully
 - Created a deployment target named "dev"
 - This environment will contain your deployed endpoints
 
-**Checkpoint:** Run `flash env list` and verify "dev" appears.
+**Checkpoint:** Run `uv run flash env list` and verify "dev" appears.
 
 ---
 
@@ -180,7 +184,7 @@ Environment 'dev' created successfully
 Package your application for deployment:
 
 ```bash
-flash build
+uv run flash build
 ```
 
 **Expected output:**
@@ -207,7 +211,7 @@ Creating archive...
 Deploy your application to the "dev" environment:
 
 ```bash
-flash deploy --env dev
+uv run flash deploy --env dev
 ```
 
 **Expected output:**
@@ -296,7 +300,8 @@ The flash-examples repository contains production-ready examples:
 ```bash
 git clone https://github.com/runpod/flash-examples.git
 cd flash-examples
-flash run
+uv sync && uv pip install -e .
+uv run flash run
 # Visit http://localhost:8888/docs to explore all examples
 ```
 
@@ -338,9 +343,11 @@ flash run
 
 **Solution:**
 ```bash
-pip install runpod-flash
+# Install uv if needed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Verify installation
-flash --version
+uv run flash --version
 ```
 
 ### Port Already in Use
@@ -350,7 +357,7 @@ flash --version
 **Solution:**
 ```bash
 # Use different port
-flash run --port 9000
+uv run flash run --port 9000
 
 # Or find and kill process using port 8888
 lsof -ti:8888 | xargs kill -9
@@ -374,7 +381,7 @@ echo $RUNPOD_API_KEY
 **Solution:**
 ```bash
 # Exclude packages present in Runpod base image
-flash build --exclude torch,torchvision,torchaudio
+uv run flash build --exclude torch,torchvision,torchaudio
 ```
 
 See [Troubleshooting Guide](troubleshooting.md) for more solutions.
@@ -385,13 +392,13 @@ See [Troubleshooting Guide](troubleshooting.md) for more solutions.
 
 | Command | Purpose |
 |---------|---------|
-| `flash init <name>` | Create new project |
-| `flash run` | Run development server |
-| `flash build` | Build deployment package |
-| `flash deploy --env <name>` | Deploy to environment |
-| `flash env create <name>` | Create environment |
-| `flash env list` | List environments |
-| `flash undeploy <name>` | Delete endpoint |
+| `uv run flash init <name>` | Create new project |
+| `uv run flash run` | Run development server |
+| `uv run flash build` | Build deployment package |
+| `uv run flash deploy --env <name>` | Deploy to environment |
+| `uv run flash env create <name>` | Create environment |
+| `uv run flash env list` | List environments |
+| `uv run flash undeploy <name>` | Delete endpoint |
 
 ---
 

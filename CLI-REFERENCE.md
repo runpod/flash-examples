@@ -21,6 +21,7 @@ flash <command> --help    # Show help for specific command
 
 | Command | Purpose |
 |---------|---------|
+| [`flash login`](#flash-login) | Authenticate with Runpod |
 | [`flash init`](#flash-init) | Create new Flash project |
 | [`flash run`](#flash-run) | Run development server |
 | [`flash build`](#flash-build) | Build application package |
@@ -57,6 +58,51 @@ flash <command> --help    # Show help for specific command
    - Common error solutions
    - Build size optimization
    - Deployment debugging
+
+---
+
+## flash login
+
+Authenticate with Runpod. Opens a browser for authentication and saves credentials locally.
+
+### Syntax
+
+```bash
+flash login
+```
+
+### What It Does
+
+1. Opens your default browser to Runpod's authentication page
+2. After you authenticate, saves credentials securely
+3. Environment variables persist across sessions
+
+### Examples
+
+**Authenticate with Runpod:**
+```bash
+flash login
+# Opens browser for authentication
+```
+
+### Alternative: Manual Configuration
+
+If `flash login` doesn't work in your environment, you can set the API key manually:
+
+```bash
+# Set environment variable
+export RUNPOD_API_KEY=your-key-here
+
+# Or add to .env file
+echo "RUNPOD_API_KEY=your-key-here" > .env
+```
+
+Get your API key from [Runpod Settings](https://www.runpod.io/console/user/settings).
+
+### Related Commands
+
+- [`flash run`](#flash-run) - Run development server (requires authentication)
+- [`flash deploy`](#flash-deploy) - Deploy to Runpod (requires authentication)
 
 ---
 
