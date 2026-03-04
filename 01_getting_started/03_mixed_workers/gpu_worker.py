@@ -10,7 +10,6 @@ from runpod_flash import Endpoint, GpuGroup
     gpu=GpuGroup.ADA_24,
     workers=(0, 3),
     idle_timeout=5,
-    dependencies=["torch"],
 )
 async def gpu_inference(input_data: dict) -> dict:
     """GPU inference: mock sentiment classification."""

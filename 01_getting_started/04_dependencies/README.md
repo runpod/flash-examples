@@ -50,17 +50,19 @@ Specified in the `Endpoint` decorator:
     name="my-worker",
     gpu=GpuGroup.ADA_24,
     dependencies=[
-        "torch==2.1.0",      # Exact version
+        "requests==2.32.3",  # Exact version
         "Pillow>=10.0.0",    # Minimum version
-        "numpy<2.0.0",       # Maximum version
-        "requests",          # Latest version
-    ],
+        "python-dateutil<3.0.0",  # Maximum version
+        "httpx",             # Latest version
+    ]
 )
 async def my_function(data: dict) -> dict:
-    import torch
-    import PIL
+    import httpx
+    import requests
     # your code here
 ```
+
+Note: `torch` is already baked into the default GPU base image, so you generally should not add it to `dependencies` unless you intentionally need to override the bundled version.
 
 ### 2. System Dependencies
 
@@ -102,7 +104,7 @@ async def simple_function(data: dict) -> dict:
 
 ### Exact Version (==)
 ```python
-"torch==2.1.0"  # Exactly 2.1.0
+"requests==2.32.3"  # Exactly 2.32.3
 ```
 **Use when:** You need reproducible builds
 
@@ -114,7 +116,7 @@ async def simple_function(data: dict) -> dict:
 
 ### Maximum Version (<)
 ```python
-"numpy<2.0.0"  # Below 2.0.0
+"python-dateutil<3.0.0"  # Below 3.0.0
 ```
 **Use when:** Avoiding breaking changes
 
@@ -135,7 +137,6 @@ async def simple_function(data: dict) -> dict:
 ### ML/AI
 ```python
 dependencies=[
-    "torch==2.1.0",
     "transformers>=4.35.0",
     "diffusers",
     "accelerate",
@@ -204,7 +205,7 @@ system_dependencies=["ffmpeg", "libgl1", "wget"]
     name="worker",
     gpu=GpuGroup.ADA_24,
     dependencies=[
-        "torch==2.1.0",
+        "requests==2.32.3",
         "transformers==4.35.2",
         "numpy==1.26.2",
     ],
@@ -215,7 +216,7 @@ system_dependencies=["ffmpeg", "libgl1", "wget"]
     name="worker",
     gpu=GpuGroup.ADA_24,
     dependencies=[
-        "torch",
+        "requests",  # Version changes over time
         "transformers",
         "numpy",
     ],
@@ -257,13 +258,13 @@ python cpu_worker.py
     name="worker",
     gpu=GpuGroup.ADA_24,
     dependencies=[
-        "torch==2.1.0",      # GPU operations
+        "requests==2.32.3",  # API calls
         "Pillow>=10.0.0",    # Image processing
-        "requests",          # API calls
-    ],
+        "python-dateutil<3.0.0",  # Date parsing compatibility
+    ]
 )
 async def process_image(data: dict):
-    """Process image with PyTorch and Pillow."""
+    """Process image with Pillow and lightweight utility libraries."""
     pass
 ```
 
@@ -272,26 +273,26 @@ async def process_image(data: dict):
 ### Import Error
 
 ```
-ModuleNotFoundError: No module named 'torch'
+ModuleNotFoundError: No module named 'PIL'
 ```
 
 **Solution:** Add to dependencies:
 ```python
-dependencies=["torch"]
+dependencies=["Pillow>=10.0.0"]
 ```
 
 ### Version Conflict
 
 ```
-ERROR: Cannot install torch==2.1.0 and torchvision==0.16.0
+ERROR: Cannot install requests==2.25.0 and urllib3==2.2.1
 because these package versions have conflicting dependencies.
 ```
 
 **Solution:** Check compatibility matrix, adjust versions:
 ```python
 dependencies=[
-    "torch==2.1.0",
-    "torchvision==0.16.0+cu121",  # Compatible CUDA version
+    "requests>=2.32.0",
+    "urllib3>=2.2.0",
 ]
 ```
 
@@ -322,7 +323,7 @@ Dependencies take long to install?
 | None | ~5-10 seconds |
 | Small (1-2 packages) | ~15-30 seconds |
 | Medium (3-5 packages) | ~30-60 seconds |
-| Large (torch, transformers) | ~60-120 seconds |
+| Large (transformers, diffusers) | ~60-120 seconds |
 
 ## Requirements.txt
 
@@ -330,7 +331,6 @@ For local development, create `requirements.txt`:
 
 ```txt
 runpod-flash
-torch==2.1.0
 transformers==4.35.2
 Pillow>=10.0.0
 numpy==1.26.2
