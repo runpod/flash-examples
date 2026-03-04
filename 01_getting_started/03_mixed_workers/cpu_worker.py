@@ -37,7 +37,7 @@ async def preprocess_text(input_data: dict) -> dict:
 
 
 @Endpoint(
-    name="01_03_mixed_workers_cpu",
+    name="01_03_mixed_workers_cpu_postprocess",
     cpu=CpuInstanceType.CPU3G_2_8,
     idle_timeout=3,
 )
