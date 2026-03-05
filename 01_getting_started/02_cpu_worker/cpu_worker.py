@@ -1,24 +1,21 @@
-# CPU serverless worker -- lightweight processing without GPU.
-# Run with: flash run
-# Test directly: python cpu_worker.py
-from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
+# cpu serverless worker -- lightweight processing without GPU.
+# run with: flash run
+# test directly: python cpu_worker.py
+from runpod_flash import CpuInstanceType, Endpoint
 
-cpu_config = CpuLiveServerless(
+
+@Endpoint(
     name="01_02_cpu_worker",
-    instanceIds=[CpuInstanceType.CPU3C_1_2],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
+    cpu=CpuInstanceType.CPU3C_1_2,
+    workers=(0, 3),
+    idle_timeout=5,
 )
-
-
-@remote(resource_config=cpu_config)
-async def cpu_hello(payload: dict) -> dict:
-    """Simple CPU worker that returns a greeting."""
+async def cpu_hello(input_data: dict) -> dict:
+    """CPU worker that returns a greeting."""
     import platform
     from datetime import datetime
 
-    message = f"Hello, {payload.get('name', 'Anonymous Panda')}!"
+    message = f"Hello, {input_data.get('name', 'Anonymous Panda')}!"
 
     return {
         "status": "success",

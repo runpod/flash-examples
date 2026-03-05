@@ -1,20 +1,17 @@
-# GPU serverless worker -- detects available GPU hardware.
-# Run with: flash run
-# Test directly: python gpu_worker.py
-from runpod_flash import GpuGroup, LiveServerless, remote
+# gpu serverless worker -- detects available GPU hardware.
+# run with: flash run
+# test directly: python gpu_worker.py
+from runpod_flash import Endpoint, GpuGroup
 
-gpu_config = LiveServerless(
+
+@Endpoint(
     name="01_01_gpu_worker",
-    gpus=[GpuGroup.ANY],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
+    gpu=GpuGroup.ANY,
+    workers=(0, 3),
+    idle_timeout=5,
 )
-
-
-@remote(resource_config=gpu_config)
-async def gpu_hello(payload: dict) -> dict:
-    """Simple GPU worker that returns GPU hardware info."""
+async def gpu_hello(input_data: dict) -> dict:
+    """GPU worker that returns GPU hardware info."""
     import platform
     from datetime import datetime
 
@@ -25,7 +22,7 @@ async def gpu_hello(payload: dict) -> dict:
     gpu_count = torch.cuda.device_count()
     gpu_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
 
-    message = payload.get("message", "Hello from GPU worker!")
+    message = input_data.get("message", "Hello from GPU worker!")
 
     return {
         "status": "success",

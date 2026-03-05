@@ -4,73 +4,85 @@
 
 ## Project Overview
 
-Production-ready examples demonstrating Flash framework capabilities. Flat-file pattern: each worker is a standalone `.py` file with `@remote` decorator, auto-discovered by `flash run`. 6 categories, 18 worker files, 31 `@remote` endpoints. Root `pyproject.toml` declares only `runpod-flash` dependency; runtime deps declared inline via `@remote(dependencies=[...])`.
+Production-ready examples demonstrating Flash framework capabilities. Flat-file pattern: each worker is a standalone `.py` file with `@Endpoint` decorator, auto-discovered by `flash run`. 6 categories, 18 worker files. Root `pyproject.toml` declares only `runpod-flash` dependency; runtime deps declared inline via `Endpoint(dependencies=[...])`.
 
 ## Architecture
 
 ### Key Abstractions
 
-1. **@remote decorator (function)** -- Core pattern. `async def` marked for remote execution. All 18 worker files use this.
-2. **@remote decorator (class)** -- Used on `SimpleSD` class (`05_data_workflows`). Class-based pattern for stateful workers.
-3. **Resource config types** -- `LiveServerless` (GPU), `CpuLiveServerless` (CPU), `CpuLiveLoadBalancer` (CPU LB), `LiveLoadBalancer` (GPU LB). Module-level config objects.
-4. **Cross-worker orchestration** -- Pipeline files import from QB workers, chain with `await`. LB imports from QB workers.
+1. **@Endpoint decorator (QB)** -- Core pattern. `async def` marked with `@Endpoint(name=..., gpu=..., ...)` for queue-based remote execution.
+2. **Endpoint routes (LB)** -- Load-balanced pattern. `api = Endpoint(...)` with `@api.get()/@api.post()` route decorators for HTTP endpoints.
+3. **@Endpoint decorator (class)** -- Used on `SimpleSD` class (`05_data_workflows`). Class-based pattern for stateful workers.
+4. **Cross-worker orchestration** -- Pipeline files import from QB workers, chain with `await`. LB endpoint orchestrates QB workers.
 5. **Flat-file discovery** -- No FastAPI boilerplate, no routers, no `main.py`. `flash run` auto-generates routes from decorated functions.
-6. **In-function imports** -- Heavy libs (torch, transformers, etc.) imported inside `@remote` body, only `runpod_flash` at module level.
+6. **In-function imports** -- Heavy libs (torch, transformers, etc.) imported inside `@Endpoint` body, only `runpod_flash` at module level.
 
 ### Entry Points
 
-All 18 worker files across 6 categories. Total: 30 `@remote` functions + 1 `@remote` class. Each file is an independent entry point discovered by `flash run`.
+All worker files across 6 categories. Each file is an independent entry point discovered by `flash run`.
 
 ### Module Structure
 
 ```
 01_getting_started/          # Fundamentals
-  01_single_gpu_worker/      # Basic GPU worker
+  01_hello_world/            # Basic GPU worker
   02_cpu_worker/             # CPU-only worker
-  03_pipeline/               # Cross-worker orchestration (CPU -> GPU -> LB)
+  03_mixed_workers/          # Cross-worker orchestration (CPU -> GPU -> LB)
   04_dependencies/           # Runtime dependency declaration
-  05_multi_resource/         # Multiple resource types in one project
 02_ml_inference/             # ML deployment
   01_text_to_speech/         # Qwen3-TTS model serving
 03_advanced_workers/         # Advanced patterns
-  01_lb_endpoint/            # LB endpoints with custom HTTP methods
+  05_load_balancer/          # LB endpoints with custom HTTP routes
 04_scaling_performance/      # Autoscaling
   01_autoscaling/            # Scaling strategy examples
 05_data_workflows/           # Data pipelines
-  01_network_volumes/        # Network volume usage
-  02_stable_diffusion/       # Stable Diffusion with @remote class
+  01_network_volumes/        # Network volume usage with @Endpoint class
 06_real_world/               # Placeholder for production patterns
 ```
 
-### Worker File Pattern
+### Worker File Patterns
 
+**Queue-based (function decorator):**
 ```python
-from runpod_flash import GpuGroup, LiveServerless, remote
+from runpod_flash import Endpoint, GpuGroup
 
-gpu_config = LiveServerless(
-    name="01_01_gpu_worker",
-    gpus=[GpuGroup.ANY],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
+@Endpoint(
+    name="my-worker",
+    gpu=GpuGroup.ANY,
+    workers=(0, 3),
+    idle_timeout=5,
 )
-
-@remote(resource_config=gpu_config)
 async def my_function(payload: dict) -> dict:
     """All runtime imports inside the function body."""
     import torch
-    # implementation
     return {"status": "success"}
 ```
 
-### Resource Types
+**Load-balanced (route decorators):**
+```python
+from runpod_flash import Endpoint
 
-| Type | Import | Use Case |
-|------|--------|----------|
-| `LiveServerless` | `from runpod_flash import LiveServerless, GpuGroup` | GPU workers (9 files) |
-| `CpuLiveServerless` | `from runpod_flash import CpuLiveServerless, CpuInstanceType` | CPU serverless (4 files) |
-| `CpuLiveLoadBalancer` | `from runpod_flash import CpuLiveLoadBalancer` | CPU LB endpoints (4 files) |
-| `LiveLoadBalancer` | `from runpod_flash import LiveLoadBalancer` | GPU LB endpoints (1 file) |
+api = Endpoint(name="my-api", cpu="cpu3c-1-2", workers=(1, 3))
+
+@api.post("/process")
+async def process(data: dict) -> dict:
+    return {"result": data}
+
+@api.get("/health")
+async def health() -> dict:
+    return {"status": "ok"}
+```
+
+### Resource Configuration
+
+GPU vs CPU is a parameter, not a class choice:
+
+| Config | Syntax | Use Case |
+|--------|--------|----------|
+| GPU endpoint | `@Endpoint(name=..., gpu=GpuGroup.ANY)` | GPU workers |
+| CPU endpoint | `@Endpoint(name=..., cpu="cpu3c-1-2")` | CPU workers |
+| GPU LB | `api = Endpoint(name=..., gpu=GpuGroup.ANY); @api.post(...)` | GPU LB endpoints |
+| CPU LB | `api = Endpoint(name=..., cpu="cpu3c-1-2"); @api.post(...)` | CPU LB endpoints |
 
 ### Cross-Worker Orchestration
 
@@ -79,11 +91,11 @@ Pipeline files import functions from other workers and chain them:
 ```python
 from cpu_worker import preprocess_text
 from gpu_worker import gpu_inference
-from runpod_flash import CpuLiveLoadBalancer, remote
+from runpod_flash import Endpoint
 
-pipeline_config = CpuLiveLoadBalancer(name="pipeline", workersMin=1)
+pipeline = Endpoint(name="pipeline", cpu="cpu3c-1-2", workers=(1, 3))
 
-@remote(resource_config=pipeline_config, method="POST", path="/classify")
+@pipeline.post("/classify")
 async def classify(text: str) -> dict:
     result = await preprocess_text({"text": text})
     return await gpu_inference(result)
@@ -95,21 +107,17 @@ All examples import from `runpod_flash`. Import frequency by symbol:
 
 | Symbol | Files Using It | Breakage Risk |
 |--------|---------------|---------------|
-| `remote` | 18 | ALL examples break |
-| `LiveServerless` | 9 | GPU examples break |
+| `Endpoint` | 18 | ALL examples break |
 | `GpuGroup` | 7 | GPU config breaks |
-| `CpuLiveServerless` | 4 | CPU examples break |
 | `CpuInstanceType` | 4 | CPU config breaks |
-| `CpuLiveLoadBalancer` | 4 | Pipeline examples break |
 | `NetworkVolume` | 2 | Volume examples break |
-| `LiveLoadBalancer` | 1 | LB example breaks |
 | `ServerlessScalerType` | 1 | Scaling example breaks |
 
 ## Cross-Repo Dependencies
 
 ### Depends On
 
-- **flash** (`runpod_flash` package) -- all 18 files import from it. Any breaking change to `@remote` signature, resource config constructors, or enum values breaks examples at import time.
+- **flash** (`runpod_flash` package) -- all files import from it. Any breaking change to `Endpoint` constructor, enum values, or route decorator signature breaks examples at import time.
 
 ### Depended On By
 
@@ -117,9 +125,9 @@ All examples import from `runpod_flash`. Import frequency by symbol:
 
 ### Interface Contracts
 
-- `@remote(resource_config=...)` decorator signature -- any parameter rename or removal breaks all 18 files
-- Resource config constructors (`LiveServerless`, `CpuLiveServerless`, etc.) -- field name changes break config objects
-- `GpuGroup`, `CpuInstanceType` enum values -- value removals break GPU/CPU configs
+- `Endpoint(name=..., gpu=..., cpu=..., workers=...)` constructor -- parameter rename/removal breaks all files
+- `.get()/.post()/.put()/.delete()/.patch()` route decorator signatures
+- `GpuGroup`, `GpuType`, `CpuInstanceType` enum values -- value removals break GPU/CPU configs
 - `NetworkVolume` constructor -- field changes break volume examples
 
 ### Dependency Chain
@@ -202,20 +210,20 @@ No formal test infrastructure exists. Each worker has an optional `if __name__ =
 
 To test manually:
 ```bash
-cd 01_getting_started/01_single_gpu_worker
+cd 01_getting_started/01_hello_world
 flash run                    # Starts dev server, auto-discovers workers
 # Use http://localhost:8888/docs to invoke endpoints
 ```
 
 ### Recommended Test Strategy
 
-1. Add `tests/test_imports.py` that imports every worker file (catches `@remote` signature drift)
+1. Add `tests/test_imports.py` that imports every worker file (catches `Endpoint` signature drift)
 2. Add `tests/test_configs.py` that validates all resource configs construct without error
 3. Add CI job that runs `flash run --check` (dry-run mode) against each example category
 
 ## Common Mistakes
 
-1. **Accessing external scope in @remote functions** -- only local variables, parameters, and internal imports work. The function body is serialized and sent to a remote worker.
+1. **Accessing external scope in @Endpoint functions** -- only local variables, parameters, and internal imports work. The function body is serialized and sent to a remote worker.
 2. **Module-level imports of heavy libraries** -- import torch, numpy, transformers, etc. inside the function body, not at module level.
 3. **Missing `if __name__ == "__main__"` test block** -- each worker should be independently testable.
 4. **Mutable default arguments** -- use `None` and initialize in function body.

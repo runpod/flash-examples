@@ -1,10 +1,10 @@
 # Load Balancer Endpoints Example
 
-Demonstrates Flash's load-balancer endpoints with custom HTTP routes using the `@remote` decorator with `method` and `path` parameters. This example shows how to create low-latency APIs with direct HTTP routing on a single serverless endpoint.
+Demonstrates Flash's load-balanced endpoints with custom HTTP routes using the `Endpoint` class with route decorators. This example shows how to create low-latency APIs with direct HTTP routing on a single serverless endpoint.
 
-## What Are Load-Balancer Endpoints?
+## What Are Load-Balanced Endpoints?
 
-Load-balancer endpoints use direct HTTP routing to serverless workers, providing lower latency compared to queue-based endpoints. They support custom HTTP methods (GET, POST, PUT, DELETE, PATCH) and multiple routes on a single endpoint.
+Load-balanced endpoints use direct HTTP routing to serverless workers, providing lower latency compared to queue-based endpoints. They support custom HTTP methods (GET, POST, PUT, DELETE, PATCH) and multiple routes on a single endpoint.
 
 | Feature | Queue-Based (QB) | Load-Balanced (LB) |
 |---------|------------------|-------------------|
@@ -12,10 +12,9 @@ Load-balancer endpoints use direct HTTP routing to serverless workers, providing
 | Latency | Higher (queuing) | Lower (direct) |
 | Custom routes | Limited | Full HTTP support (GET, POST, PUT, DELETE, PATCH) |
 | Automatic retries | Yes | No (client handles) |
-| Configuration | Default `ServerlessType.QB` | Use `LiveLoadBalancer` or `LoadBalancerSlsResource` |
 | Use case | Batch processing, long-running tasks | Real-time APIs, request/response patterns |
 
-**Load-balancer endpoints are ideal for:**
+**Load-balanced endpoints are ideal for:**
 - Low-latency REST APIs
 - Custom HTTP routes with different methods (GET, POST, etc.)
 - Request/response patterns that require direct HTTP communication
@@ -81,45 +80,45 @@ curl -X POST http://localhost:8888/05_load_balancer/cpu/transform \
   -d '{"text": "hello", "operation": "uppercase"}'
 ```
 
-## How Load-Balancer Endpoints Work
+## How Load-Balanced Endpoints Work
 
-### Defining Routes with @remote Decorator
+### Defining Routes with Endpoint
 
-Load-balancer endpoints use the `@remote` decorator with `method` and `path` parameters to define HTTP routes. The decorator automatically registers the function as an HTTP endpoint on the load-balancer runtime.
+Load-balanced endpoints use the `Endpoint` class with route decorators (`.get()`, `.post()`, etc.) to define HTTP routes. The decorator automatically registers the function as an HTTP endpoint on the load-balancer runtime.
 
 ```python
-from runpod_flash import remote, LiveLoadBalancer
+from runpod_flash import Endpoint, GpuGroup
 
-# Create load-balanced endpoint (for local development)
-lb = LiveLoadBalancer(name="my_service")
+# create load-balanced endpoint
+api = Endpoint(name="my-service", gpu=GpuGroup.ANY, workers=(1, 3))
 
-# Define HTTP routes with method and path parameters
-@remote(lb, method="GET", path="/health")
+# define HTTP routes with method decorators
+@api.get("/health")
 async def health_check() -> dict:
     """Health check endpoint."""
     return {"status": "healthy"}
 
-@remote(lb, method="POST", path="/compute")
+@api.post("/compute")
 async def compute_data(numbers: list[int]) -> dict:
     """Compute the sum of squared numbers."""
     result = sum(x ** 2 for x in numbers)
     return {"result": result}
 
-@remote(lb, method="GET", path="/info")
+@api.get("/info")
 async def get_info() -> dict:
     """Get service information."""
     return {"info": "service running"}
 ```
 
-**Key parameters for @remote:**
-- `method`: HTTP verb (GET, POST, PUT, DELETE, PATCH)
-- `path`: Route path (must start with `/`)
-- Resource: Use `LiveLoadBalancer` for local development, `LoadBalancerSlsResource` for production deployment
+**Key parameters for Endpoint:**
+- `name`: Endpoint name for identification
+- `gpu=` or `cpu=`: Resource type
+- `workers=(min, max)`: Worker scaling bounds
 
 **How routing works:**
-1. Each `@remote` decorated function becomes an HTTP endpoint
-2. The `method` parameter specifies the HTTP verb
-3. The `path` parameter specifies the URL route
+1. Each route-decorated function becomes an HTTP endpoint
+2. The decorator method (`.get()`, `.post()`, etc.) specifies the HTTP verb
+3. The path argument specifies the URL route
 4. When an HTTP request matches the method and path, the function is called with the request data
 
 ### Multiple Routes on One Endpoint
@@ -127,19 +126,25 @@ async def get_info() -> dict:
 One load-balanced endpoint can have multiple routes:
 
 ```python
-api = LiveLoadBalancer(name="user_api")
+api = Endpoint(name="user-api", cpu="cpu3c-1-2", workers=(1, 5))
 
-@remote(api, method="GET", path="/users")
+@api.get("/users")
 async def list_users(): ...
 
-@remote(api, method="POST", path="/users")
+@api.post("/users")
 async def create_user(name: str): ...
 
-@remote(api, method="DELETE", path="/users/{user_id}")
+@api.delete("/users/{user_id}")
 async def delete_user(user_id: int): ...
 ```
 
 All routes are automatically registered on the same load-balanced endpoint.
+
+### Queue-Based vs Load-Balanced
+
+The `Endpoint` class infers QB vs LB from usage pattern:
+- **Direct decorator** (`@Endpoint(...)`) = queue-based (one function per endpoint)
+- **Route decorators** (`.get()`, `.post()`, etc.) = load-balanced (multiple routes, shared workers)
 
 ### Reserved Paths
 
@@ -151,8 +156,8 @@ The following paths are reserved and cannot be used:
 
 ```
 05_load_balancer/
-├── gpu_lb.py            # GPU load-balancer endpoints with @remote
-├── cpu_lb.py            # CPU load-balancer endpoints with @remote
+├── gpu_lb.py            # GPU load-balanced endpoints
+├── cpu_lb.py            # CPU load-balanced endpoints
 ├── .env.example         # Environment template
 ├── requirements.txt     # Dependencies
 └── README.md            # This file
@@ -252,69 +257,6 @@ Response:
 }
 ```
 
-## Resource Types
-
-### LiveLoadBalancer (Local Development)
-
-`LiveLoadBalancer` is used for local development and testing. It provides all load-balancer features in a development environment without requiring a full deployment.
-
-```python
-from runpod_flash import LiveLoadBalancer, remote
-
-# Create load-balanced endpoint for local development
-lb = LiveLoadBalancer(name="my_api")
-
-@remote(lb, method="POST", path="/process")
-async def process(data: dict) -> dict:
-    """Process data on the load-balanced endpoint."""
-    return {"result": "success", "processed": data}
-```
-
-**When to use:**
-- Local development and testing
-- Testing @remote decorated functions before deployment
-- Running examples with `flash run` from the repository root
-
-**Features:**
-- Automatically uses the `runpod-flash-lb` container image
-- Local execution with `/execute` endpoint for development
-- Perfect for testing and debugging
-- No GPU/CPU configuration needed (inherits from resource type)
-
-### LoadBalancerSlsResource (Production Deployment)
-
-`LoadBalancerSlsResource` is the production resource for deploying load-balancer endpoints to RunPod.
-
-```python
-from runpod_flash import LoadBalancerSlsResource, remote
-
-# Create load-balanced endpoint for production deployment
-lb = LoadBalancerSlsResource(
-    name="my_api",
-    imageName="runpod/runpod-flash-lb:latest",
-    workersMin=1,
-    workersMax=5,
-)
-
-@remote(lb, method="POST", path="/process")
-async def process(data: dict) -> dict:
-    """Process data on the deployed load-balanced endpoint."""
-    return {"result": "success", "processed": data}
-```
-
-**When to use:**
-- Production deployment to RunPod
-- Scaling requirements (auto-scaling based on request count)
-- Multi-region deployment
-
-**Features:**
-- Direct HTTP routing to healthy workers
-- Auto-scaling based on request count (default scaler)
-- No `/execute` endpoint (security - direct routes only)
-- Client handles retries (no automatic retries)
-- Lower latency for request/response patterns
-- Custom HTTP routes on a single endpoint
-
 ## Testing Workers Locally
 
 ```bash
@@ -333,75 +275,52 @@ python cpu_lb.py
 flash build
 ```
 
-This generates handlers for your load-balancer endpoints.
+This generates handlers for your load-balanced endpoints.
 
-### Deploy to RunPod
+### Deploy to Runpod
 
 ```bash
 flash deploy new production
 flash deploy send production
 ```
 
-## Local vs Deployed
-
-The `@remote` decorator with method and path works the same way in both local and production environments. The only difference is the resource configuration.
-
-**Local Development (LiveLoadBalancer):**
-- Use `LiveLoadBalancer` for testing load-balancer endpoints locally
-- Automatically uses `runpod-flash-lb` container image
-- Includes `/execute` endpoint for development/testing
-- Testing via `flash run` or direct Python execution
-- Perfect for development, testing, and debugging
-
-**Production Deployment (LoadBalancerSlsResource):**
-- Use `LoadBalancerSlsResource` when deploying to RunPod
-- Specifies the container image and scaling parameters
-- No `/execute` endpoint (security - direct routes only)
-- All execution flows through custom HTTP routes
-- Automatic scaling based on request count
-- Direct HTTP routing to healthy workers
-
-**Migration path:** Code remains identical - just change the resource from `LiveLoadBalancer` to `LoadBalancerSlsResource` when deploying to production!
-
 ## Key Concepts
 
 ### Async Functions
-All `@remote` functions should be async:
+All route-decorated functions should be async:
 ```python
-@remote(config, method="POST", path="/process")
+@api.post("/process")
 async def process_data(input: str) -> dict:
-    # Your code here
     return {"result": "success"}
 ```
 
 ### Error Handling
-For load-balancer endpoints, raise `ValueError` for validation errors. The framework automatically handles these as HTTP 400 Bad Request responses:
+For load-balanced endpoints, raise `ValueError` for validation errors. The framework automatically handles these as HTTP 400 Bad Request responses:
 ```python
-@remote(lb, method="POST", path="/process")
+@api.post("/process")
 async def process(text: str) -> dict:
     if not text:
         raise ValueError("text cannot be empty")
-    if not isinstance(text, str):
-        raise ValueError("text must be a string")
     return {"result": text.upper()}
 ```
 
 **HTTP Error Mapping:**
-- `ValueError` → 400 Bad Request
-- Other exceptions → 500 Internal Server Error
+- `ValueError` -> 400 Bad Request
+- Other exceptions -> 500 Internal Server Error
 
 ### Dependencies
-Specify Python dependencies in the decorator:
+Specify Python dependencies on the Endpoint:
 ```python
-@remote(
-    config,
-    method="POST",
-    path="/analyze",
-    dependencies=["torch", "transformers"]
+api = Endpoint(
+    name="my-service",
+    gpu=GpuGroup.ADA_24,
+    dependencies=["torch", "transformers"],
 )
+
+@api.post("/analyze")
 async def analyze(data: str) -> dict:
     import torch
-    # Your code here
+    # your code here
 ```
 
 ## Environment Variables
@@ -418,7 +337,7 @@ LOG_LEVEL=INFO          # Logging level (default: INFO)
 
 ## Cost Estimates
 
-Load-balancer endpoints are cost-efficient for request/response patterns:
+Load-balanced endpoints are cost-efficient for request/response patterns:
 
 **GPU Service (Compute)**
 - Instance type: GPU (depends on your configuration)
@@ -435,16 +354,16 @@ Load-balancer endpoints are cost-efficient for request/response patterns:
 - Load-balancers: Lower latency, pay for active processing time only
 - Queue-based: Higher throughput, automatic retries, better for batch jobs
 
-For current pricing, see [RunPod Pricing](https://www.runpod.io/pricing).
+For current pricing, see [Runpod Pricing](https://www.runpod.io/pricing).
 
 ## Troubleshooting
 
-### Load-balancer endpoints not responding
+### Load-balanced endpoints not responding
 
 **Problem**: Endpoints return 502 or timeout
 - Ensure workers are properly deployed with `flash deploy`
-- Check worker logs via RunPod console
-- Verify `method` and `path` parameters match your HTTP requests
+- Check worker logs via Runpod console
+- Verify route paths match your HTTP requests
 - Confirm the resource configuration (GPU/CPU types) is available
 
 ### ValueError not mapping to 400 responses
@@ -457,23 +376,23 @@ For current pricing, see [RunPod Pricing](https://www.runpod.io/pricing).
 ### Workers not starting
 
 **Problem**: Workers fail to initialize
-- Check that all dependencies in `dependencies` parameter are available
+- Check that all `dependencies` are available
 - Verify the container image has required system packages
 - Check worker function imports and module availability
-- Review worker logs in the RunPod console
+- Review worker logs in the Runpod console
 
 ### Mixed latency in responses
 
 **Problem**: Some requests are fast, others are slow
-- Load-balancer uses direct HTTP routing (no queue)
+- Load-balanced uses direct HTTP routing (no queue)
 - First request to a cold worker will be slower (initialization)
-- Adjust `workersMin` to keep workers warm if consistent low latency is critical
-- Consider using `idleTimeout` to reduce cold starts
+- Set `workers=(1, N)` to keep workers warm if consistent low latency is critical
+- Adjust `idle_timeout` to reduce cold starts
 
 ## Next Steps
 
 1. Explore the endpoints via Swagger UI (`/docs`)
-2. Modify the `@remote` functions to add your logic
-3. Add new routes with different `method` and `path` values
-4. Deploy to RunPod when ready
+2. Modify the route functions to add your logic
+3. Add new routes with different HTTP methods
+4. Deploy to Runpod when ready
 5. Monitor performance and scaling behavior

@@ -10,13 +10,13 @@ The simplest Flash application with GPU workers
 **What you'll learn:**
 - Basic Flash application structure
 - Creating GPU workers
-- Using the `@remote` decorator
+- Using the `@Endpoint` decorator
 - Running Flash applications locally
 - Testing endpoints with Swagger docs
 
 **Concepts:**
-- `LiveServerless` configuration for GPU workers
-- Worker auto-scaling (min/max workers)
+- `Endpoint` with `gpu=` parameter for GPU workers
+- Worker auto-scaling via `workers=(min, max)`
 
 ### [02_cpu_worker](./02_cpu_worker/)
 CPU-only worker example for non-GPU workloads.
@@ -37,7 +37,7 @@ Mixed GPU/CPU workers for cost-effective ML pipelines.
 - Fail-fast validation before expensive GPU operations
 
 **Concepts:**
-- `CpuLiveServerless` for preprocessing and postprocessing
+- CPU `Endpoint` for preprocessing and postprocessing
 - Pipeline orchestration with load-balanced endpoints
 
 ### [04_dependencies](./04_dependencies/)

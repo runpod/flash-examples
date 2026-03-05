@@ -1,49 +1,20 @@
-# GPU autoscaling strategies -- scale-to-zero, always-on, high-throughput.
-# Run with: flash run
-# Test directly: python gpu_worker.py
-from runpod_flash import GpuGroup, LiveServerless, ServerlessScalerType, remote
+# gpu autoscaling strategies -- scale-to-zero, always-on, high-throughput.
+# run with: flash run
+# test directly: python gpu_worker.py
+from runpod_flash import Endpoint, GpuGroup, ServerlessScalerType
 
-# --- Strategy 1: Scale to Zero ---
-# Sporadic or batch workloads where cost matters more than cold-start latency.
-# Workers scale down to zero after 5 minutes of idle time.
-scale_to_zero_config = LiveServerless(
+
+# --- strategy 1: scale to zero ---
+# sporadic or batch workloads where cost matters more than cold-start latency.
+# workers scale down to zero after 5 minutes of idle time.
+@Endpoint(
     name="04_01_scale_to_zero",
-    gpus=[GpuGroup.ANY],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
-    scalerType=ServerlessScalerType.QUEUE_DELAY,
-    scalerValue=4,
+    gpu=GpuGroup.ANY,
+    workers=(0, 3),
+    idle_timeout=5,
+    scaler_type=ServerlessScalerType.QUEUE_DELAY,
+    scaler_value=4,
 )
-
-# --- Strategy 2: Always On ---
-# Steady traffic where low latency matters more than cost.
-# At least one worker stays warm to avoid cold starts.
-always_on_config = LiveServerless(
-    name="04_01_always_on",
-    gpus=[GpuGroup.ANY],
-    workersMin=1,
-    workersMax=3,
-    idleTimeout=60,
-    scalerType=ServerlessScalerType.QUEUE_DELAY,
-    scalerValue=4,
-)
-
-# --- Strategy 3: High Throughput ---
-# Bursty traffic where throughput matters most.
-# Starts with 2 warm workers, scales aggressively to 10 based on request count.
-high_throughput_config = LiveServerless(
-    name="04_01_high_throughput",
-    gpus=[GpuGroup.ANY],
-    workersMin=2,
-    workersMax=10,
-    idleTimeout=30,
-    scalerType=ServerlessScalerType.REQUEST_COUNT,
-    scalerValue=3,
-)
-
-
-@remote(resource_config=scale_to_zero_config)
 async def scale_to_zero_inference(payload: dict) -> dict:
     """GPU inference with scale-to-zero -- cost-optimized for sporadic workloads."""
     import asyncio
@@ -79,7 +50,17 @@ async def scale_to_zero_inference(payload: dict) -> dict:
     }
 
 
-@remote(resource_config=always_on_config)
+# --- strategy 2: always on ---
+# steady traffic where low latency matters more than cost.
+# at least one worker stays warm to avoid cold starts.
+@Endpoint(
+    name="04_01_always_on",
+    gpu=GpuGroup.ANY,
+    workers=(1, 3),
+    idle_timeout=60,
+    scaler_type=ServerlessScalerType.QUEUE_DELAY,
+    scaler_value=4,
+)
 async def always_on_inference(payload: dict) -> dict:
     """GPU inference with always-on worker -- latency-optimized for steady traffic."""
     import asyncio
@@ -115,7 +96,17 @@ async def always_on_inference(payload: dict) -> dict:
     }
 
 
-@remote(resource_config=high_throughput_config)
+# --- strategy 3: high throughput ---
+# bursty traffic where throughput matters most.
+# starts with 2 warm workers, scales aggressively to 10 based on request count.
+@Endpoint(
+    name="04_01_high_throughput",
+    gpu=GpuGroup.ANY,
+    workers=(2, 10),
+    idle_timeout=30,
+    scaler_type=ServerlessScalerType.REQUEST_COUNT,
+    scaler_value=3,
+)
 async def high_throughput_inference(payload: dict) -> dict:
     """GPU inference with high-throughput scaling -- optimized for bursty traffic."""
     import asyncio
