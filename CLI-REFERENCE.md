@@ -839,11 +839,13 @@ export FLASH_PORT=9000
 
 **.env file:**
 ```bash
-# .env (loaded automatically by Flash)
+# .env (loaded into os.environ for CLI and local development)
 RUNPOD_API_KEY=your-key-here
 FLASH_HOST=0.0.0.0
 FLASH_PORT=8888
 ```
+
+> **Note:** `.env` values populate `os.environ` locally. They are **not** carried to deployed endpoints. To pass env vars at deploy time, declare them on the resource: `env={"KEY": os.environ["KEY"]}`.
 
 ## Configuration Files
 
