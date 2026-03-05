@@ -50,10 +50,10 @@ async def process_data(input_data: dict) -> dict:
     }
 
     versions = {
-        "pandas": pd.__version__,
-        "numpy": np.__version__,
-        "scipy": scipy.__version__,
-        "matplotlib": matplotlib.__version__,
+        "pandas": str(pd.__version__),
+        "numpy": str(np.__version__),
+        "scipy": str(scipy.__version__),
+        "matplotlib": str(matplotlib.__version__),
     }
 
     return {

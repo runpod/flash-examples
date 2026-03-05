@@ -22,7 +22,7 @@ volume = NetworkVolume(
     idle_timeout=5,
     volume=volume,
     env={"HF_HUB_CACHE": MODEL_PATH, "MODEL_PATH": MODEL_PATH},
-    dependencies=["diffusers", "torch", "transformers"],
+    dependencies=["diffusers", "transformers"],
 )
 class SimpleSD:
     def __init__(self):

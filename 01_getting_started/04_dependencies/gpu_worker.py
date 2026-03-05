@@ -9,46 +9,40 @@ from runpod_flash import Endpoint, GpuGroup
     gpu=GpuGroup.ADA_32_PRO,
     workers=(0, 2),
     dependencies=[
-        "torch==2.1.0",
-        "torchvision",
-        "Pillow>=10.0.0",
-        "numpy<2.0.0",
+        "requests==2.32.3",  # Pin specific version
+        "Pillow>=10.0.0",  # Minimum version
+        "python-dateutil<3.0.0",  # Maximum version constraint
+        "httpx",  # Unpinned
     ],
 )
 async def process_with_ml_libs(payload: dict) -> dict:
     """
-    Worker with versioned Python dependencies.
+    Worker with lightweight, versioned Python dependencies.
 
     Best practices:
-    - Pin exact versions for reproducibility (torch==2.1.0)
+    - Pin exact versions for reproducibility (requests==2.32.3)
     - Use >= for minimum versions (Pillow>=10.0.0)
-    - Use < to avoid breaking changes (numpy<2.0.0)
+    - Use < to avoid breaking changes (python-dateutil<3.0.0)
     """
     from datetime import datetime
 
-    import numpy as np
-    import torch
-    import torchvision
+    import httpx
+    import requests
+    from importlib.metadata import version
     from PIL import Image
 
     versions = {
-        "torch": torch.__version__,
-        "torchvision": torchvision.__version__,
-        "pillow": Image.__version__,
-        "numpy": np.__version__,
+        "requests": str(requests.__version__),
+        "httpx": str(httpx.__version__),
+        "python_dateutil": str(version("python-dateutil")),
+        "pillow": str(Image.__version__),
     }
-
-    if torch.cuda.is_available():
-        tensor = torch.randn(100, 100, device="cuda")
-        result = tensor.sum().item()
-    else:
-        result = "No GPU available"
 
     return {
         "status": "success",
-        "message": "ML dependencies loaded successfully",
+        "message": "Python dependencies loaded successfully",
         "versions": versions,
-        "gpu_test": result,
+        "payload_keys": list(payload.keys()),
         "timestamp": datetime.now().isoformat(),
     }
 
