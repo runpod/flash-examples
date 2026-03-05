@@ -27,10 +27,10 @@ uv run flash login
 
 This opens a browser for authentication and saves your credentials.
 
-**Alternative:** Set your Runpod API key manually:
+**Alternative:** Set your Runpod API key in the environment for local CLI use:
 ```bash
 export RUNPOD_API_KEY=your-key-here
-# Or add to .env file:
+# Or add to .env file (populates os.environ locally, not carried to deployed endpoints):
 echo "RUNPOD_API_KEY=your-key-here" > .env
 ```
 

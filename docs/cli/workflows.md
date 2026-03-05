@@ -63,23 +63,24 @@ python --version  # Should show 3.10+
 uv run flash --version  # Should show flash version
 ```
 
-#### 3. Configure Environment Variables
+#### 3. Authenticate
+
+The recommended way to authenticate is `flash login`:
 
 ```bash
-# Copy example environment file
-cp .env.example .env
-
-# Edit .env file
-# Required: RUNPOD_API_KEY (for deployment)
-# Optional: FLASH_HOST, FLASH_PORT (for development)
+uv run flash login
 ```
 
-Example `.env`:
+Alternatively, set `RUNPOD_API_KEY` in your environment or a `.env` file for local CLI use:
+
 ```bash
+# .env file (populates os.environ for CLI and local development)
 RUNPOD_API_KEY=your-key-here
 FLASH_HOST=localhost
 FLASH_PORT=8888
 ```
+
+> **Note:** `.env` values are **not** carried to deployed endpoints. To pass env vars at deploy time, declare them on the resource: `env={"KEY": os.environ["KEY"]}`.
 
 #### 4. Start Development Server
 
