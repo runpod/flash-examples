@@ -277,7 +277,7 @@ flash build
 
 This generates handlers for your load-balanced endpoints.
 
-### Deploy to RunPod
+### Deploy to Runpod
 
 ```bash
 flash deploy new production
@@ -354,7 +354,7 @@ Load-balanced endpoints are cost-efficient for request/response patterns:
 - Load-balancers: Lower latency, pay for active processing time only
 - Queue-based: Higher throughput, automatic retries, better for batch jobs
 
-For current pricing, see [RunPod Pricing](https://www.runpod.io/pricing).
+For current pricing, see [Runpod Pricing](https://www.runpod.io/pricing).
 
 ## Troubleshooting
 
@@ -362,7 +362,7 @@ For current pricing, see [RunPod Pricing](https://www.runpod.io/pricing).
 
 **Problem**: Endpoints return 502 or timeout
 - Ensure workers are properly deployed with `flash deploy`
-- Check worker logs via RunPod console
+- Check worker logs via Runpod console
 - Verify route paths match your HTTP requests
 - Confirm the resource configuration (GPU/CPU types) is available
 
@@ -379,7 +379,7 @@ For current pricing, see [RunPod Pricing](https://www.runpod.io/pricing).
 - Check that all `dependencies` are available
 - Verify the container image has required system packages
 - Check worker function imports and module availability
-- Review worker logs in the RunPod console
+- Review worker logs in the Runpod console
 
 ### Mixed latency in responses
 
@@ -394,5 +394,5 @@ For current pricing, see [RunPod Pricing](https://www.runpod.io/pricing).
 1. Explore the endpoints via Swagger UI (`/docs`)
 2. Modify the route functions to add your logic
 3. Add new routes with different HTTP methods
-4. Deploy to RunPod when ready
+4. Deploy to Runpod when ready
 5. Monitor performance and scaling behavior

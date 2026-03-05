@@ -1,6 +1,6 @@
 # Text-to-Speech with Qwen3-TTS
 
-Text-to-Speech API using [Qwen3-TTS-12Hz-1.7B-CustomVoice](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice) running on RunPod serverless GPUs.
+Text-to-Speech API using [Qwen3-TTS-12Hz-1.7B-CustomVoice](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice) running on Runpod serverless GPUs.
 
 ## Overview
 
@@ -18,7 +18,7 @@ This example demonstrates running a 1.7B parameter TTS model on serverless GPU i
 ### Prerequisites
 
 - Python 3.10+
-- RunPod API key ([get one here](https://docs.runpod.io/get-started/api-keys))
+- Runpod API key ([get one here](https://docs.runpod.io/get-started/api-keys))
 
 ### Setup
 
