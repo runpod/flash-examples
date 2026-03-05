@@ -791,15 +791,11 @@ ERROR: Failed to create endpoint: Insufficient GPU availability
 
 **1. Use more flexible GPU type:**
 ```python
-# Before (specific GPU)
-gpu_config = LiveServerless(
-    gpus=[GpuGroup.A100]
-)
+# before (specific GPU)
+@Endpoint(name="worker", gpu=GpuGroup.A100)
 
-# After (any GPU)
-gpu_config = LiveServerless(
-    gpus=[GpuGroup.ANY]
-)
+# after (any GPU)
+@Endpoint(name="worker", gpu=GpuGroup.ANY)
 ```
 
 Redeploy:
@@ -929,10 +925,8 @@ RuntimeError: CUDA not available
 
 Fix:
 ```python
-# Ensure GPU specified in config
-gpu_config = LiveServerless(
-    gpus=[GpuGroup.ANY]
-)
+# ensure GPU specified in Endpoint
+@Endpoint(name="worker", gpu=GpuGroup.ANY)
 ```
 
 **4. Redeploy after fixing:**

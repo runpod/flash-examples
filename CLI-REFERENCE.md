@@ -42,7 +42,7 @@ flash <command> --help    # Show help for specific command
 1. **Start Here**: [Getting Started Guide](docs/cli/getting-started.md)
    - Create your first project
    - Run locally and test
-   - Deploy to RunPod
+   - Deploy to Runpod
 
 2. **Deep Dive**: [Command Reference](docs/cli/commands.md)
    - Understand all options and parameters
@@ -147,7 +147,7 @@ flash init my-api --force
 
 ### What It Creates
 
-- `gpu_worker.py` - GPU worker template with `@remote` decorator
+- `gpu_worker.py` - GPU worker template with `@Endpoint` decorator
 - `pyproject.toml` - Project dependencies
 - `.env.example` - Environment variable template
 - `.gitignore` - Git ignore patterns
@@ -209,7 +209,7 @@ flash run --no-reload
 **Auto-provision resources:**
 ```bash
 flash run --auto-provision
-# Automatically creates RunPod endpoints on startup
+# Automatically creates Runpod endpoints on startup
 ```
 
 **Using environment variables:**
@@ -221,7 +221,7 @@ flash run
 
 ### What It Does
 
-1. Discovers all `.py` files (excluding `.venv/`, `.flash/`, `.runpod/`, `__init__.py`) and finds `@remote` decorated functions via AST parsing
+1. Discovers all `.py` files (excluding `.venv/`, `.flash/`, `.runpod/`, `__init__.py`) and finds `@Endpoint` decorated functions via AST parsing
 2. Generates a FastAPI application with routes for each discovered function
 3. Starts uvicorn development server with hot reload
 4. Provides interactive API documentation at `/docs`
@@ -284,7 +284,7 @@ flash build -o my-app-v1.0.tar.gz
 **Exclude packages present in base image:**
 ```bash
 flash build --exclude torch,torchvision,torchaudio
-# Reduces archive size by excluding packages already in RunPod base images
+# Reduces archive size by excluding packages already in Runpod base images
 ```
 
 **Skip transitive dependencies:**
@@ -304,7 +304,7 @@ flash build --use-local-flash
 1. Creates `.build/` directory (kept for inspection)
 2. Installs dependencies via pip for Linux x86_64
 3. Generates `flash_manifest.json` with resource configurations
-4. Creates handler files for each `@remote` function
+4. Creates handler files for each `@Endpoint` function
 5. Packages everything into `artifact.tar.gz`
 6. Reports archive size (max 500MB for deployment)
 
@@ -343,7 +343,7 @@ The `.build/` directory is preserved for inspection. Check:
 
 ## flash deploy
 
-Build and deploy the Flash application to RunPod in a single command.
+Build and deploy the Flash application to Runpod in a single command.
 
 ### Syntax
 
@@ -402,7 +402,7 @@ flash deploy --preview
 1. Runs `flash build` with specified options
 2. Validates `RUNPOD_API_KEY` environment variable
 3. Selects target environment (auto or via `--env`)
-4. Uploads artifact to RunPod
+4. Uploads artifact to Runpod
 5. Creates/updates serverless endpoints for each resource
 6. Displays endpoint URLs and access information
 7. Provides next steps for testing
@@ -442,7 +442,7 @@ flash deploy --env production  # Redeploy with changes
 
 ## flash undeploy
 
-Delete deployed RunPod serverless endpoints.
+Delete deployed Runpod serverless endpoints.
 
 ### Syntax
 
@@ -504,9 +504,9 @@ flash undeploy --cleanup-stale
 ### What It Does
 
 1. Lists tracked endpoints (from `.runpod/` directory)
-2. Verifies endpoints exist on RunPod
+2. Verifies endpoints exist on Runpod
 3. Prompts for confirmation (unless `--force`)
-4. Deletes endpoints via RunPod API
+4. Deletes endpoints via Runpod API
 5. Removes local tracking files
 
 ### Use Cases
@@ -526,7 +526,7 @@ flash undeploy --interactive
 **Fix tracking inconsistencies:**
 ```bash
 flash undeploy --cleanup-stale
-# If endpoints deleted manually via RunPod console
+# If endpoints deleted manually via Runpod console
 ```
 
 ### Related Commands
@@ -825,7 +825,7 @@ Flash CLI respects these environment variables:
 
 | Variable | Purpose | Used By |
 |----------|---------|---------|
-| `RUNPOD_API_KEY` | RunPod API authentication | `deploy`, `undeploy`, `env`, `app` |
+| `RUNPOD_API_KEY` | Runpod API authentication | `deploy`, `undeploy`, `env`, `app` |
 | `FLASH_HOST` | Default development server host | `run` |
 | `FLASH_PORT` | Default development server port | `run` |
 
@@ -861,7 +861,7 @@ Flash uses these configuration files:
 See the [Workflows Guide](docs/cli/workflows.md) for detailed step-by-step instructions:
 
 - **Local Development** - Create, run, test, iterate
-- **Build and Deploy** - Package and deploy to RunPod
+- **Build and Deploy** - Package and deploy to Runpod
 - **Multi-Environment** - Manage staging and production
 - **Testing** - Validate before production
 - **Cleanup** - Remove unused resources

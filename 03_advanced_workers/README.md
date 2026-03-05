@@ -20,8 +20,7 @@ Load-balancer endpoints with custom HTTP routes.
 - Low-latency inference services
 
 **Resources:**
-- `LiveLoadBalancer` - Local development
-- `LoadBalancerSlsResource` - Production deployment
+- `Endpoint` with route decorators (`.get()`, `.post()`, etc.)
 
 ### 01_streaming _(coming soon)_
 Streaming responses with Server-Sent Events (SSE) and WebSockets.

@@ -511,17 +511,17 @@ cd 01_getting_started/05_new_example
 touch README.md gpu_worker.py pyproject.toml
 ```
 
-Each worker file (named `*_worker.py` by convention) is self-contained with `@remote` decorated functions. `flash run` discovers all `.py` files with `@remote` functions automatically -- no `main.py`, no `workers/` directories needed.
+Each worker file (named `*_worker.py` by convention) is self-contained with `@Endpoint` decorated functions. `flash run` discovers all `.py` files with `@Endpoint` functions automatically -- no `main.py`, no `workers/` directories needed.
 
 **3. Declare dependencies:**
 
-Add a `pyproject.toml` with `runpod-flash` as the only local dependency. Runtime deps (torch, etc.) go in `@remote(dependencies=[...])`.
+Add a `pyproject.toml` with `runpod-flash` as the only local dependency. Runtime deps (torch, etc.) go in `Endpoint(dependencies=[...])`.
 
 **4. Verify discovery:**
 
 ```bash
 cd ../../  # Back to root
-flash run  # Discovers all .py files with @remote functions
+flash run  # Discovers all .py files with @Endpoint functions
 ```
 
 ### Cleaning Up

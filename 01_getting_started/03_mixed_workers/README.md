@@ -6,7 +6,7 @@ Learn the production pattern of combining CPU and GPU workers for cost-effective
 
 - **Mixed worker architecture** - Combining CPU and GPU workers intelligently
 - **Cost optimization** - Using GPU only when necessary
-- **Pipeline orchestration** - Coordinating multiple worker types
+- **Pipeline orchestration** - Coordinating multiple worker types via a load-balanced endpoint
 - **Production patterns** - Real-world ML service architecture
 
 ## Architecture
@@ -130,13 +130,13 @@ Total: $0.0019/sec
 
 ### CPU Preprocessing Worker
 ```python
-preprocess_config = CpuLiveServerless(
+@Endpoint(
     name="preprocess_worker",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],  # 2 vCPU, 8GB
-    workersMin=0,
-    workersMax=10,  # High traffic capacity
-    idleTimeout=3,   # Quick scale-down
+    cpu=CpuInstanceType.CPU3G_2_8,  # 2 vCPU, 8GB
+    workers=(0, 10),
+    idle_timeout=3,
 )
+async def preprocess_text(input_data: dict) -> dict: ...
 ```
 
 **Cost:** ~$0.0002/sec
@@ -144,13 +144,14 @@ preprocess_config = CpuLiveServerless(
 
 ### GPU Inference Worker
 ```python
-gpu_config = LiveServerless(
+@Endpoint(
     name="inference_worker",
-    gpus=[GpuGroup.ADA_24],  # RTX 4090
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
+    gpu=GpuGroup.ADA_24,  # RTX 4090
+    workers=(0, 3),
+    idle_timeout=5,
+    dependencies=["torch"],
 )
+async def gpu_inference(input_data: dict) -> dict: ...
 ```
 
 **Cost:** ~$0.0015/sec
@@ -158,13 +159,13 @@ gpu_config = LiveServerless(
 
 ### CPU Postprocessing Worker
 ```python
-postprocess_config = CpuLiveServerless(
+@Endpoint(
     name="postprocess_worker",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],  # 2 vCPU, 8GB
-    workersMin=0,
-    workersMax=10,
-    idleTimeout=3,
+    cpu=CpuInstanceType.CPU3G_2_8,  # 2 vCPU, 8GB
+    workers=(0, 10),
+    idle_timeout=3,
 )
+async def postprocess_results(input_data: dict) -> dict: ...
 ```
 
 **Cost:** ~$0.0002/sec
@@ -175,7 +176,13 @@ postprocess_config = CpuLiveServerless(
 The `/classify` load-balanced endpoint orchestrates all workers:
 
 ```python
-@remote(resource_config=pipeline_config, method="POST", path="/classify")
+from cpu_worker import postprocess_results, preprocess_text
+from gpu_worker import gpu_inference
+from runpod_flash import Endpoint
+
+pipeline = Endpoint(name="classify_pipeline", cpu="cpu3c-1-2", workers=(1, 3))
+
+@pipeline.post("/classify")
 async def classify(text: str) -> dict:
     """Complete ML pipeline: CPU preprocess -> GPU inference -> CPU postprocess."""
     preprocess_result = await preprocess_text({"text": text})
@@ -233,15 +240,9 @@ For higher volumes, savings multiply significantly.
 
 ```python
 try:
-    # Stage 1: Preprocess (validation already done)
     preprocess_result = await preprocess_text(data)
-
-    # Stage 2: GPU inference
     gpu_result = await gpu_inference(preprocess_result)
-
-    # Stage 3: Postprocess
     final_result = await postprocess_results(gpu_result)
-
     return final_result
 except Exception as e:
     logger.error(f"Pipeline failed: {e}")
@@ -250,13 +251,13 @@ except Exception as e:
 
 ### 2. Timeouts
 
-Set appropriate timeouts for each stage:
+Set appropriate timeouts for each stage via `execution_timeout_ms`:
 ```python
 # CPU stages: short timeouts
-preprocess_config.executionTimeout = 30  # seconds
+@Endpoint(name="preprocess", cpu="cpu3c-1-2", execution_timeout_ms=30000)
 
 # GPU stage: longer timeout
-gpu_config.executionTimeout = 120  # seconds
+@Endpoint(name="inference", gpu=GpuGroup.ADA_24, execution_timeout_ms=120000)
 ```
 
 ### 3. Monitoring
@@ -298,7 +299,7 @@ Review worker usage:
 ### Slow Performance
 
 - Increase CPU worker max count for preprocessing
-- Check if GPU cold start is the issue (set workersMin=1)
+- Check if GPU cold start is the issue (set `workers=(1, 3)` for always-warm)
 - Consider caching preprocessed data
 
 ## Next Steps

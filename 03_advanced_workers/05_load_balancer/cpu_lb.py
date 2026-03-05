@@ -1,20 +1,18 @@
-# CPU load-balanced endpoints with custom HTTP routes.
-# Run with: flash run
-# Test directly: python cpu_lb.py
-from runpod_flash import CpuLiveLoadBalancer, remote
+# cpu load-balanced endpoints with custom HTTP routes.
+# run with: flash run
+# test directly: python cpu_lb.py
+from runpod_flash import Endpoint
 
-cpu_config = CpuLiveLoadBalancer(
-    name="03_05_load_balancer_cpu",
-)
+api = Endpoint(name="03_05_load_balancer_cpu", cpu="cpu3c-1-2")
 
 
-@remote(cpu_config, method="GET", path="/health")
+@api.get("/health")
 async def cpu_health() -> dict:
     """Health check endpoint for CPU service."""
     return {"status": "healthy", "service": "cpu"}
 
 
-@remote(cpu_config, method="POST", path="/validate")
+@api.post("/validate")
 async def validate_data(text: str) -> dict:
     """Validate and analyze text data.
 
@@ -32,7 +30,6 @@ async def validate_data(text: str) -> dict:
 
     start_time = time.time()
 
-    # Simple text analysis
     words = text.split()
     char_count = len(text)
     word_count = len(words)
@@ -51,7 +48,7 @@ async def validate_data(text: str) -> dict:
     }
 
 
-@remote(cpu_config, method="POST", path="/transform")
+@api.post("/transform")
 async def transform_data(text: str, operation: str = "uppercase") -> dict:
     """Transform text data.
 
@@ -76,7 +73,6 @@ async def transform_data(text: str, operation: str = "uppercase") -> dict:
     start_time = time.time()
     result = ""
 
-    # Perform transformation
     if operation == "uppercase":
         result = text.upper()
     elif operation == "lowercase":

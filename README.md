@@ -7,14 +7,16 @@ A collection of example applications showcasing Runpod Flash - a framework for b
 Flash is a Python framework that lets you run functions on Runpod's Serverless infrastructure with a single decorator. Write code locally, deploy globally—Flash handles provisioning, scaling, and routing automatically.
 
 ```python
-@remote(resource_config=gpu_config)
+from runpod_flash import Endpoint, GpuType
+
+@Endpoint(name="image-gen", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, dependencies=["torch", "diffusers"])
 async def generate_image(prompt: str) -> bytes:
     # This runs on a cloud GPU, not your laptop
     ...
 ```
 
 **Key features:**
-- **`@remote` decorator**: Mark any async function to run on serverless infrastructure
+- **`@Endpoint` decorator**: Mark any async function to run on serverless infrastructure
 - **Auto-scaling**: Scale to zero when idle, scale up under load
 - **Local development**: `flash run` starts a local server with hot reload
 - **One-command deploy**: `flash deploy` packages and ships your code
@@ -73,41 +75,71 @@ See **[CLI-REFERENCE.md](./CLI-REFERENCE.md)** for complete documentation.
 
 ## Key Concepts
 
-### Remote Workers
+### Endpoint
 
-The `@remote` decorator marks functions for execution on Runpod's serverless infrastructure:
+The `Endpoint` class configures functions for execution on Runpod's serverless infrastructure:
+
+**Queue-based (one function = one endpoint):**
 
 ```python
-from runpod_flash import remote, LiveServerless, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
-config = LiveServerless(
-    name="my_worker",
-    gpus=[GpuGroup.ADA_24],  # RTX 4090
-    workersMin=0,            # Scale to zero when idle
-    workersMax=3,            # Maximum concurrent workers
-)
-
-@remote(resource_config=config, dependencies=["torch"])
+@Endpoint(name="my-worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, workers=(0, 3), dependencies=["torch"])
 async def process(data: dict) -> dict:
     import torch
-    # This code runs on Runpod GPUs
+    # this code runs on Runpod GPUs
     return {"result": "processed"}
+```
+
+**Load-balanced (multiple routes, shared workers):**
+
+```python
+from runpod_flash import Endpoint
+
+api = Endpoint(name="my-api", cpu="cpu3c-1-2", workers=(1, 3))
+
+@api.get("/health")
+async def health():
+    return {"status": "ok"}
+
+@api.post("/compute")
+async def compute(data: dict) -> dict:
+    return {"result": data}
+```
+
+**Client mode (connect to an existing endpoint):**
+
+```python
+from runpod_flash import Endpoint
+
+ep = Endpoint(id="ep-abc123")
+job = await ep.run({"prompt": "hello"})
+await job.wait()
+print(job.output)
 ```
 
 ### Resource Types
 
+**GPU Workers** (`gpu=`):
 | Type | Use Case |
 |------|----------|
-| `LiveServerless` + `GpuGroup` | GPU workers (ADA_24, ADA_48_PRO, AMPERE_80) |
-| `CpuLiveServerless` + `CpuInstanceType` | CPU-only workers |
-| `LiveLoadBalancer` / `CpuLiveLoadBalancer` | Load-balanced endpoints |
+| `GpuType.NVIDIA_GEFORCE_RTX_4090` | RTX 4090 (24GB) |
+| `GpuType.NVIDIA_RTX_6000_ADA_GENERATION` | RTX 6000 Ada (48GB) |
+| `GpuType.NVIDIA_A100_80GB_PCIe` | A100 (80GB) |
+
+**CPU Workers** (`cpu=`):
+| Type | Specs |
+|------|-------|
+| `cpu3g-2-8` | 2 vCPU, 8GB RAM |
+| `cpu3c-4-8` | 4 vCPU, 8GB RAM (Compute) |
+| `cpu5c-4-16` | 4 vCPU, 16GB RAM (Latest) |
 
 ### Auto-Scaling
 
 Workers automatically scale based on demand:
-- `workersMin=0` - Scale to zero when idle (cost-efficient)
-- `workersMax=N` - Maximum concurrent workers
-- `idleTimeout=5` - Minutes before scaling down
+- `workers=(0, 3)` - Scale from 0 to 3 workers (cost-efficient)
+- `workers=(1, 5)` - Keep 1 warm, scale up to 5
+- `idle_timeout=5` - Minutes before scaling down
 
 ## Resources
 

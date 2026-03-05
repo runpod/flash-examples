@@ -66,8 +66,8 @@ Visit `http://localhost:8888/docs` for interactive API documentation.
 
 ```
 01_network_volumes/
-├── gpu_worker.py        # Stable Diffusion worker with @remote
-├── cpu_worker.py        # List and serve images with @remote
+├── gpu_worker.py        # Stable Diffusion worker with @Endpoint
+├── cpu_worker.py        # List and serve images with Endpoint routes
 ├── requirements.txt
 └── README.md
 ```
@@ -76,7 +76,7 @@ Visit `http://localhost:8888/docs` for interactive API documentation.
 
 ### POST /gpu_worker/runsync
 
-GPU worker (QB, class-based `@remote`). Generates an image and saves it to the shared volume.
+GPU worker (QB, class-based `@Endpoint`). Generates an image and saves it to the shared volume.
 
 **Request**:
 ```json

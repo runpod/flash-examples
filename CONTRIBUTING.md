@@ -45,7 +45,7 @@ All examples must meet these standards:
 - [ ] Error handling is implemented
 - [ ] Environment variables are documented
 - [ ] Dependencies are declared in pyproject.toml
-- [ ] Runtime deps declared in `@remote(dependencies=[...])`
+- [ ] Runtime deps declared in `Endpoint(dependencies=[...])`
 - [ ] Example discovered by `flash run` from project root
 
 ### 2. Code Quality
@@ -132,7 +132,7 @@ flash run
 
 ### 5. Verify Discovery
 
-`flash run` auto-discovers all `.py` files containing `@remote` functions. Verify your example loads:
+`flash run` auto-discovers all `.py` files containing `@Endpoint` functions. Verify your example loads:
 
 ```bash
 # From the repository root
@@ -140,7 +140,7 @@ flash run
 # Check http://localhost:8888/docs for your new endpoints
 ```
 
-Runtime dependencies (torch, transformers, etc.) are declared in `@remote(dependencies=[...])` and installed on the remote worker, not locally.
+Runtime dependencies (torch, transformers, etc.) are declared in `Endpoint(dependencies=[...])` and installed on the remote worker, not locally.
 
 ### 6. Create Pull Request
 
@@ -166,8 +166,8 @@ Each example is a flat directory with self-contained worker files (named `*_work
 ```
 your_example/
 ├── README.md              # Required: comprehensive documentation
-├── gpu_worker.py          # Required: GPU worker with @remote decorator
-├── cpu_worker.py          # Optional: CPU worker with @remote decorator
+├── gpu_worker.py          # Required: GPU worker with @Endpoint decorator
+├── cpu_worker.py          # Optional: CPU worker with @Endpoint decorator
 ├── pyproject.toml         # Required: project metadata and dependencies
 ├── .flashignore           # Optional: files to exclude from deployment
 ├── tests/                 # Recommended: test files
@@ -177,16 +177,14 @@ your_example/
     └── architecture.png
 ```
 
-`flash run` discovers all `.py` files with `@remote` functions automatically -- no `main.py`, no `workers/` directories, no router wiring.
+`flash run` discovers all `.py` files with `@Endpoint` functions automatically -- no `main.py`, no `workers/` directories, no router wiring.
 
 ### Minimal Worker (`gpu_worker.py`)
 
 ```python
-from runpod_flash import remote, LiveServerless
+from runpod_flash import Endpoint, GpuGroup
 
-config = LiveServerless(name="your_worker")
-
-@remote(resource_config=config, dependencies=["torch"])
+@Endpoint(name="your-worker", gpu=GpuGroup.ANY, dependencies=["torch"])
 async def your_function(payload: dict) -> dict:
     """
     Clear docstring explaining what this function does.
@@ -199,7 +197,7 @@ async def your_function(payload: dict) -> dict:
     """
     import torch
 
-    # Your implementation
+    # your implementation
     result = process(payload)
 
     return {"status": "success", "result": result}
@@ -407,12 +405,11 @@ RUNPOD_API_KEY = "hardcoded_key"  # Never do this!
 ### Error Handling
 
 ```python
-# Good - handle errors within @remote functions
-from runpod_flash import remote, LiveServerless
+# Good - handle errors within @Endpoint functions
+from runpod_flash import Endpoint, GpuGroup
 
-config = LiveServerless(name="processor")
-
-@remote(resource_config=config)
+# Good
+@Endpoint(name="processor", gpu=GpuGroup.ANY)
 async def process(data: dict) -> dict:
     try:
         result = do_work(data)
@@ -421,9 +418,9 @@ async def process(data: dict) -> dict:
         return {"status": "error", "detail": str(e)}
 
 # Bad
-@remote(resource_config=config)
+@Endpoint(name="processor", gpu=GpuGroup.ANY)
 async def process(data: dict) -> dict:
-    result = do_work(data)  # No error handling
+    result = do_work(data)  # no error handling
     return result
 ```
 
@@ -431,7 +428,7 @@ async def process(data: dict) -> dict:
 
 ### pyproject.toml
 
-Each example declares only its local development dependencies in `pyproject.toml`. Runtime deps needed on the GPU (torch, transformers, etc.) go in `@remote(dependencies=[...])`:
+Each example declares only its local development dependencies in `pyproject.toml`. Runtime deps needed on the GPU (torch, transformers, etc.) go in `Endpoint(dependencies=[...])`:
 
 ```toml
 [project]

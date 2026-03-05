@@ -99,7 +99,7 @@ If `PROJECT_NAME` is omitted or set to `.`, the project is initialized in the cu
 project-name/
 ├── main.py                 # FastAPI application entry point
 ├── mothership.py          # Mothership endpoint configuration
-├── gpu_worker.py          # GPU worker template with @remote decorator
+├── gpu_worker.py          # GPU worker template with @Endpoint decorator
 ├── pyproject.toml         # Project dependencies and metadata
 ├── requirements.txt       # Pinned dependencies (generated)
 ├── .env.example           # Environment variable template
@@ -114,7 +114,7 @@ project-name/
 **main.py**
 - FastAPI application that loads routers from worker files
 - Configured for local development and testing
-- Automatically discovers `@remote` decorated functions
+- Automatically discovers `@Endpoint` decorated functions
 
 **mothership.py**
 - Configures the mothership endpoint (load-balanced FastAPI application endpoint)
@@ -122,8 +122,8 @@ project-name/
 - Delete this file if you don't want to deploy the mothership endpoint
 
 **gpu_worker.py**
-- Template worker with `@remote` decorator
-- Configured for GPU resources via `LiveServerless`
+- Template worker with `@Endpoint` decorator
+- Configured for GPU resources via `gpu=` parameter
 - Contains example endpoint with proper structure
 
 **pyproject.toml**
@@ -290,14 +290,14 @@ flash run [OPTIONS]
 
 ### Description
 
-Starts a local uvicorn development server that runs your Flash application. The server automatically discovers all `@remote` decorated functions and makes them available as HTTP endpoints. Supports hot reloading, custom host/port configuration, and optional resource auto-provisioning.
+Starts a local uvicorn development server that runs your Flash application. The server automatically discovers all `@Endpoint` decorated functions and makes them available as HTTP endpoints. Supports hot reloading, custom host/port configuration, and optional resource auto-provisioning.
 
 ### Architecture: Hybrid Local + Cloud
 
 With `flash run`, your system operates in a **hybrid architecture**:
 
 - **Your FastAPI app runs locally** on your machine (localhost:8888)
-- **`@remote` functions run on Runpod** as serverless endpoints
+- **`@Endpoint` functions run on Runpod** as serverless endpoints
 - **Hot reload works** because your app code is local—changes are picked up instantly
 - **Endpoints are prefixed with `live-`** to distinguish from production (e.g., `gpu-worker` becomes `live-gpu-worker`)
 
@@ -412,7 +412,7 @@ flash run --auto-provision
 
 This will:
 1. Start local development server
-2. Provision Runpod endpoints for all `@remote` functions
+2. Provision Runpod endpoints for all `@Endpoint` functions
 3. Allow testing with real Runpod infrastructure
 4. Incur Runpod costs (workers will spin up)
 
@@ -439,7 +439,7 @@ Share the URL with team members for testing.
 
 1. **Application Loading**: Imports `main.py` and discovers FastAPI app
 2. **Router Discovery**: Scans for APIRouter exports in worker files
-3. **Remote Function Discovery**: Finds all `@remote` decorated functions
+3. **Remote Function Discovery**: Finds all `@Endpoint` decorated functions
 4. **Uvicorn Startup**: Starts ASGI server with specified configuration
 5. **Hot Reload Setup**: Watches Python files for changes (if enabled)
 6. **Documentation Generation**: Creates OpenAPI schema at `/docs`
@@ -629,7 +629,7 @@ flash build [OPTIONS]
 
 ### Description
 
-Packages your Flash application and its dependencies into a tar.gz archive suitable for deployment to Runpod. The build process installs dependencies cross-platform (Linux x86_64), generates handler files for each `@remote` function, creates a manifest with resource configurations, and produces a final artifact ready for upload.
+Packages your Flash application and its dependencies into a tar.gz archive suitable for deployment to Runpod. The build process installs dependencies cross-platform (Linux x86_64), generates handler files for each `@Endpoint` function, creates a manifest with resource configurations, and produces a final artifact ready for upload.
 
 The `.build/` directory is preserved after building for inspection and debugging.
 
@@ -671,12 +671,12 @@ The build command executes these steps:
    - Respects `--no-deps` and `--exclude` options
 
 3. **Generate Manifest**
-   - Scans code for `@remote` decorated functions
-   - Extracts resource configurations (`LiveServerless`, etc.)
+   - Scans code for `@Endpoint` decorated functions
+   - Extracts resource configurations (Endpoint params)
    - Creates `flash_manifest.json` with deployment metadata
 
 4. **Generate Handlers**
-   - Creates handler file for each `@remote` function
+   - Creates handler file for each `@Endpoint` function
    - Handlers interface between Runpod and your functions
    - Includes error handling and serialization logic
 
@@ -868,7 +868,7 @@ The `flash_manifest.json` contains deployment metadata:
   "resources": [
     {
       "name": "gpu_worker_process_request",
-      "type": "LiveServerless",
+      "type": "Endpoint",
       "config": {
         "name": "my_api_gpu",
         "gpus": ["ANY"],
@@ -1040,7 +1040,7 @@ If only one environment exists, it's used automatically. With multiple environme
 With `flash deploy`, your **entire application** runs on Runpod Serverless:
 
 - **Your FastAPI app runs on Runpod** as the "mothership" endpoint
-- **`@remote` functions run on Runpod** as separate worker endpoints
+- **`@Endpoint` functions run on Runpod** as separate worker endpoints
 - **Users call the mothership URL** directly (e.g., `https://xyz123.api.runpod.ai/api/hello`)
 - **No `live-` prefix** on endpoint names—these are production endpoints
 - **No hot reload**—code changes require a new deployment
@@ -1492,10 +1492,10 @@ Deployed Endpoints:
 ┌──────────────────────────┬─────────────────────┬──────────────────────┬────────────┐
 │ Name                     │ Type                │ Environment          │ Status     │
 ├──────────────────────────┼─────────────────────┼──────────────────────┼────────────┤
-│ my-api-gpu               │ LiveServerless      │ production           │ Active     │
-│ my-api-mothership        │ LiveLoadBalancer    │ production           │ Active     │
-│ test-worker              │ LiveServerless      │ dev                  │ Active     │
-│ old-api-gpu              │ LiveServerless      │ staging              │ Inactive   │
+│ my-api-gpu               │ Endpoint            │ production           │ Active     │
+│ my-api-mothership        │ Endpoint (LB)       │ production           │ Active     │
+│ test-worker              │ Endpoint            │ dev                  │ Active     │
+│ old-api-gpu              │ Endpoint            │ staging              │ Inactive   │
 └──────────────────────────┴─────────────────────┴──────────────────────┴────────────┘
 
 Total: 4 endpoints
@@ -1510,7 +1510,7 @@ flash undeploy my-api-gpu
 Output:
 ```
 Endpoint: my-api-gpu
-Type: LiveServerless (GPU)
+Type: Endpoint (GPU)
 Environment: production
 Status: Active
 
@@ -2016,10 +2016,10 @@ Endpoints (4):
 ┌──────────────────────────┬─────────────────────┬────────────┬──────────────┐
 │ Name                     │ Type                │ Status     │ Workers      │
 ├──────────────────────────┼─────────────────────┼────────────┼──────────────┤
-│ my-api-gpu               │ LiveServerless      │ Active     │ 0/3          │
-│ my-api-mothership        │ LiveLoadBalancer    │ Active     │ 1/3          │
-│ batch-processor          │ LiveServerless      │ Idle       │ 0/5          │
-│ image-worker             │ LiveServerless      │ Active     │ 2/3          │
+│ my-api-gpu               │ Endpoint            │ Active     │ 0/3          │
+│ my-api-mothership        │ Endpoint (LB)       │ Active     │ 1/3          │
+│ batch-processor          │ Endpoint            │ Idle       │ 0/5          │
+│ image-worker             │ Endpoint            │ Active     │ 2/3          │
 └──────────────────────────┴─────────────────────┴────────────┴──────────────┘
 
 Resource Configuration:

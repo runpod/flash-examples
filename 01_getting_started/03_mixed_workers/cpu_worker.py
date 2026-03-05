@@ -1,29 +1,21 @@
-# CPU workers for text preprocessing and postprocessing.
-# Part of the mixed CPU/GPU pipeline example.
-# Run with: flash run
-# Test directly: python cpu_worker.py
-from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
+# cpu workers for text preprocessing and postprocessing.
+# part of the mixed CPU/GPU pipeline example.
+# run with: flash run
+# test directly: python cpu_worker.py
+from runpod_flash import CpuInstanceType, Endpoint
 
-cpu_preprocess_config = CpuLiveServerless(
-    name="01_03_mixed_workers_cpu_preprocess",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],
-    idleTimeout=3,
+
+@Endpoint(
+    name="01_03_mixed_workers_cpu",
+    cpu=CpuInstanceType.CPU3G_2_8,
+    idle_timeout=3,
 )
-
-cpu_postprocess_config = CpuLiveServerless(
-    name="01_03_mixed_workers_cpu_postprocess",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],
-    idleTimeout=3,
-)
-
-
-@remote(resource_config=cpu_preprocess_config)
-async def preprocess_text(payload: dict) -> dict:
+async def preprocess_text(input_data: dict) -> dict:
     """Preprocess text: cleaning and tokenization (cheap CPU work)."""
     import re
     from datetime import datetime
 
-    text = payload.get("text", "")
+    text = input_data.get("text", "")
 
     cleaned_text = text.strip()
     cleaned_text = re.sub(r"\s+", " ", cleaned_text)
@@ -44,14 +36,18 @@ async def preprocess_text(payload: dict) -> dict:
     }
 
 
-@remote(resource_config=cpu_postprocess_config)
-async def postprocess_results(payload: dict) -> dict:
+@Endpoint(
+    name="01_03_mixed_workers_cpu_postprocess",
+    cpu=CpuInstanceType.CPU3G_2_8,
+    idle_timeout=3,
+)
+async def postprocess_results(input_data: dict) -> dict:
     """Postprocess GPU results: formatting and aggregation (cheap CPU work)."""
     from datetime import datetime
 
-    predictions = payload.get("predictions", [])
-    original_text = payload.get("original_text", "")
-    metadata = payload.get("metadata", {})
+    predictions = input_data.get("predictions", [])
+    original_text = input_data.get("original_text", "")
+    metadata = input_data.get("metadata", {})
 
     if predictions:
         top_prediction = max(predictions, key=lambda x: x["confidence"])

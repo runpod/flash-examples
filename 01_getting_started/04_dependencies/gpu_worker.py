@@ -1,78 +1,58 @@
-# GPU workers demonstrating Python and system dependency management.
-# Run with: flash run
-# Test directly: python gpu_worker.py
-from runpod_flash import GpuGroup, LiveServerless, remote
+# gpu workers demonstrating Python and system dependency management.
+# run with: flash run
+# test directly: python gpu_worker.py
+from runpod_flash import Endpoint, GpuGroup
 
-# Worker with ML dependencies (versioned)
-ml_config = LiveServerless(
+
+@Endpoint(
     name="01_04_deps_ml",
-    gpus=[GpuGroup.ADA_32_PRO],
-    workersMin=0,
-    workersMax=2,
-)
-
-# Worker with system dependencies
-system_deps_config = LiveServerless(
-    name="01_04_deps_system",
-    gpus=[GpuGroup.AMPERE_16],
-    workersMin=0,
-    workersMax=2,
-)
-
-
-@remote(
-    resource_config=ml_config,
+    gpu=GpuGroup.ADA_32_PRO,
+    workers=(0, 2),
     dependencies=[
-        "torch==2.1.0",  # Pin specific version
-        "torchvision",
+        "requests==2.32.3",  # Pin specific version
         "Pillow>=10.0.0",  # Minimum version
-        "numpy<2.0.0",  # Maximum version constraint
+        "python-dateutil<3.0.0",  # Maximum version constraint
+        "httpx",  # Unpinned
     ],
 )
 async def process_with_ml_libs(payload: dict) -> dict:
     """
-    Worker with versioned Python dependencies.
+    Worker with lightweight, versioned Python dependencies.
 
     Best practices:
-    - Pin exact versions for reproducibility (torch==2.1.0)
+    - Pin exact versions for reproducibility (requests==2.32.3)
     - Use >= for minimum versions (Pillow>=10.0.0)
-    - Use < to avoid breaking changes (numpy<2.0.0)
+    - Use < to avoid breaking changes (python-dateutil<3.0.0)
     """
     from datetime import datetime
 
-    import numpy as np
-    import torch
-    import torchvision
+    import httpx
+    import requests
+    from importlib.metadata import version
     from PIL import Image
 
-    # Show installed versions
     versions = {
-        "torch": torch.__version__,
-        "torchvision": torchvision.__version__,
-        "pillow": Image.__version__,
-        "numpy": np.__version__,
+        "requests": str(requests.__version__),
+        "httpx": str(httpx.__version__),
+        "python_dateutil": str(version("python-dateutil")),
+        "pillow": str(Image.__version__),
     }
-
-    # Simple tensor operation to verify GPU
-    if torch.cuda.is_available():
-        tensor = torch.randn(100, 100, device="cuda")
-        result = tensor.sum().item()
-    else:
-        result = "No GPU available"
 
     return {
         "status": "success",
-        "message": "ML dependencies loaded successfully",
+        "message": "Python dependencies loaded successfully",
         "versions": versions,
-        "gpu_test": result,
+        "payload_keys": list(payload.keys()),
         "timestamp": datetime.now().isoformat(),
     }
 
 
-@remote(
-    resource_config=system_deps_config,
+@Endpoint(
+    name="01_04_deps_system",
+    gpu=GpuGroup.AMPERE_16,
+    workers=(0, 2),
     dependencies=["opencv-python", "requests"],
-    system_dependencies=["ffmpeg", "libgl1"],  # System packages via apt
+    system_dependencies=["ffmpeg", "libgl1"],
 )
 async def process_with_system_deps(payload: dict) -> dict:
     """
@@ -87,7 +67,6 @@ async def process_with_system_deps(payload: dict) -> dict:
 
     import cv2
 
-    # Check FFmpeg installation
     try:
         ffmpeg_version = (
             subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT)
@@ -97,7 +76,6 @@ async def process_with_system_deps(payload: dict) -> dict:
     except Exception as e:
         ffmpeg_version = f"Error: {e}"
 
-    # Check OpenCV (requires libgl1)
     opencv_version = cv2.__version__
 
     return {

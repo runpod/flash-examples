@@ -1,9 +1,9 @@
-# GPU worker with network volume for Stable Diffusion image generation.
-# Run with: flash run
-# Test directly: python gpu_worker.py
+# gpu worker with network volume for Stable Diffusion image generation.
+# run with: flash run
+# test directly: python gpu_worker.py
 import logging
 
-from runpod_flash import GpuGroup, LiveServerless, NetworkVolume, remote
+from runpod_flash import Endpoint, GpuGroup, NetworkVolume
 
 logger = logging.getLogger(__name__)
 
@@ -14,18 +14,16 @@ volume = NetworkVolume(
     size=50,
 )
 
-gpu_config = LiveServerless(
+
+@Endpoint(
     name="05_01_gpu_worker",
-    gpus=[GpuGroup.ANY],
-    workersMin=0,
-    workersMax=3,
-    idleTimeout=5,
-    networkVolume=volume,
+    gpu=GpuGroup.ANY,
+    workers=(0, 3),
+    idle_timeout=5,
+    volume=volume,
     env={"HF_HUB_CACHE": MODEL_PATH, "MODEL_PATH": MODEL_PATH},
+    dependencies=["diffusers", "transformers"],
 )
-
-
-@remote(resource_config=gpu_config, dependencies=["diffusers", "torch", "transformers"])
 class SimpleSD:
     def __init__(self):
         import gc

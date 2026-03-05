@@ -1,30 +1,17 @@
-# CPU autoscaling strategies -- scale-to-zero and burst-ready.
-# Run with: flash run
-# Test directly: python cpu_worker.py
-from runpod_flash import CpuInstanceType, CpuLiveServerless, remote
+# cpu autoscaling strategies -- scale-to-zero and burst-ready.
+# run with: flash run
+# test directly: python cpu_worker.py
+from runpod_flash import CpuInstanceType, Endpoint
 
-# --- Strategy 1: Scale to Zero ---
-# Cost-optimized for preprocessing tasks that tolerate cold starts.
-cpu_scale_to_zero_config = CpuLiveServerless(
+
+# --- strategy 1: scale to zero ---
+# cost-optimized for preprocessing tasks that tolerate cold starts.
+@Endpoint(
     name="04_01_cpu_scale_to_zero",
-    instanceIds=[CpuInstanceType.CPU3C_1_2],
-    workersMin=0,
-    workersMax=5,
-    idleTimeout=5,
+    cpu=CpuInstanceType.CPU3C_1_2,
+    workers=(0, 5),
+    idle_timeout=5,
 )
-
-# --- Strategy 2: Burst Ready ---
-# Always-warm worker for API gateway or latency-sensitive CPU tasks.
-cpu_burst_ready_config = CpuLiveServerless(
-    name="04_01_cpu_burst_ready",
-    instanceIds=[CpuInstanceType.CPU3G_2_8],
-    workersMin=1,
-    workersMax=10,
-    idleTimeout=30,
-)
-
-
-@remote(resource_config=cpu_scale_to_zero_config)
 async def cpu_scale_to_zero(payload: dict) -> dict:
     """CPU worker with scale-to-zero -- cost-optimized preprocessing."""
     import hashlib
@@ -35,7 +22,6 @@ async def cpu_scale_to_zero(payload: dict) -> dict:
 
     text = payload.get("text", "")
 
-    # Simulate CPU-bound preprocessing: hashing, serialization, string ops
     text_hash = hashlib.sha256(text.encode()).hexdigest()
     normalized = " ".join(text.lower().split())
     tokens = normalized.split()
@@ -58,7 +44,14 @@ async def cpu_scale_to_zero(payload: dict) -> dict:
     }
 
 
-@remote(resource_config=cpu_burst_ready_config)
+# --- strategy 2: burst ready ---
+# always-warm worker for API gateway or latency-sensitive CPU tasks.
+@Endpoint(
+    name="04_01_cpu_burst_ready",
+    cpu=CpuInstanceType.CPU3G_2_8,
+    workers=(1, 10),
+    idle_timeout=30,
+)
 async def cpu_burst_ready(payload: dict) -> dict:
     """CPU worker with burst-ready scaling -- always-warm for low latency."""
     import hashlib
@@ -69,7 +62,6 @@ async def cpu_burst_ready(payload: dict) -> dict:
 
     text = payload.get("text", "")
 
-    # Simulate CPU-bound API gateway work: validation, transformation, routing
     text_hash = hashlib.sha256(text.encode()).hexdigest()
     words = text.split()
     word_lengths = [len(w) for w in words]

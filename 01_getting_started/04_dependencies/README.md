@@ -42,33 +42,37 @@ uv run flash run
 
 ### 1. Python Dependencies
 
-Specified in `@remote` decorator:
+Specified in the `Endpoint` decorator:
 
 ```python
-@remote(
-    resource_config=config,
+@Endpoint(
+    name="my-worker",
+    gpu=GpuGroup.ADA_24,
     dependencies=[
-        "torch==2.1.0",      # Exact version
+        "requests==2.32.3",  # Exact version
         "Pillow>=10.0.0",    # Minimum version
-        "numpy<2.0.0",       # Maximum version
-        "requests",          # Latest version
+        "python-dateutil<3.0.0",  # Maximum version
+        "httpx",             # Latest version
     ]
 )
 async def my_function(data: dict) -> dict:
-    import torch
-    import PIL
-    # Your code here
+    import httpx
+    import requests
+    # your code here
 ```
+
+Note: `torch` is already baked into the default GPU base image, so you generally should not add it to `dependencies` unless you intentionally need to override the bundled version.
 
 ### 2. System Dependencies
 
 Install apt packages:
 
 ```python
-@remote(
-    resource_config=config,
+@Endpoint(
+    name="my-worker",
+    gpu=GpuGroup.AMPERE_16,
     dependencies=["opencv-python"],
-    system_dependencies=["ffmpeg", "libgl1", "graphviz"]
+    system_dependencies=["ffmpeg", "libgl1", "graphviz"],
 )
 async def process_video(data: dict) -> dict:
     import cv2
@@ -86,9 +90,9 @@ async def process_video(data: dict) -> dict:
 Fastest cold start:
 
 ```python
-@remote(resource_config=config)  # No dependencies!
+@Endpoint(name="my-worker", cpu="cpu3c-1-2")
 async def simple_function(data: dict) -> dict:
-    # Only Python stdlib
+    # only Python stdlib
     import json
     import re
     from datetime import datetime
@@ -99,7 +103,7 @@ async def simple_function(data: dict) -> dict:
 
 ### Exact Version (==)
 ```python
-"torch==2.1.0"  # Exactly 2.1.0
+"requests==2.32.3"  # Exactly 2.32.3
 ```
 **Use when:** You need reproducible builds
 
@@ -111,7 +115,7 @@ async def simple_function(data: dict) -> dict:
 
 ### Maximum Version (<)
 ```python
-"numpy<2.0.0"  # Below 2.0.0
+"python-dateutil<3.0.0"  # Below 3.0.0
 ```
 **Use when:** Avoiding breaking changes
 
@@ -132,7 +136,6 @@ async def simple_function(data: dict) -> dict:
 ### ML/AI
 ```python
 dependencies=[
-    "torch==2.1.0",
     "transformers>=4.35.0",
     "diffusers",
     "accelerate",
@@ -197,39 +200,42 @@ system_dependencies=["ffmpeg", "libgl1", "wget"]
 
 ```python
 # Good - Reproducible
-dependencies=[
-    "torch==2.1.0",
-    "transformers==4.35.2",
-    "numpy==1.26.2",
-]
+@Endpoint(
+    name="worker",
+    gpu=GpuGroup.ADA_24,
+    dependencies=[
+        "requests==2.32.3",
+        "transformers==4.35.2",
+        "numpy==1.26.2",
+    ],
+)
 
 # Bad - Unpredictable
-dependencies=[
-    "torch",  # Version changes over time
-    "transformers",
-    "numpy",
-]
+@Endpoint(
+    name="worker",
+    gpu=GpuGroup.ADA_24,
+    dependencies=[
+        "requests",  # Version changes over time
+        "transformers",
+        "numpy",
+    ],
+)
 ```
 
 ### 2. Minimize Dependencies
 
 ```python
 # Good - Only what's needed
-@remote(
-    dependencies=["requests"]  # Just one package
-)
+@Endpoint(name="fetcher", cpu="cpu3c-1-2", dependencies=["requests"])
 async def fetch_data(url: str):
     import requests
     return requests.get(url).json()
 
 # Bad - Unnecessary bloat
-@remote(
-    dependencies=[
-        "requests",
-        "pandas",  # Not used
-        "numpy",   # Not used
-        "scipy",   # Not used
-    ]
+@Endpoint(
+    name="fetcher",
+    cpu="cpu3c-1-2",
+    dependencies=["requests", "pandas", "numpy", "scipy"],
 )
 async def fetch_data(url: str):
     import requests
@@ -247,16 +253,17 @@ python cpu_worker.py
 ### 4. Document Dependencies
 
 ```python
-@remote(
-    resource_config=config,
+@Endpoint(
+    name="worker",
+    gpu=GpuGroup.ADA_24,
     dependencies=[
-        "torch==2.1.0",      # GPU operations
+        "requests==2.32.3",  # API calls
         "Pillow>=10.0.0",    # Image processing
-        "requests",          # API calls
+        "python-dateutil<3.0.0",  # Date parsing compatibility
     ]
 )
 async def process_image(data: dict):
-    """Process image with PyTorch and Pillow."""
+    """Process image with Pillow and lightweight utility libraries."""
     pass
 ```
 
@@ -265,26 +272,26 @@ async def process_image(data: dict):
 ### Import Error
 
 ```
-ModuleNotFoundError: No module named 'torch'
+ModuleNotFoundError: No module named 'PIL'
 ```
 
 **Solution:** Add to dependencies:
 ```python
-dependencies=["torch"]
+dependencies=["Pillow>=10.0.0"]
 ```
 
 ### Version Conflict
 
 ```
-ERROR: Cannot install torch==2.1.0 and torchvision==0.16.0
+ERROR: Cannot install requests==2.25.0 and urllib3==2.2.1
 because these package versions have conflicting dependencies.
 ```
 
 **Solution:** Check compatibility matrix, adjust versions:
 ```python
 dependencies=[
-    "torch==2.1.0",
-    "torchvision==0.16.0+cu121",  # Compatible CUDA version
+    "requests>=2.32.0",
+    "urllib3>=2.2.0",
 ]
 ```
 
@@ -306,7 +313,7 @@ Dependencies take long to install?
 **Solutions:**
 1. Minimize dependencies
 2. Use custom Docker image (advanced)
-3. Keep workers warm (workersMin=1)
+3. Keep workers warm (`workers=(1, 3)`)
 
 ## Cold Start Times
 
@@ -315,7 +322,7 @@ Dependencies take long to install?
 | None | ~5-10 seconds |
 | Small (1-2 packages) | ~15-30 seconds |
 | Medium (3-5 packages) | ~30-60 seconds |
-| Large (torch, transformers) | ~60-120 seconds |
+| Large (transformers, diffusers) | ~60-120 seconds |
 
 ## Requirements.txt
 
@@ -323,34 +330,29 @@ For local development, create `requirements.txt`:
 
 ```txt
 runpod-flash
-torch==2.1.0
 transformers==4.35.2
 Pillow>=10.0.0
 numpy==1.26.2
 ```
 
-**Note:** Worker dependencies in `@remote` decorator are deployed automatically. `requirements.txt` is for local development only.
+**Note:** Worker dependencies in the `Endpoint` decorator are deployed automatically. `requirements.txt` is for local development only.
 
-## Advanced: Custom Docker Images
+## Advanced: External Docker Images
 
-For complex dependencies, consider custom images:
+For complex dependencies, deploy a pre-built image:
 
 ```python
-from runpod_flash import ServerlessEndpoint
+from runpod_flash import Endpoint, GpuGroup
 
-custom_config = ServerlessEndpoint(
-    name="custom_image_worker",
-    dockerImage="myregistry/my-image:v1.0",
-    gpuIds=["NVIDIA GeForce RTX 4090"],
+vllm = Endpoint(
+    name="vllm-service",
+    image="vllm/vllm-openai:latest",
+    gpu=GpuGroup.ADA_24,
 )
 
-@remote(resource_config=custom_config)
-async def process(data: dict):
-    # All dependencies pre-installed in image
-    pass
+# call it as an API client
+result = await vllm.post("/v1/completions", {"prompt": "hello"})
 ```
-
-See [02_ml_inference/04_custom_images](../../02_ml_inference/04_custom_images/) for details.
 
 ## Next Steps
 
