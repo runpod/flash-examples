@@ -11,23 +11,21 @@ The GPU worker generates images with Stable Diffusion and writes them to a Runpo
 ### 1. Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
-### 2. Configure Environment
-
-Create `.env`:
+### 2. Authenticate
 
 ```bash
-RUNPOD_API_KEY=your_api_key_here
+uv run flash login
 ```
 
-Get your API key from [Runpod Settings](https://www.runpod.io/console/user/settings).
+Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 
 ### 3. Run Locally
 
 ```bash
-flash run
+uv run flash run
 ```
 
 Server starts at `http://localhost:8888`

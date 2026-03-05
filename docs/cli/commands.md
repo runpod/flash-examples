@@ -4,6 +4,7 @@ Exhaustive documentation for all Flash CLI commands. This guide covers every opt
 
 ## Table of Contents
 
+- [flash login](#flash-login) - Authenticate with Runpod
 - [flash init](#flash-init) - Create new Flash project
 - [flash run](#flash-run) - Run development server
 - [flash build](#flash-build) - Build deployment package
@@ -19,6 +20,46 @@ Exhaustive documentation for all Flash CLI commands. This guide covers every opt
   - [flash app create](#flash-app-create)
   - [flash app get](#flash-app-get)
   - [flash app delete](#flash-app-delete)
+
+---
+
+## flash login
+
+Authenticate with Runpod by opening a browser for OAuth authentication.
+
+### Synopsis
+
+```bash
+flash login
+```
+
+### Description
+
+Authenticates with Runpod by opening your default browser to the Runpod authentication page. After successful authentication, credentials are saved locally and persist across terminal sessions.
+
+This is the recommended authentication method for interactive use. For CI/CD or automated environments, use the `RUNPOD_API_KEY` environment variable instead.
+
+### Examples
+
+**Authenticate with Runpod:**
+```bash
+flash login
+```
+
+**Alternative: Manual API key configuration:**
+```bash
+# Set environment variable
+export RUNPOD_API_KEY=your-key-here
+
+# Or add to .env file
+echo "RUNPOD_API_KEY=your-key-here" > .env
+```
+
+### Notes
+
+- Requires a browser for OAuth flow
+- Credentials are stored securely on your local machine
+- For headless environments, use `RUNPOD_API_KEY` environment variable
 
 ---
 
@@ -179,12 +220,12 @@ The generated `.gitignore` already includes necessary patterns.
 
 2. **Install Dependencies**
    ```bash
-   pip install -e .
+   uv sync && uv pip install -e .
    ```
 
 3. **Run Locally**
    ```bash
-   flash run
+   uv run flash run
    ```
 
 4. **View Documentation**

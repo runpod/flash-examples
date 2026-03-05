@@ -60,8 +60,8 @@ Managing Python packages and system dependencies.
 
 1. Start with **01_hello_world** to understand the basics
 2. Explore **03_mixed_workers** for cost optimization and validation patterns
-3. Move to **02_cpu_worker** to learn CPU-only patterns _(coming soon)_
-4. Master **04_dependencies** for production readiness _(coming soon)_
+3. Move to **02_cpu_worker** to learn CPU-only patterns
+4. Master **04_dependencies** for production readiness
 
 ## Next Steps
 

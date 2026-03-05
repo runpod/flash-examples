@@ -26,22 +26,21 @@ Load-balanced endpoints use direct HTTP routing to serverless workers, providing
 ### 1. Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
-### 2. Configure Environment
+### 2. Authenticate
 
 ```bash
-cp .env.example .env
-# Add your RUNPOD_API_KEY to .env
+uv run flash login
 ```
 
-Get your API key from [Runpod Settings](https://www.runpod.io/console/user/settings).
+Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 
 ### 3. Run Locally (from repository root)
 
 ```bash
-flash run
+uv run flash run
 ```
 
 Visit **http://localhost:8888/docs** for interactive API documentation (unified app with all examples).

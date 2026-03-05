@@ -46,19 +46,21 @@ cd my-api
 #### 2. Set Up Environment
 
 ```bash
-# Create virtual environment (if needed)
+# Install dependencies with uv (recommended)
+uv sync && uv pip install -e .
+```
+
+**Alternative with pip:**
+```bash
 python -m venv .venv
 source .venv/bin/activate  # macOS/Linux
-# .venv\Scripts\activate  # Windows
-
-# Install dependencies
 pip install -e .
 ```
 
 **Validation:**
 ```bash
 python --version  # Should show 3.10+
-pip list | grep runpod-flash  # Should show runpod-flash
+uv run flash --version  # Should show flash version
 ```
 
 #### 3. Configure Environment Variables

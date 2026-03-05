@@ -24,15 +24,16 @@ This example demonstrates running a 1.7B parameter TTS model on serverless GPU i
 
 ```bash
 cd 02_ml_inference/01_text_to_speech
-pip install -r requirements.txt
-cp .env.example .env
-# Add your RUNPOD_API_KEY to .env
+uv sync
+uv run flash login
 ```
+
+Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 
 ### Run
 
 ```bash
-flash run
+uv run flash run
 ```
 
 First run provisions the endpoint (~1 min). Server starts at http://localhost:8888

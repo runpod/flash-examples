@@ -29,7 +29,16 @@ bash: flash: command not found
 
 **Solutions:**
 
-**1. Install Flash:**
+**1. Install with uv (recommended):**
+```bash
+# Install uv if needed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Verify installation
+uv run flash --version
+```
+
+**2. Install with pip (alternative):**
 ```bash
 pip install runpod-flash
 
@@ -37,7 +46,7 @@ pip install runpod-flash
 flash --version
 ```
 
-**2. Check PATH:**
+**3. Check PATH:**
 ```bash
 # Find where flash is installed
 which flash

@@ -4,7 +4,7 @@ Handle data storage, processing, and pipelines in Flash applications. Learn pers
 
 ## Examples
 
-### 01_network_volumes _(coming soon)_
+### [01_network_volumes](./01_network_volumes/)
 Persistent storage with Runpod network volumes.
 
 **What you'll learn:**

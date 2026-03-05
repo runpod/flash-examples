@@ -4,6 +4,15 @@ Deploy machine learning models as production-ready APIs. Learn how to serve LLMs
 
 ## Examples
 
+### [01_text_to_speech](./01_text_to_speech/)
+Text-to-Speech API using Qwen3-TTS.
+
+**What you'll learn:**
+- Running HuggingFace models with `@remote` on GPU workers
+- Returning binary audio data (WAV) from API endpoints
+- Using `bfloat16` precision for memory-efficient inference
+- Input validation inside self-contained `@remote` functions
+
 ### 01_text_generation _(coming soon)_
 LLM inference API with streaming support.
 

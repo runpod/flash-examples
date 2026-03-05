@@ -53,15 +53,14 @@ If you haven't run the repository-wide setup:
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
-# Set API key (choose one):
-export RUNPOD_API_KEY=your_api_key_here
-# OR create .env file:
-echo "RUNPOD_API_KEY=your_api_key_here" > .env
+# Authenticate
+uv run flash login
+# Or create .env file with RUNPOD_API_KEY=your_api_key_here
 
 # Run
-flash run
+uv run flash run
 ```
 
 Server starts at http://localhost:8888
