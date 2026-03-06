@@ -661,8 +661,11 @@ Error: RUNPOD_API_KEY environment variable not set
 
 **1. Use `flash login` (recommended):**
 ```bash
+# If you installed Flash via uv (recommended)
+uv run flash login
+
+# Or, if flash is installed globally
 flash login
-# Opens browser for authentication
 ```
 
 **2. Set environment variable:**
