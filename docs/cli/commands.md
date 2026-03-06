@@ -338,7 +338,7 @@ FLASH_PORT=9000
 RUNPOD_API_KEY=your-key-here
 ```
 
-> To pass env vars to deployed endpoints, declare them on the resource config: `env={"HF_TOKEN": os.environ["HF_TOKEN"]}`.
+> To pass env vars to deployed endpoints, declare them on the resource config: `env={"HF_TOKEN": os.getenv("HF_TOKEN")}`.
 
 **Precedence (highest to lowest):**
 1. Command-line options (`--host`, `--port`)
