@@ -143,8 +143,7 @@ Workers automatically scale based on demand:
 
 ## Resources
 
-- [Flash Documentation](https://docs.runpod.io)
-- [Runpod Serverless Docs](https://docs.runpod.io/serverless/overview)
+- [Flash documentation](https://docs.runpod.io/flash/overview)
 - [Community Discord](https://discord.gg/runpod)
 
 ## Contributing
