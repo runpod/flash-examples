@@ -6,9 +6,7 @@ from runpod_flash import Endpoint, GpuGroup
 
 @Endpoint(
     name="01_01_gpu_worker",
-    gpu=GpuGroup.ANY,
-    workers=(0, 3),
-    idle_timeout=5,
+    gpu=GpuGroup.ADA_24,
 )
 async def gpu_hello(input_data: dict) -> dict:
     """GPU worker that returns GPU hardware info."""

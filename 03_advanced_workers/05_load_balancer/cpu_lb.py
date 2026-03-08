@@ -3,7 +3,11 @@
 # test directly: python cpu_lb.py
 from runpod_flash import Endpoint
 
-api = Endpoint(name="03_05_load_balancer_cpu", cpu="cpu3c-1-2")
+api = Endpoint(
+    name="03_05_load_balancer_cpu",
+    cpu="cpu3c-1-2",
+    workers=(1, 3),
+)
 
 
 @api.get("/health")
