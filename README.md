@@ -27,6 +27,13 @@ async def generate_image(prompt: str) -> bytes:
 - **uv**: Install with `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - **Runpod account**: [Sign up here](https://runpod.io/console/signup)
 
+### Python version in deployed workers
+
+Your local Python version does not affect what runs in the cloud. `flash build` downloads wheels for the container's Python version automatically.
+
+- **GPU workers**: Python 3.12 only. The GPU base image ships multiple interpreters (3.9-3.14) for interactive pod use, but torch and CUDA libraries are installed only for 3.12.
+- **CPU workers**: Python 3.10, 3.11, or 3.12. Configurable via `PYTHON_VERSION` build arg.
+
 ## Quick Start
 
 ```bash
@@ -139,7 +146,7 @@ print(job.output)
 Workers automatically scale based on demand:
 - `workers=(0, 3)` - Scale from 0 to 3 workers (cost-efficient)
 - `workers=(1, 5)` - Keep 1 warm, scale up to 5
-- `idle_timeout=5` - Minutes before scaling down
+- `idle_timeout=5` - Seconds before scaling down
 
 ## Resources
 

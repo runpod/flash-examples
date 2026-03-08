@@ -3,9 +3,9 @@ name = "runpod-flash-examples"
 version = "1.0.0"
 description = "A collection of example applications showcasing Runpod Flash - a framework for building production-ready AI applications with distributed GPU and CPU computing."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 dependencies = [
-    "runpod-flash>=1.4.0",
+    "runpod-flash>=1.7.0",
 ]
 
 [dependency-groups]
