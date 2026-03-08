@@ -58,7 +58,6 @@ class SimpleSD:
             f"Model weights stored in {model_path}: {os.listdir(model_path)}"
         )
 
-
     async def generate_image(self, prompt: str) -> dict:
         """Generate a single image from prompt."""
         self.logger.info(f"Generating image for: '{prompt}'")
