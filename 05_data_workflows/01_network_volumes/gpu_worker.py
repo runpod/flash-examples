@@ -3,7 +3,7 @@
 # test directly: python gpu_worker.py
 import logging
 
-from runpod_flash import Endpoint, GpuGroup, NetworkVolume
+from runpod_flash import Endpoint, GpuType, NetworkVolume
 
 logger = logging.getLogger(__name__)
 
@@ -17,12 +17,12 @@ volume = NetworkVolume(
 
 @Endpoint(
     name="05_01_gpu_worker",
-    gpu=GpuGroup.ANY,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_5090,
     workers=(0, 3),
-    idle_timeout=5,
+    idle_timeout=300,
     volume=volume,
     env={"HF_HUB_CACHE": MODEL_PATH, "MODEL_PATH": MODEL_PATH},
-    dependencies=["diffusers", "transformers"],
+    dependencies=["torch", "diffusers", "transformers", "accelerate"],
 )
 class SimpleSD:
     def __init__(self):
@@ -57,6 +57,7 @@ class SimpleSD:
         self.logger.info(
             f"Model weights stored in {model_path}: {os.listdir(model_path)}"
         )
+
 
     async def generate_image(self, prompt: str) -> dict:
         """Generate a single image from prompt."""

@@ -789,13 +789,13 @@ ERROR: Failed to create endpoint: Insufficient GPU availability
 
 **Solutions:**
 
-**1. Use more flexible GPU type:**
+**1. Switch to a commonly-available GPU type:**
 ```python
 # before (specific GPU)
-@Endpoint(name="worker", gpu=GpuGroup.A100)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_A100_80GB)
 
-# after (any GPU)
-@Endpoint(name="worker", gpu=GpuGroup.ANY)
+# after (widely available)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 ```
 
 Redeploy:
@@ -803,12 +803,12 @@ Redeploy:
 flash deploy --env production
 ```
 
-**2. Try different GPU type:**
+**2. Use GpuGroup for maximum flexibility:**
 ```python
-# More common/available GPUs
-gpus=[GpuGroup.RTX_4090]
-# or
-gpus=[GpuGroup.RTX_3090]
+# Accepts any GPU in the group
+gpu=GpuGroup.ADA_24
+# or any available GPU at all
+gpu=GpuGroup.ANY
 ```
 
 **3. Wait and retry:**
@@ -926,7 +926,7 @@ RuntimeError: CUDA not available
 Fix:
 ```python
 # ensure GPU specified in Endpoint
-@Endpoint(name="worker", gpu=GpuGroup.ANY)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 ```
 
 **4. Redeploy after fixing:**
@@ -1409,7 +1409,7 @@ flash deploy --env production
 | Environment not found | `flash env create <name>` |
 | Module not found | `pip install -e .` |
 | Upload failed | Retry or reduce size |
-| GPU unavailable | Use `gpus=[GpuGroup.ANY]` |
+| GPU unavailable | Use `gpu=GpuType.NVIDIA_GEFORCE_RTX_4090` |
 
 **Diagnostic Commands:**
 

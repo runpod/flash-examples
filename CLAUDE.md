@@ -44,13 +44,11 @@ All worker files across 6 categories. Each file is an independent entry point di
 
 **Queue-based (function decorator):**
 ```python
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
 @Endpoint(
     name="my-worker",
-    gpu=GpuGroup.ANY,
-    workers=(0, 3),
-    idle_timeout=5,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
 )
 async def my_function(payload: dict) -> dict:
     """All runtime imports inside the function body."""
@@ -79,9 +77,9 @@ GPU vs CPU is a parameter, not a class choice:
 
 | Config | Syntax | Use Case |
 |--------|--------|----------|
-| GPU endpoint | `@Endpoint(name=..., gpu=GpuGroup.ANY)` | GPU workers |
+| GPU endpoint | `@Endpoint(name=..., gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)` | GPU workers |
 | CPU endpoint | `@Endpoint(name=..., cpu="cpu3c-1-2")` | CPU workers |
-| GPU LB | `api = Endpoint(name=..., gpu=GpuGroup.ANY); @api.post(...)` | GPU LB endpoints |
+| GPU LB | `api = Endpoint(name=..., gpu=GpuType.NVIDIA_GEFORCE_RTX_4090); @api.post(...)` | GPU LB endpoints |
 | CPU LB | `api = Endpoint(name=..., cpu="cpu3c-1-2"); @api.post(...)` | CPU LB endpoints |
 
 ### Cross-Worker Orchestration
@@ -108,7 +106,7 @@ All examples import from `runpod_flash`. Import frequency by symbol:
 | Symbol | Files Using It | Breakage Risk |
 |--------|---------------|---------------|
 | `Endpoint` | 18 | ALL examples break |
-| `GpuGroup` | 7 | GPU config breaks |
+| `GpuType` | 7 | GPU config breaks |
 | `CpuInstanceType` | 4 | CPU config breaks |
 | `NetworkVolume` | 2 | Volume examples break |
 | `ServerlessScalerType` | 1 | Scaling example breaks |

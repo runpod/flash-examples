@@ -6,7 +6,7 @@ Learn how to manage Python packages and system dependencies in Flash workers.
 
 - **Python dependencies** - Installing packages with version constraints
 - **System dependencies** - Installing apt packages (ffmpeg, libgl1, etc.)
-- **Version pinning** - Reproducible builds with exact versions
+- **Version constraints** - Supported syntax for version pinning
 - **Dependency optimization** - Minimizing cold start time
 
 ## Quick Start
@@ -105,7 +105,7 @@ async def simple_function(data: dict) -> dict:
 ```python
 "requests==2.32.3"  # Exactly 2.32.3
 ```
-**Use when:** You need reproducible builds
+**Use when:** You need reproducible builds for a specific Python version
 
 ### Minimum Version (>=)
 ```python
@@ -117,7 +117,7 @@ async def simple_function(data: dict) -> dict:
 ```python
 "python-dateutil<3.0.0"  # Below 3.0.0
 ```
-**Use when:** Avoiding breaking changes
+**Use when:** Avoiding breaking changes in a major release
 
 ### Compatible Release (~=)
 ```python
@@ -129,7 +129,7 @@ async def simple_function(data: dict) -> dict:
 ```python
 "pandas"  # Latest available
 ```
-**Use when:** You always want the newest version (not recommended for production)
+**Use when:** You want the latest compatible version (recommended for examples and prototyping)
 
 ## Common Dependencies
 
@@ -146,8 +146,8 @@ dependencies=[
 ### Data Science
 ```python
 dependencies=[
-    "pandas==2.1.3",
-    "numpy==1.26.2",
+    "pandas",
+    "numpy",
     "scipy>=1.11.0",
     "matplotlib",
     "scikit-learn",
@@ -196,31 +196,27 @@ system_dependencies=["ffmpeg", "libgl1", "wget"]
 
 ## Best Practices
 
-### 1. Pin Versions for Production
+### 1. Use Version Constraints Thoughtfully
 
 ```python
-# Good - Reproducible
-@Endpoint(
-    name="worker",
-    gpu=GpuGroup.ADA_24,
-    dependencies=[
-        "requests==2.32.3",
-        "transformers==4.35.2",
-        "numpy==1.26.2",
-    ],
-)
+# Good for examples and prototyping - works across Python versions
+dependencies=[
+    "requests",
+    "transformers",
+    "numpy",
+]
 
-# Bad - Unpredictable
-@Endpoint(
-    name="worker",
-    gpu=GpuGroup.ADA_24,
-    dependencies=[
-        "requests",  # Version changes over time
-        "transformers",
-        "numpy",
-    ],
-)
+# Good for production - reproducible on a known Python version
+dependencies=[
+    "requests==2.32.3",
+    "transformers==4.35.2",
+    "numpy==1.26.2",
+]
 ```
+
+Exact pins can break across Python versions (e.g., older numpy
+builds don't exist for Python 3.13+). Pin only when you control
+the target Python version.
 
 ### 2. Minimize Dependencies
 
@@ -287,7 +283,9 @@ ERROR: Cannot install requests==2.25.0 and urllib3==2.2.1
 because these package versions have conflicting dependencies.
 ```
 
-**Solution:** Check compatibility matrix, adjust versions:
+**Solutions:**
+1. Drop exact pins and let pip resolve compatible versions
+2. Check compatibility matrix and adjust versions:
 ```python
 dependencies=[
     "requests>=2.32.0",
@@ -332,7 +330,7 @@ For local development, create `requirements.txt`:
 runpod-flash
 transformers==4.35.2
 Pillow>=10.0.0
-numpy==1.26.2
+numpy
 ```
 
 **Note:** Worker dependencies in the `Endpoint` decorator are deployed automatically. `requirements.txt` is for local development only.

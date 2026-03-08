@@ -134,7 +134,7 @@ Total: $0.0019/sec
     name="preprocess_worker",
     cpu=CpuInstanceType.CPU3G_2_8,  # 2 vCPU, 8GB
     workers=(0, 10),
-    idle_timeout=3,
+    idle_timeout=180,
 )
 async def preprocess_text(input_data: dict) -> dict: ...
 ```
@@ -148,7 +148,7 @@ async def preprocess_text(input_data: dict) -> dict: ...
     name="inference_worker",
     gpu=GpuGroup.ADA_24,  # RTX 4090
     workers=(0, 3),
-    idle_timeout=5,
+    idle_timeout=300,
     dependencies=["torch"],
 )
 async def gpu_inference(input_data: dict) -> dict: ...
