@@ -2,8 +2,18 @@
 name = "runpod-flash-examples"
 version = "1.0.0"
 description = "A collection of example applications showcasing Runpod Flash - a framework for building production-ready AI applications with distributed GPU and CPU computing."
+authors = [
+    { name = "Runpod", email = "engineer@runpod.io" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "runpod-flash>=1.7.0",
 ]
