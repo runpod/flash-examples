@@ -145,7 +145,7 @@ flash run
 
 ## Next Steps
 
-- Customize GPU type: Change `GpuType.NVIDIA_GEFORCE_RTX_4090` to another GPU (e.g. `GpuType.NVIDIA_A100_80GB`, `GpuType.NVIDIA_H100_80GB`)
+- Customize GPU type: Change `GpuType.NVIDIA_GEFORCE_RTX_4090` to another GPU (e.g. `GpuType.NVIDIA_A100_80GB_PCIe`, `GpuType.NVIDIA_H100_80GB_HBM3`)
 - Add your own GPU-accelerated code
 - Implement error handling and validation
 - Deploy to production with `flash deploy`

@@ -792,7 +792,7 @@ ERROR: Failed to create endpoint: Insufficient GPU availability
 **1. Switch to a commonly-available GPU type:**
 ```python
 # before (specific GPU)
-@Endpoint(name="worker", gpu=GpuType.NVIDIA_A100_80GB)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_A100_80GB_PCIe)
 
 # after (widely available)
 @Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
@@ -1409,7 +1409,7 @@ flash deploy --env production
 | Environment not found | `flash env create <name>` |
 | Module not found | `pip install -e .` |
 | Upload failed | Retry or reduce size |
-| GPU unavailable | Use `gpu=GpuType.NVIDIA_GEFORCE_RTX_4090` |
+| GPU unavailable | Use `gpu=GpuGroup.ANY` or `gpu=GpuType.ANY` |
 
 **Diagnostic Commands:**
 

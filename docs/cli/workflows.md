@@ -1451,7 +1451,7 @@ cat gpu_worker.py
 **A. Choose a commonly-available GPU type:**
 ```python
 # before (specific GPU, may not be available)
-@Endpoint(name="worker", gpu=GpuType.NVIDIA_A100_80GB)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_A100_80GB_PCIe)
 
 # after (widely available)
 @Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)

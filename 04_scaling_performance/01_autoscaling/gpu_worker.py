@@ -45,7 +45,7 @@ async def scale_to_zero_inference(payload: dict) -> dict:
             if torch.cuda.is_available()
             else "N/A",
         },
-        "config": {"workersMin": 0, "workersMax": 3, "idleTimeout": 5},
+        "config": {"workersMin": 0, "workersMax": 3, "idleTimeout": 300},
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
 

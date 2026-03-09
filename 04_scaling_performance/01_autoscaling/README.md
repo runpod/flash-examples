@@ -38,16 +38,16 @@ curl -X POST http://localhost:8888/cpu_worker/runsync \
 
 | Strategy | workers | idle_timeout | scaler_type | scaler_value | Use Case |
 |----------|---------|-------------|-------------|-------------|----------|
-| Scale to Zero | (0, 3) | 5 min | QUEUE_DELAY | 4 | Sporadic/batch, cost-first |
-| Always On | (1, 3) | 60 min | QUEUE_DELAY | 4 | Steady traffic, latency-first |
-| High Throughput | (2, 10) | 30 min | REQUEST_COUNT | 3 | Bursty traffic, throughput-first |
+| Scale to Zero | (0, 3) | 300s | QUEUE_DELAY | 4 | Sporadic/batch, cost-first |
+| Always On | (1, 3) | 60s | QUEUE_DELAY | 4 | Steady traffic, latency-first |
+| High Throughput | (2, 10) | 30s | REQUEST_COUNT | 3 | Bursty traffic, throughput-first |
 
 ### CPU Workers (`cpu_worker.py`)
 
 | Strategy | workers | idle_timeout | Use Case |
 |----------|---------|-------------|----------|
-| Scale to Zero | (0, 5) | 5 min | Cost-optimized preprocessing |
-| Burst Ready | (1, 10) | 30 min | Always-warm API gateway |
+| Scale to Zero | (0, 5) | 1s | Cost-optimized preprocessing |
+| Burst Ready | (1, 10) | 30s | Always-warm API gateway |
 
 ## How Autoscaling Works
 
@@ -83,7 +83,7 @@ Requests arrive
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `workers` | int or (min, max) | (0, 1) | Worker scaling bounds |
-| `idle_timeout` | int | 60 | Minutes before idle workers terminate |
+| `idle_timeout` | int | 60 | Seconds before idle workers terminate |
 | `scaler_type` | ServerlessScalerType | QUEUE_DELAY | Scaling trigger metric |
 | `scaler_value` | int | 4 | Target value for the scaler metric |
 | `gpu` | GpuType or GpuGroup | -- | GPU type for GPU endpoints |
@@ -99,7 +99,7 @@ from runpod_flash import Endpoint, GpuType, ServerlessScalerType
     name="batch-worker",
     gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     workers=(0, 3),
-    idle_timeout=1,
+    idle_timeout=300,
     scaler_type=ServerlessScalerType.QUEUE_DELAY,
     scaler_value=4,
 )

@@ -39,7 +39,7 @@ async def cpu_scale_to_zero(payload: dict) -> dict:
             "token_count": len(tokens),
             "byte_size": byte_size,
         },
-        "config": {"workersMin": 0, "workersMax": 5, "idleTimeout": 5},
+        "config": {"workersMin": 0, "workersMax": 5, "idleTimeout": 1},
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
 
