@@ -6,12 +6,24 @@ Learn how to manage Python packages and system dependencies in Flash workers.
 
 - **Python dependencies** - Installing packages with version constraints
 - **System dependencies** - Installing apt packages (ffmpeg, libgl1, etc.)
+- **GPU vs CPU packaging** - How dependencies are resolved differently per runtime
+- **Shared dependencies** - GPU and CPU endpoints using the same package (numpy)
 - **Version constraints** - Supported syntax for version pinning
 - **Dependency optimization** - Minimizing cold start time
 
 ## Quick Start
 
 **Prerequisites**: Complete the [repository setup](../../README.md#quick-start) first (clone, `make dev`, set API key).
+
+### Files
+
+| File | What it demonstrates |
+|------|---------------------|
+| `gpu_worker.py` | Python deps with version pins, system deps (ffmpeg, libgl1) |
+| `cpu_worker.py` | Data science deps on CPU (numpy, pandas, scipy), zero-dep worker |
+| `mixed_worker.py` | Same dependency (numpy) on both GPU and CPU endpoints |
+
+> **Note:** `gpu_worker.py` uses `GpuGroup` while newer snippets in this README use `GpuType`. Both enums are supported by the SDK; `GpuType` is recommended for new code.
 
 ### Run This Example
 
@@ -38,6 +50,26 @@ uv run flash login
 uv run flash run
 ```
 
+## GPU vs CPU Packaging
+
+GPU and CPU endpoints use different base Docker images, which affects how dependencies are resolved:
+
+| | GPU images (`runpod/pytorch:*`) | CPU images (`python:X.Y-slim`) |
+|---|---|---|
+| **Base image** | PyTorch + CUDA + numpy + triton | Python stdlib only |
+| **Pre-installed** | torch, torchvision, torchaudio, numpy, triton | Nothing |
+| **Build artifact** | Excludes torch ecosystem (too large for 500 MB tarball) | Includes everything declared in `dependencies` |
+
+**What this means for you:**
+
+- **GPU endpoints**: `torch`, `torchvision`, `torchaudio`, and `triton` are excluded from the build artifact because they already exist in the base image and would exceed the 500 MB tarball limit. All other dependencies (including `numpy`) are packaged normally.
+- **CPU endpoints**: Every dependency must be in the build artifact. Nothing is pre-installed.
+- **Mixed projects**: When GPU and CPU endpoints share a dependency like `numpy`, it ships in the tarball. The GPU image ignores the duplicate (its pre-installed copy takes precedence).
+
+See `mixed_worker.py` for a working example of GPU and CPU endpoints sharing `numpy`.
+
+**Safety net**: If a dependency is missing from the build artifact at runtime, the worker attempts to install it on-the-fly and logs a warning. This prevents crashes but adds to cold start time. Always declare your dependencies explicitly to avoid this penalty.
+
 ## Dependency Types
 
 ### 1. Python Dependencies
@@ -47,7 +79,7 @@ Specified in the `Endpoint` decorator:
 ```python
 @Endpoint(
     name="my-worker",
-    gpu=GpuGroup.ADA_24,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     dependencies=[
         "requests==2.32.3",  # Exact version
         "Pillow>=10.0.0",    # Minimum version
@@ -70,7 +102,7 @@ Install apt packages:
 ```python
 @Endpoint(
     name="my-worker",
-    gpu=GpuGroup.AMPERE_16,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     dependencies=["opencv-python"],
     system_dependencies=["ffmpeg", "libgl1", "graphviz"],
 )
@@ -251,7 +283,7 @@ python cpu_worker.py
 ```python
 @Endpoint(
     name="worker",
-    gpu=GpuGroup.ADA_24,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     dependencies=[
         "requests==2.32.3",  # API calls
         "Pillow>=10.0.0",    # Image processing
@@ -335,17 +367,36 @@ numpy
 
 **Note:** Worker dependencies in the `Endpoint` decorator are deployed automatically. `requirements.txt` is for local development only.
 
+## Build Exclusions
+
+Flash automatically excludes packages that are too large for the 500 MB build artifact limit. Currently excluded: `torch`, `torchvision`, `torchaudio`, `triton` (all CUDA-specific, pre-installed in GPU images).
+
+You can exclude additional large packages with `--exclude`:
+
+```bash
+# Exclude tensorflow from the build artifact
+flash build --exclude tensorflow
+```
+
+**Important:** Only exclude packages that are pre-installed in your target runtime. If you exclude a package that a CPU endpoint needs, the worker will attempt to install it on-the-fly at startup. This works but adds to cold start time and logs a warning:
+
+```
+WARNING - Package 'scipy' is not in the build artifact. Installing on-the-fly.
+This adds to cold start time -- consider adding it to your dependencies list
+to include it in the build artifact.
+```
+
 ## Advanced: External Docker Images
 
 For complex dependencies, deploy a pre-built image:
 
 ```python
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
 vllm = Endpoint(
     name="vllm-service",
     image="vllm/vllm-openai:latest",
-    gpu=GpuGroup.ADA_24,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
 )
 
 # call it as an API client
