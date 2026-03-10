@@ -23,6 +23,8 @@ Learn how to manage Python packages and system dependencies in Flash workers.
 | `cpu_worker.py` | Data science deps on CPU (numpy, pandas, scipy), zero-dep worker |
 | `mixed_worker.py` | Same dependency (numpy) on both GPU and CPU endpoints |
 
+> **Note:** `gpu_worker.py` uses `GpuGroup` while newer snippets in this README use `GpuType`. Both enums are supported by the SDK; `GpuType` is recommended for new code.
+
 ### Run This Example
 
 ```bash

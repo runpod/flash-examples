@@ -15,15 +15,16 @@ from runpod_flash import CpuInstanceType, Endpoint, GpuType
     dependencies=["numpy"],
 )
 async def gpu_matrix_multiply(input_data: dict) -> dict:
-    """GPU worker using numpy for matrix operations.
+    """GPU-instance worker running CPU-bound numpy matrix operations.
 
-    On GPU images, numpy is pre-installed in the base image. The build
-    artifact also includes it, so both paths work. The GPU image's
-    pre-installed copy takes precedence via Python's import resolution.
+    This endpoint runs on a GPU instance type, but uses standard numpy,
+    so all computations execute on the CPU. On GPU images, numpy is
+    pre-installed in the base image; the build artifact also includes
+    it, so both paths work, with the image's copy taking precedence.
     """
     import numpy as np
 
-    size = input_data.get("size", 100)
+    size = min(max(int(input_data.get("size", 100)), 1), 10_000)
     a = np.random.rand(size, size)
     b = np.random.rand(size, size)
     result = np.dot(a, b)
@@ -53,7 +54,13 @@ async def cpu_statistics(input_data: dict) -> dict:
     """
     import numpy as np
 
-    values = input_data.get("values", [1.0, 2.0, 3.0, 4.0, 5.0])
+    raw_values = input_data.get("values", [1.0, 2.0, 3.0, 4.0, 5.0])
+    if not isinstance(raw_values, list) or len(raw_values) > 100_000:
+        return {
+            "status": "error",
+            "message": "values must be a list with at most 100000 elements",
+        }
+    values = raw_values
     arr = np.array(values)
 
     return {
