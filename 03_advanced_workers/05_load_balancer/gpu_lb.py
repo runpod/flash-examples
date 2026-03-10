@@ -7,6 +7,7 @@ api = Endpoint(
     name="03_05_load_balancer_gpu",
     gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     workers=(1, 3),
+    dependencies=["torch"],
 )
 
 
@@ -58,21 +59,16 @@ async def compute_intensive(numbers: list[float]) -> dict:
 @api.get("/info")
 async def gpu_info() -> dict:
     """Get GPU availability information."""
-    try:
-        import torch
+    import torch
 
-        if torch.cuda.is_available():
-            info = {
-                "available": True,
-                "device": torch.cuda.get_device_name(0),
-                "count": torch.cuda.device_count(),
-            }
-        else:
-            info = {"available": False, "device": "No GPU", "count": 0}
-    except Exception as e:
-        info = {"available": False, "device": str(e), "count": 0}
+    if torch.cuda.is_available():
+        return {
+            "available": True,
+            "device": torch.cuda.get_device_name(0),
+            "count": torch.cuda.device_count(),
+        }
 
-    return info
+    return {"available": False, "device": "No GPU", "count": 0}
 
 
 if __name__ == "__main__":
