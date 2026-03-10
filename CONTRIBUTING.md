@@ -332,7 +332,10 @@ To debug a worker:
 4. Choose the appropriate debug configuration
 5. The debugger will execute the `if __name__ == "__main__"` test block
 
-The `.env` file is automatically loaded, so your `RUNPOD_API_KEY` is available during debugging.
+The `.env` file is loaded into `os.environ` for local CLI use and debugging.
+
+- To pass environment variables to deployed endpoints, declare them explicitly on the resource config, for example: `env={"KEY": os.getenv("KEY")}`.
+- For authentication, prefer using `flash login`.
 
 ### Unit Tests (Recommended)
 

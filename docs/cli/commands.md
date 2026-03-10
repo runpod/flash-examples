@@ -329,14 +329,16 @@ This hybrid approach enables rapid development: iterate on your orchestration lo
 
 ### Environment Variables
 
-Variables can be set in `.env` file or exported in shell:
+Variables can be set in `.env` file or exported in shell. The `.env` file populates `os.environ` for local CLI use and development -- it is not carried to deployed endpoints.
 
 ```bash
-# .env file
+# .env file (local CLI and development only)
 FLASH_HOST=0.0.0.0
 FLASH_PORT=9000
 RUNPOD_API_KEY=your-key-here
 ```
+
+> To pass env vars to deployed endpoints, declare them on the resource config: `env={"HF_TOKEN": os.getenv("HF_TOKEN")}`.
 
 **Precedence (highest to lowest):**
 1. Command-line options (`--host`, `--port`)
