@@ -1,14 +1,12 @@
 # gpu serverless worker -- detects available GPU hardware.
 # run with: flash run
 # test directly: python gpu_worker.py
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
 
 @Endpoint(
     name="01_01_gpu_worker",
-    gpu=GpuGroup.ANY,
-    workers=(0, 3),
-    idle_timeout=5,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
 )
 async def gpu_hello(input_data: dict) -> dict:
     """GPU worker that returns GPU hardware info."""

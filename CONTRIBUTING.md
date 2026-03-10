@@ -182,9 +182,9 @@ your_example/
 ### Minimal Worker (`gpu_worker.py`)
 
 ```python
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
-@Endpoint(name="your-worker", gpu=GpuGroup.ANY, dependencies=["torch"])
+@Endpoint(name="your-worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, dependencies=["torch"])
 async def your_function(payload: dict) -> dict:
     """
     Clear docstring explaining what this function does.
@@ -406,10 +406,10 @@ RUNPOD_API_KEY = "hardcoded_key"  # Never do this!
 
 ```python
 # Good - handle errors within @Endpoint functions
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
 # Good
-@Endpoint(name="processor", gpu=GpuGroup.ANY)
+@Endpoint(name="processor", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 async def process(data: dict) -> dict:
     try:
         result = do_work(data)
@@ -418,7 +418,7 @@ async def process(data: dict) -> dict:
         return {"status": "error", "detail": str(e)}
 
 # Bad
-@Endpoint(name="processor", gpu=GpuGroup.ANY)
+@Endpoint(name="processor", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 async def process(data: dict) -> dict:
     result = do_work(data)  # no error handling
     return result

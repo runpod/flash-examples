@@ -12,6 +12,7 @@ api = Endpoint(
     name="05_01_cpu_worker",
     cpu="cpu3c-1-2",
     workers=(1, 3),
+    idle_timeout=120,
     volume=volume,
 )
 

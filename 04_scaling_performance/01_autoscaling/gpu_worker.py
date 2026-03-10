@@ -1,7 +1,7 @@
 # gpu autoscaling strategies -- scale-to-zero, always-on, high-throughput.
 # run with: flash run
 # test directly: python gpu_worker.py
-from runpod_flash import Endpoint, GpuGroup, ServerlessScalerType
+from runpod_flash import Endpoint, GpuType, ServerlessScalerType
 
 
 # --- strategy 1: scale to zero ---
@@ -9,9 +9,9 @@ from runpod_flash import Endpoint, GpuGroup, ServerlessScalerType
 # workers scale down to zero after 5 minutes of idle time.
 @Endpoint(
     name="04_01_scale_to_zero",
-    gpu=GpuGroup.ANY,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     workers=(0, 3),
-    idle_timeout=5,
+    idle_timeout=300,
     scaler_type=ServerlessScalerType.QUEUE_DELAY,
     scaler_value=4,
 )
@@ -45,7 +45,7 @@ async def scale_to_zero_inference(payload: dict) -> dict:
             if torch.cuda.is_available()
             else "N/A",
         },
-        "config": {"workersMin": 0, "workersMax": 3, "idleTimeout": 5},
+        "config": {"workersMin": 0, "workersMax": 3, "idleTimeout": 300},
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
 
@@ -55,7 +55,7 @@ async def scale_to_zero_inference(payload: dict) -> dict:
 # at least one worker stays warm to avoid cold starts.
 @Endpoint(
     name="04_01_always_on",
-    gpu=GpuGroup.ANY,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     workers=(1, 3),
     idle_timeout=60,
     scaler_type=ServerlessScalerType.QUEUE_DELAY,
@@ -101,7 +101,7 @@ async def always_on_inference(payload: dict) -> dict:
 # starts with 2 warm workers, scales aggressively to 10 based on request count.
 @Endpoint(
     name="04_01_high_throughput",
-    gpu=GpuGroup.ANY,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     workers=(2, 10),
     idle_timeout=30,
     scaler_type=ServerlessScalerType.REQUEST_COUNT,

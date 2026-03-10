@@ -86,10 +86,10 @@ curl -X POST http://localhost:8888/05_load_balancer/cpu/transform \
 Load-balanced endpoints use the `Endpoint` class with route decorators (`.get()`, `.post()`, etc.) to define HTTP routes. The decorator automatically registers the function as an HTTP endpoint on the load-balancer runtime.
 
 ```python
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
 # create load-balanced endpoint
-api = Endpoint(name="my-service", gpu=GpuGroup.ANY, workers=(1, 3))
+api = Endpoint(name="my-service", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, workers=(1, 3))
 
 # define HTTP routes with method decorators
 @api.get("/health")

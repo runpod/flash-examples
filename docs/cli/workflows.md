@@ -101,7 +101,7 @@ INFO: Application startup complete.
 Edit your worker files (e.g., `gpu_worker.py`):
 
 ```python
-@Endpoint(name="my-worker", gpu=GpuGroup.ANY)
+@Endpoint(name="my-worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 async def process_request(payload: dict) -> dict:
     """Process incoming requests on GPU."""
     result = perform_processing(payload)
@@ -601,7 +601,7 @@ flash deploy --env production
 ```python
 @Endpoint(
     name="myapi_dev_gpu",
-    gpu=GpuGroup.ANY,      # any GPU is fine
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,  # specific GPU for fast provisioning
     workers=(0, 2),        # scale to zero, small max for cost
     idle_timeout=1,        # quick shutdown
 )
@@ -614,7 +614,7 @@ async def process(payload: dict) -> dict: ...
     name="myapi_prod_gpu",
     gpu=GpuGroup.A100,     # specific GPU for consistency
     workers=(1, 10),       # always have one ready, handle load spikes
-    idle_timeout=5,        # keep warm longer
+    idle_timeout=300,        # keep warm longer
 )
 async def process(payload: dict) -> dict: ...
 ```
@@ -1155,12 +1155,12 @@ flash env get production
 
 **Before (high cost):**
 ```python
-@Endpoint(name="worker", gpu=GpuGroup.ANY, workers=(5, 10))  # always 5 running
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, workers=(5, 10))  # always 5 running
 ```
 
 **After (optimized):**
 ```python
-@Endpoint(name="worker", gpu=GpuGroup.ANY, workers=(0, 10), idle_timeout=1)  # scale to zero
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, workers=(0, 10), idle_timeout=1)  # scale to zero
 ```
 
 Redeploy with optimized config:
@@ -1448,13 +1448,13 @@ cat gpu_worker.py
 
 **Solutions:**
 
-**A. Change GPU type:**
+**A. Choose a commonly-available GPU type:**
 ```python
 # before (specific GPU, may not be available)
-@Endpoint(name="worker", gpu=GpuGroup.A100)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_A100_80GB_PCIe)
 
-# after (more flexible)
-@Endpoint(name="worker", gpu=GpuGroup.ANY)
+# after (widely available)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 ```
 
 Redeploy:
@@ -1469,9 +1469,9 @@ sleep 300
 flash deploy --env production
 ```
 
-**C. Choose different GPU type:**
+**C. Use GpuGroup for maximum flexibility:**
 ```python
-@Endpoint(name="worker", gpu=GpuGroup.RTX_4090)  # more common
+@Endpoint(name="worker", gpu=GpuGroup.ANY)  # any available GPU
 ```
 
 #### Issue 5: Runtime Errors
@@ -1534,7 +1534,7 @@ RuntimeError: CUDA not available
 
 Solution: Verify GPU configuration:
 ```python
-@Endpoint(name="worker", gpu=GpuGroup.ANY)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 ```
 
 #### Issue 6: Performance Issues
@@ -1560,9 +1560,9 @@ flash env get production
 # keep workers warm with workers=(1, N)
 @Endpoint(
     name="worker",
-    gpu=GpuGroup.ANY,
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
     workers=(1, 5),       # keep 1 warm
-    idle_timeout=5,       # keep alive longer
+    idle_timeout=600,       # keep alive longer
 )
 ```
 
@@ -1575,7 +1575,7 @@ flash env get production
 # lazy loading example
 _model = None
 
-@Endpoint(name="worker", gpu=GpuGroup.ANY)
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 async def infer(payload: dict) -> dict:
     global _model
     if _model is None:
@@ -1586,7 +1586,7 @@ async def infer(payload: dict) -> dict:
 **C. Increase worker capacity:**
 ```python
 # handle more concurrent requests
-@Endpoint(name="worker", gpu=GpuGroup.ANY, workers=(0, 10))
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, workers=(0, 10))
 ```
 
 ### General Debugging Approach

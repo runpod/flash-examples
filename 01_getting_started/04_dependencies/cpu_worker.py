@@ -10,8 +10,8 @@ from runpod_flash import CpuInstanceType, Endpoint
     cpu=CpuInstanceType.CPU3C_8_16,
     workers=(0, 3),
     dependencies=[
-        "pandas==2.1.3",
-        "numpy==1.26.2",
+        "pandas",
+        "numpy",
         "scipy>=1.11.0",
         "matplotlib",
     ],

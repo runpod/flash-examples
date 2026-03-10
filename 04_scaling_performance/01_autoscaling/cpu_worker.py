@@ -10,7 +10,7 @@ from runpod_flash import CpuInstanceType, Endpoint
     name="04_01_cpu_scale_to_zero",
     cpu=CpuInstanceType.CPU3C_1_2,
     workers=(0, 5),
-    idle_timeout=5,
+    idle_timeout=1,
 )
 async def cpu_scale_to_zero(payload: dict) -> dict:
     """CPU worker with scale-to-zero -- cost-optimized preprocessing."""
@@ -39,7 +39,7 @@ async def cpu_scale_to_zero(payload: dict) -> dict:
             "token_count": len(tokens),
             "byte_size": byte_size,
         },
-        "config": {"workersMin": 0, "workersMax": 5, "idleTimeout": 5},
+        "config": {"workersMin": 0, "workersMax": 5, "idleTimeout": 1},
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
 

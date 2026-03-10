@@ -112,9 +112,9 @@ The `@Endpoint` decorator transparently executes functions on serverless infrast
 - Handles serialization and resource management
 
 ```python
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
-@Endpoint(name="my-worker", gpu=GpuGroup.ANY, workers=(0, 3))
+@Endpoint(name="my-worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, workers=(0, 3))
 async def my_function(data: dict) -> dict:
     return {"result": "processed"}
 ```
@@ -145,7 +145,7 @@ flash run
 
 ## Next Steps
 
-- Customize GPU type: Change `GpuGroup.ANY` to a specific GPU (e.g. `GpuGroup.ADA_24`, `GpuGroup.AMPERE_80`)
+- Customize GPU type: Change `GpuType.NVIDIA_GEFORCE_RTX_4090` to another GPU (e.g. `GpuType.NVIDIA_A100_80GB_PCIe`, `GpuType.NVIDIA_H100_80GB_HBM3`)
 - Add your own GPU-accelerated code
 - Implement error handling and validation
 - Deploy to production with `flash deploy`

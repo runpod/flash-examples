@@ -7,8 +7,6 @@ from runpod_flash import CpuInstanceType, Endpoint
 @Endpoint(
     name="01_02_cpu_worker",
     cpu=CpuInstanceType.CPU3C_1_2,
-    workers=(0, 3),
-    idle_timeout=5,
 )
 async def cpu_hello(input_data: dict) -> dict:
     """CPU worker that returns a greeting."""

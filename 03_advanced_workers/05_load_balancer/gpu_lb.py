@@ -1,9 +1,13 @@
 # gpu load-balanced endpoints with custom HTTP routes.
 # run with: flash run
 # test directly: python gpu_lb.py
-from runpod_flash import Endpoint, GpuGroup
+from runpod_flash import Endpoint, GpuType
 
-api = Endpoint(name="03_05_load_balancer_gpu", gpu=GpuGroup.ANY, workers=(1, 3))
+api = Endpoint(
+    name="03_05_load_balancer_gpu",
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
+    workers=(1, 3),
+)
 
 
 @api.get("/health")

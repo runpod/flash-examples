@@ -8,7 +8,7 @@ from runpod_flash import Endpoint, GpuGroup
     name="02_01_text_to_speech_gpu",
     gpu=GpuGroup.ADA_24,
     workers=(0, 3),
-    idle_timeout=5,
+    idle_timeout=300,
     dependencies=["qwen-tts", "soundfile"],
 )
 async def generate_speech(input_data: dict) -> dict:
