@@ -12,7 +12,7 @@ MODEL_PATH = "/runpod-volume/models"
 volume = NetworkVolume(
     name="flash-05-volume",
     size=50,
-    dataCenterId=DataCenter.EU_RO_1,
+    datacenter=DataCenter.EU_RO_1,
 )
 
 
