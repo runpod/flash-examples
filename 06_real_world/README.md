@@ -116,9 +116,17 @@ All real-world examples include:
 ## Deployment Patterns
 
 ### Development
+
+Run individual workers directly:
 ```bash
 cd example_name
-flash run
+python gpu_worker.py
+python cpu_worker.py
+```
+
+Or run the full app with HTTP routes:
+```bash
+uv run flash run
 ```
 
 ### Production

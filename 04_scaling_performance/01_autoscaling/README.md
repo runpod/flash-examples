@@ -6,22 +6,32 @@ Configure Flash worker autoscaling for different workload patterns. This example
 
 **Prerequisites**: Complete the [repository setup](../../README.md#quick-start) first, or run `flash login` to authenticate.
 
+### Run the Examples
+
 ```bash
 cd 04_scaling_performance/01_autoscaling
-flash run
+
+# Run GPU worker
+python gpu_worker.py
+
+# Run CPU worker
+python cpu_worker.py
 ```
 
-Server starts at http://localhost:8888 -- visit http://localhost:8888/docs for interactive API docs.
+First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
 
-### Test Individual Strategies
+### Alternative: HTTP API Testing
+
+To test via HTTP endpoints:
+
+```bash
+uv run flash run
+```
+
+Server starts at http://localhost:8888. Visit http://localhost:8888/docs for interactive API docs.
 
 ```bash
 # Scale-to-zero GPU worker
-curl -X POST http://localhost:8888/gpu_worker/runsync \
-  -H "Content-Type: application/json" \
-  -d '{"matrix_size": 512}'
-
-# Always-on GPU worker (same payload, different endpoint)
 curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
   -d '{"matrix_size": 512}'

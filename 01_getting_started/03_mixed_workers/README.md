@@ -40,16 +40,33 @@ Response
 
 **Prerequisites**: Complete the [repository setup](../../README.md#quick-start) first (clone, `make dev`, set API key).
 
-### Run This Example
+### Test Individual Workers
+
+Run the CPU and GPU workers directly:
 
 ```bash
 cd 01_getting_started/03_mixed_workers
-flash run
+
+# Test CPU preprocessing worker
+python cpu_worker.py
+
+# Test GPU inference worker
+python gpu_worker.py
 ```
 
-### Alternative: Standalone Setup
+First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
 
-If you haven't run the repository-wide setup:
+### Run the Full Pipeline
+
+The pipeline endpoint (`/classify`) orchestrates multiple workers via HTTP. To test it:
+
+```bash
+uv run flash run
+```
+
+Server starts at http://localhost:8888
+
+### Setup (if needed)
 
 ```bash
 # Install dependencies
@@ -58,12 +75,7 @@ uv sync
 # Authenticate
 uv run flash login
 # Or create .env file with RUNPOD_API_KEY=your_api_key_here
-
-# Run
-uv run flash run
 ```
-
-Server starts at http://localhost:8888
 
 ## Test the Pipeline
 

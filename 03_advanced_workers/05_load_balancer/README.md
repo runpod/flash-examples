@@ -37,13 +37,29 @@ uv run flash login
 
 Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 
-### 3. Run Locally (from repository root)
+### 3. Test Individual Workers
+
+Run each load-balanced worker directly:
+
+```bash
+# Test GPU load-balanced worker
+python gpu_lb.py
+
+# Test CPU load-balanced worker
+python cpu_lb.py
+```
+
+This tests the worker setup. Results are printed directly to your terminal.
+
+### 4. Test HTTP Routes
+
+Load-balanced endpoints expose HTTP routes. To test the full API:
 
 ```bash
 uv run flash run
 ```
 
-Visit **http://localhost:8888/docs** for interactive API documentation (unified app with all examples).
+Visit **http://localhost:8888/docs** for interactive API documentation.
 
 ### 4. Test Endpoints (via unified app)
 

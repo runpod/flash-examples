@@ -1,6 +1,6 @@
-# cpu workers demonstrating data science and zero-dependency patterns.
-# run with: flash run
-# test directly: python cpu_worker.py
+# CPU workers demonstrating data science and zero-dependency patterns.
+# Run: python cpu_worker.py
+# Alternative: flash run (for HTTP API testing)
 from runpod_flash import CpuInstanceType, Endpoint
 
 

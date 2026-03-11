@@ -3,8 +3,8 @@
 #   - GPU images (runpod/pytorch:*) have numpy pre-installed
 #   - CPU images (python-slim) install numpy from the build artifact
 #
-# run with: flash run
-# test directly: python mixed_worker.py
+# Run: python mixed_worker.py
+# Alternative: flash run (for HTTP API testing)
 from runpod_flash import CpuInstanceType, Endpoint, GpuType
 
 

@@ -22,7 +22,19 @@ uv run flash login
 
 Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 
-### 3. Run Locally
+### 3. Run the GPU Worker
+
+Generate an image by running the GPU worker directly:
+
+```bash
+python gpu_worker.py
+```
+
+First run takes 60-120 seconds (provisioning + model download). The image is saved to the network volume and the result is printed to your terminal.
+
+### 4. Test the CPU Worker (HTTP API)
+
+The CPU worker serves images via HTTP routes. To test it:
 
 ```bash
 uv run flash run
@@ -30,21 +42,12 @@ uv run flash run
 
 Server starts at `http://localhost:8888`
 
-### 4. Test the API
-
-**Generate an image (GPU worker):**
-```bash
-curl -X POST http://localhost:8888/gpu_worker/runsync \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "a sunset over mountains"}'
-```
-
-**List generated images (CPU worker):**
+**List generated images:**
 ```bash
 curl http://localhost:8888/images
 ```
 
-**Get a specific image (CPU worker):**
+**Get a specific image:**
 ```bash
 curl http://localhost:8888/images/sd_generated_20240101_120000.png
 ```
