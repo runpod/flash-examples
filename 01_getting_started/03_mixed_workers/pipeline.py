@@ -1,6 +1,13 @@
 # Classification pipeline: CPU preprocess -> GPU inference -> CPU postprocess.
 # Demonstrates cross-worker orchestration via a load-balanced endpoint.
-# Run: flash run (LB endpoints require the development server for HTTP route testing)
+# Run: python pipeline.py (local testing)
+# Alternative: flash run (for HTTP route testing)
+import sys
+from pathlib import Path
+
+# Ensure sibling modules (cpu_worker, gpu_worker) are importable regardless of cwd
+sys.path.insert(0, str(Path(__file__).parent))
+
 from runpod_flash import Endpoint
 
 pipeline = Endpoint(name="01_03_classify_pipeline", cpu="cpu3c-1-2", workers=(1, 3))
