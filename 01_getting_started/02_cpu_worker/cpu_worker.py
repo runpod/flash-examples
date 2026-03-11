@@ -1,6 +1,6 @@
-# cpu serverless worker -- lightweight processing without GPU.
-# run with: flash run
-# test directly: python cpu_worker.py
+# CPU serverless worker -- lightweight processing without GPU.
+# Run: python cpu_worker.py
+# Alternative: flash run (for HTTP API testing)
 from runpod_flash import CpuInstanceType, Endpoint
 
 

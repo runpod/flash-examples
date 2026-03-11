@@ -1,6 +1,6 @@
-# cpu worker with network volume for listing and serving generated images.
-# run with: flash run
-# test directly: python cpu_worker.py
+# CPU worker with network volume for listing and serving generated images.
+# This is an LB endpoint with HTTP routes - use flash run to test routes.
+# Run: flash run (required for HTTP route testing)
 from runpod_flash import Endpoint, NetworkVolume
 
 volume = NetworkVolume(

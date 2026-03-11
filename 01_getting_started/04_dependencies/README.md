@@ -29,14 +29,16 @@ Learn how to manage Python packages and system dependencies in Flash workers.
 
 ```bash
 cd 01_getting_started/04_dependencies
-flash run
+
+# Run any worker directly
+python gpu_worker.py
+python cpu_worker.py
+python mixed_worker.py
 ```
 
-Server starts at http://localhost:8888
+First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
 
-### Alternative: Standalone Setup
-
-If you haven't run the repository-wide setup:
+### Setup (if needed)
 
 ```bash
 # Install dependencies
@@ -45,10 +47,17 @@ uv sync
 # Authenticate
 uv run flash login
 # Or create .env file with RUNPOD_API_KEY=your_api_key_here
+```
 
-# Run
+### Alternative: HTTP API Testing
+
+To test via HTTP endpoints:
+
+```bash
 uv run flash run
 ```
+
+Server starts at http://localhost:8888
 
 ## GPU vs CPU Packaging
 

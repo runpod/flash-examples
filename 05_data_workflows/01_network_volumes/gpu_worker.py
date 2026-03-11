@@ -1,6 +1,6 @@
-# gpu worker with network volume for Stable Diffusion image generation.
-# run with: flash run
-# test directly: python gpu_worker.py
+# GPU worker with network volume for Stable Diffusion image generation.
+# Run: python gpu_worker.py
+# Alternative: flash run (for HTTP API testing)
 import logging
 
 from runpod_flash import Endpoint, GpuType, NetworkVolume

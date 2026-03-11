@@ -13,11 +13,12 @@ uv sync && uv pip install -e .
 # Authenticate with Runpod
 uv run flash login
 
-# Run all examples locally
-uv run flash run
+# Run an example
+cd 01_getting_started/01_hello_world
+python gpu_worker.py
 ```
 
-Open **http://localhost:8888/docs** to explore all endpoints.
+The function executes on a Runpod GPU and prints the result directly. First run takes 30-60 seconds (provisioning); subsequent runs take 2-3 seconds.
 
 > **Using pip, poetry, or conda?** See [DEVELOPMENT.md](./DEVELOPMENT.md) for alternative setups.
 

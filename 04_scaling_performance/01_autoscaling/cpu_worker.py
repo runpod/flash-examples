@@ -1,6 +1,6 @@
-# cpu autoscaling strategies -- scale-to-zero and burst-ready.
-# run with: flash run
-# test directly: python cpu_worker.py
+# CPU autoscaling strategies -- scale-to-zero and burst-ready.
+# Run: python cpu_worker.py
+# Alternative: flash run (for HTTP API testing)
 from runpod_flash import CpuInstanceType, Endpoint
 
 
