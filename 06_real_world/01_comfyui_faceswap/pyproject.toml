@@ -1,0 +1,8 @@
+[project]
+name = "01_comfyui_character"
+version = "0.1.0"
+description = "ComfyUI SDXL character generation with face swapping on Flash"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash",
+]

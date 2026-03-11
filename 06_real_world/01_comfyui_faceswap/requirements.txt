@@ -1,0 +1,10 @@
+# Dependencies for ComfyUI character generation worker.
+# Workaround: flash build/deploy only scans workers/ dir for @remote deps,
+# but this project uses the flat-file pattern. This file ensures deps are
+# bundled into the deploy artifact.
+insightface
+onnxruntime-gpu
+safetensors
+Pillow
+huggingface_hub
+requests
