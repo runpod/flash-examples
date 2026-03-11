@@ -1,11 +1,13 @@
 # cpu worker with network volume for listing and serving generated images.
 # run with: flash run
 # test directly: python cpu_worker.py
-from runpod_flash import Endpoint, NetworkVolume
+from runpod_flash import Endpoint, DataCenter, NetworkVolume
 
+# same volume as gpu_worker.py -- must match name and datacenter
 volume = NetworkVolume(
     name="flash-05-volume",
     size=50,
+    datacenter=DataCenter.EU_RO_1,
 )
 
 api = Endpoint(
@@ -13,6 +15,7 @@ api = Endpoint(
     cpu="cpu3c-1-2",
     workers=(1, 3),
     idle_timeout=120,
+    datacenter=DataCenter.EU_RO_1,
     volume=volume,
 )
 

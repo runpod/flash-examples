@@ -3,7 +3,7 @@
 # test directly: python gpu_worker.py
 import logging
 
-from runpod_flash import Endpoint, GpuType, NetworkVolume
+from runpod_flash import Endpoint, GpuType, DataCenter, NetworkVolume
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +12,7 @@ MODEL_PATH = "/runpod-volume/models"
 volume = NetworkVolume(
     name="flash-05-volume",
     size=50,
+    datacenter=DataCenter.EU_RO_1,
 )
 
 
@@ -20,6 +21,7 @@ volume = NetworkVolume(
     gpu=GpuType.NVIDIA_GEFORCE_RTX_5090,
     workers=(0, 3),
     idle_timeout=300,
+    datacenter=DataCenter.EU_RO_1,
     volume=volume,
     env={"HF_HUB_CACHE": MODEL_PATH, "MODEL_PATH": MODEL_PATH},
     dependencies=["torch", "diffusers", "transformers", "accelerate"],
