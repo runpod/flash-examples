@@ -16,25 +16,24 @@ async def numpy_benchmark(payload: dict) -> dict:
 
     import numpy as np
 
-    np.random.seed(42)
     installed_version = np.__version__
     benchmarks = {}
     total_start = time.perf_counter()
 
     # matrix multiplication: 1000x1000 dot product
-    a = np.random.rand(1000, 1000)
-    b = np.random.rand(1000, 1000)
+    a = np.ones((1000, 1000)) * 0.5
+    b = np.arange(1_000_000, dtype=np.float64).reshape(1000, 1000) / 1_000_000
     start = time.perf_counter()
-    result = np.dot(a, b)
+    matmul_result = np.dot(a, b)
     elapsed = (time.perf_counter() - start) * 1000
-    result_hash = hashlib.sha256(result.tobytes()).hexdigest()[:12]
+    result_hash = hashlib.sha256(matmul_result.tobytes()).hexdigest()[:12]
     benchmarks["matrix_multiply"] = {
         "time_ms": round(elapsed, 2),
         "result_hash": result_hash,
     }
 
-    # array sort: 1M random elements
-    arr = np.random.rand(1_000_000)
+    # array sort: 1M elements (reverse-sorted for worst-case input)
+    arr = np.arange(1_000_000, dtype=np.float64)[::-1] / 1_000_000
     start = time.perf_counter()
     sorted_arr = np.sort(arr)
     elapsed = (time.perf_counter() - start) * 1000
@@ -44,8 +43,8 @@ async def numpy_benchmark(payload: dict) -> dict:
         "result_hash": result_hash,
     }
 
-    # FFT: 1D FFT on 1M points
-    signal = np.random.rand(1_000_000)
+    # FFT: 1D FFT on 1M points (440Hz sine wave)
+    signal = np.sin(np.linspace(0, 2 * np.pi * 440, 1_000_000))
     start = time.perf_counter()
     fft_result = np.fft.fft(signal)
     elapsed = (time.perf_counter() - start) * 1000
@@ -53,11 +52,11 @@ async def numpy_benchmark(payload: dict) -> dict:
     benchmarks["fft"] = {"time_ms": round(elapsed, 2), "result_hash": result_hash}
 
     # element-wise: sin + cos on 1M elements
-    arr = np.random.rand(1_000_000)
+    arr = np.linspace(0, 10, 1_000_000)
     start = time.perf_counter()
-    result = np.sin(arr) + np.cos(arr)
+    elementwise_result = np.sin(arr) + np.cos(arr)
     elapsed = (time.perf_counter() - start) * 1000
-    result_hash = hashlib.sha256(result.tobytes()).hexdigest()[:12]
+    result_hash = hashlib.sha256(elementwise_result.tobytes()).hexdigest()[:12]
     benchmarks["elementwise"] = {
         "time_ms": round(elapsed, 2),
         "result_hash": result_hash,
