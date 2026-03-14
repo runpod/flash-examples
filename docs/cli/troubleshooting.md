@@ -929,6 +929,22 @@ Fix:
 @Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 ```
 
+**D. CUDA version mismatch (worker stuck, no errors in endpoint logs):**
+```
+nvidia-container-cli: requirement error: unsatisfied condition: cuda>=12.8
+```
+
+This happens when a worker lands on a host whose CUDA driver is older than the
+base image requires. GPU endpoints default `min_cuda_version` to `"12.8"`. If
+you need a different minimum, set it explicitly:
+```python
+@Endpoint(
+    name="worker",
+    gpu=GpuType.NVIDIA_GEFORCE_RTX_4090,
+    min_cuda_version="12.4",
+)
+```
+
 **4. Redeploy after fixing:**
 ```bash
 flash deploy --env production

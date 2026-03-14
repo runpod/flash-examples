@@ -1537,6 +1537,18 @@ Solution: Verify GPU configuration:
 @Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090)
 ```
 
+**D. CUDA version mismatch (worker stuck, no errors in endpoint logs):**
+```
+nvidia-container-cli: requirement error: unsatisfied condition: cuda>=12.8
+```
+
+The worker landed on a host whose CUDA driver is older than the base image
+requires. GPU endpoints default `min_cuda_version` to `"12.8"`. Lower it only
+if your workload supports older CUDA:
+```python
+@Endpoint(name="worker", gpu=GpuType.NVIDIA_GEFORCE_RTX_4090, min_cuda_version="12.4")
+```
+
 #### Issue 6: Performance Issues
 
 **Symptom:**
