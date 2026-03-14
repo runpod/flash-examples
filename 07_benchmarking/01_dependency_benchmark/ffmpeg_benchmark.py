@@ -5,7 +5,7 @@ from runpod_flash import Endpoint
 
 
 @Endpoint(
-    name="07_ffmpeg_v6",
+    name="07_ffmpeg_baseline",
     cpu="cpu3c-1-2",
     system_dependencies=["ffmpeg"],
 )
@@ -18,15 +18,19 @@ async def ffmpeg_benchmark(payload: dict) -> dict:
     import tempfile
     import time
 
+    total_start = time.perf_counter()
+
     # parse installed version
-    version_output = subprocess.check_output(
-        ["ffmpeg", "-version"], stderr=subprocess.STDOUT
-    ).decode()
-    version_match = re.search(r"ffmpeg version (\S+)", version_output)
-    installed_version = version_match.group(1) if version_match else "unknown"
+    try:
+        version_output = subprocess.check_output(
+            ["ffmpeg", "-version"], stderr=subprocess.STDOUT
+        ).decode()
+        version_match = re.search(r"ffmpeg version (\S+)", version_output)
+        installed_version = version_match.group(1) if version_match else "unknown"
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        installed_version = f"error: {e}"
 
     benchmarks = {}
-    total_start = time.perf_counter()
     tmp_dir = tempfile.mkdtemp(prefix="ffmpeg_bench_")
 
     try:
