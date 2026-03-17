@@ -43,20 +43,20 @@ A two-worker Flash example that deploys Kimi-K2-Instruct via vLLM on 8xH100 GPUs
                ▼
 ┌─────────────────────────────────────────────────┐
 │  GPU Worker (QB) -- gpu_worker.py               │
-│  Endpoint: 02_02_kimi_k2_gpu                    │
+│  @Endpoint class: KimiK2                        │
 │  gpu=GpuType.NVIDIA_H100_80GB_HBM3, gpu_count=8│
 │  workers=(0, 1), idle_timeout=600               │
 │                                                 │
-│  QB Functions (each decorated separately):      │
+│  Class-based pattern (like SimpleSD example):   │
+│    __init__: loads vLLM engine once             │
 │    generate(prompt) → raw LLM text              │
-│    health()         → loading/ready/error       │
+│    health()         → ready/error               │
 │                                                 │
 │  Internals:                                     │
 │    - Pre-quantized W4A16 model (~500GB)         │
 │    - RedHatAI/Kimi-K2-Instruct-quantized.w4a16  │
 │    - vLLM engine, tensor_parallel_size=8        │
 │    - max_model_len=8192 (VRAM-constrained)      │
-│    - Eager model loading at startup             │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -64,7 +64,7 @@ A two-worker Flash example that deploys Kimi-K2-Instruct via vLLM on 8xH100 GPUs
 
 ### Resource Configuration
 
-Both QB functions share the same endpoint name and resource config, each with its own `@Endpoint` decorator (same pattern as the TTS example):
+Class-based `@Endpoint` pattern (same as `05_data_workflows/01_network_volumes/gpu_worker.py`). `__init__` runs once on the worker to load the model; methods handle requests with access to `self.engine`.
 
 ```python
 @Endpoint(
@@ -75,17 +75,14 @@ Both QB functions share the same endpoint name and resource config, each with it
     idle_timeout=600,
     dependencies=["vllm", "torch"],
 )
-async def generate(input_data: dict) -> dict:
-    ...
+class KimiK2:
+    def __init__(self):
+        from vllm import LLM
+        self.engine = LLM(...)
+        self.tokenizer = self.engine.get_tokenizer()
 
-@Endpoint(
-    name="02_02_kimi_k2_gpu",
-    gpu=GpuType.NVIDIA_H100_80GB_HBM3,
-    gpu_count=8,
-    dependencies=["vllm"],
-)
-async def health(input_data: dict) -> dict:
-    ...
+    async def generate(self, input_data: dict) -> dict: ...
+    async def health(self, input_data: dict) -> dict: ...
 ```
 
 - 8xH100 80GB = 640GB VRAM total
@@ -94,7 +91,7 @@ async def health(input_data: dict) -> dict:
 - `workers=(0, 1)` -- single instance, scales to zero when idle
 - `idle_timeout=600` -- 10 minutes to avoid frequent cold starts
 
-### Endpoints
+### Methods
 
 **`generate`** -- Takes chat messages (system + user), returns raw text.
 
@@ -142,35 +139,9 @@ Or during loading:
 
 ### Model Initialization
 
-vLLM engine initialized eagerly inside the first function call, then cached in a module-level dict. This works because the entire module runs on the worker process -- module-level state persists between invocations on the same pod.
+vLLM engine loads in `__init__`, which runs once when the worker pod starts. The class instance persists across requests -- `self.engine` and `self.tokenizer` are available to all methods. This is the standard Flash pattern for expensive model loading (same as `SimpleSD` in the network volumes example).
 
-```python
-_state = {}
-
-@Endpoint(
-    name="02_02_kimi_k2_gpu",
-    gpu=GpuType.NVIDIA_H100_80GB_HBM3,
-    gpu_count=8,
-    workers=(0, 1),
-    idle_timeout=600,
-    dependencies=["vllm", "torch"],
-)
-async def generate(input_data: dict) -> dict:
-    from vllm import LLM, SamplingParams
-
-    if "engine" not in _state:
-        _state["engine"] = LLM(
-            model="RedHatAI/Kimi-K2-Instruct-quantized.w4a16",
-            tensor_parallel_size=8,
-            gpu_memory_utilization=0.95,
-            max_model_len=8192,
-            distributed_executor_backend="ray",
-        )
-    engine = _state["engine"]
-    # ... generate
-```
-
-Note: No `quantization` parameter needed -- the model is pre-quantized. vLLM detects the format from the model config.
+No `quantization` parameter needed -- the model is pre-quantized. vLLM detects the format from the model config.
 
 ## CPU Worker -- cpu_worker.py
 
@@ -185,13 +156,18 @@ api = Endpoint(
     workers=(1, 3),
 )
 
+def _get_gpu_worker():
+    from gpu_worker import KimiK2
+    return KimiK2()
+
 @api.post("/review/json")
 async def review_json(data: dict) -> dict:
-    from gpu_worker import generate, health as gpu_health
+    worker = _get_gpu_worker()
+    result = await worker.generate({...})
     # ... route handler body
 ```
 
-Cross-worker imports (`generate`, `health`) go inside route handler bodies, matching the established pattern from `03_mixed_workers/pipeline.py`. The `prompts.py` import stays at module level since it's just string constants with no side effects.
+Cross-worker import instantiates the `KimiK2` class. In local dev (`flash run`), this creates the instance directly. When deployed, Flash wraps it as a `RemoteClassWrapper` that dispatches method calls to the GPU worker pod.
 
 ### Routes
 
@@ -318,7 +294,7 @@ No silent failures. Every error includes enough context to diagnose.
 
 ```
 02_ml_inference/02_code_review_agent/
-├── gpu_worker.py          # vLLM Kimi-K2 inference (QB endpoint, two @Endpoint functions)
+├── gpu_worker.py          # vLLM Kimi-K2 inference (class-based @Endpoint: KimiK2)
 ├── cpu_worker.py          # Code review orchestrator (LB routes)
 ├── prompts.py             # System/user prompt templates (plain string constants)
 ├── sample_diffs/          # Curated test diffs
