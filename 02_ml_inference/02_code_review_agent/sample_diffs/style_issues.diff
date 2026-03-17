@@ -1,0 +1,52 @@
+--- a/src/processor.py
++++ b/src/processor.py
+@@ -1,4 +1,5 @@
+ import time
++import json
+
+
+ def process_data(data):
+@@ -8,3 +9,45 @@ def process_data(data):
+         raise ValueError("data cannot be empty")
+     return [item.strip() for item in data]
+
++
++def handleUserRequest(requestData, retryCount=3):
++    """Process a user request with retries."""
++    MaxItems = 100
++    result_list = []
++    error_list = []
++    for i in range(len(requestData)):
++        item = requestData[i]
++        if item.get("type") == 1:
++            processed = item.get("value", "").upper()
++            if len(processed) > 256:
++                processed = processed[:256]
++            result_list.append({"output": processed, "code": 1})
++        elif item.get("type") == 2:
++            processed = item.get("value", "").lower()
++            if len(processed) > 256:
++                processed = processed[:256]
++            result_list.append({"output": processed, "code": 2})
++        elif item.get("type") == 3:
++            processed = item.get("value", "").title()
++            if len(processed) > 256:
++                processed = processed[:256]
++            result_list.append({"output": processed, "code": 3})
++        else:
++            error_list.append({"index": i, "error": "unknown type"})
++        if len(result_list) >= MaxItems:
++            break
++    time.sleep(0.5)
++    final = {
++        "results": result_list,
++        "errors": error_list,
++        "total": len(result_list),
++        "error_count": len(error_list),
++        "ts": time.time(),
++    }
++    if len(error_list) > 0:
++        final["status"] = "partial"
++    else:
++        final["status"] = "ok"
++    return final
