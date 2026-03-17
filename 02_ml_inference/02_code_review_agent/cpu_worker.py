@@ -131,11 +131,17 @@ def _format_markdown(review: dict) -> str:
     return "\n".join(lines)
 
 
-async def _call_generate(messages: list[dict], max_tokens: int = 4096) -> dict:
-    """Call the GPU worker's generate function."""
-    from gpu_worker import generate
+def _get_gpu_worker():
+    """Import and instantiate the GPU worker class."""
+    from gpu_worker import KimiK2
 
-    return await generate(
+    return KimiK2()
+
+
+async def _call_generate(messages: list[dict], max_tokens: int = 4096) -> dict:
+    """Call the GPU worker's generate method."""
+    worker = _get_gpu_worker()
+    return await worker.generate(
         {
             "messages": messages,
             "max_tokens": max_tokens,
@@ -146,14 +152,13 @@ async def _call_generate(messages: list[dict], max_tokens: int = 4096) -> dict:
 
 
 async def _check_gpu_health() -> dict:
-    """Call the GPU worker's health function with timeout handling."""
+    """Call the GPU worker's health method with timeout handling."""
     import asyncio
 
-    from gpu_worker import health as gpu_health
-
     try:
+        worker = _get_gpu_worker()
         result = await asyncio.wait_for(
-            gpu_health({}),
+            worker.health({}),
             timeout=HEALTH_TIMEOUT_SECONDS,
         )
         return result
