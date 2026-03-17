@@ -26,6 +26,7 @@ class KimiK2:
             gpu_memory_utilization=0.95,
             max_model_len=8192,
             distributed_executor_backend="ray",
+            trust_remote_code=True,
         )
         self.tokenizer = self.engine.get_tokenizer()
 
