@@ -13,6 +13,15 @@ Text-to-Speech API using Qwen3-TTS.
 - Using `bfloat16` precision for memory-efficient inference
 - Input validation inside self-contained `@remote` functions
 
+### [02_code_review_agent](./02_code_review_agent/)
+PR diff code reviewer powered by Kimi-K2-Instruct via vLLM.
+
+**What you'll learn:**
+- Self-hosting a 1T parameter MoE model with vLLM and W4A16 quantization
+- Cross-worker orchestration: CPU LB routes dispatching to GPU QB endpoints
+- Health check patterns for large models with long cold starts
+- Multi-GPU provisioning with `gpu_count=8`
+
 ### 01_text_generation _(coming soon)_
 LLM inference API with streaming support.
 
