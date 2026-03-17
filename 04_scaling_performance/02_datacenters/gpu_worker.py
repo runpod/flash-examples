@@ -8,11 +8,11 @@ from runpod_flash import Endpoint, GpuGroup, DataCenter
     name="04_02_gpu_us",
     gpu=GpuGroup.ANY,
     workers=(0, 3),
-    datacenter=DataCenter.US_GA_1,
+    datacenter=DataCenter.US_GA_2,
 )
 async def us_inference(payload: dict) -> dict:
-    """GPU inference pinned to US-GA-1."""
-    return {"datacenter": "US-GA-1", "result": payload}
+    """GPU inference pinned to US-GA-2."""
+    return {"datacenter": "US-GA-2", "result": payload}
 
 
 # deploy across multiple datacenters for broader availability
@@ -20,10 +20,10 @@ async def us_inference(payload: dict) -> dict:
     name="04_02_gpu_multi",
     gpu=GpuGroup.ANY,
     workers=(0, 3),
-    datacenter=[DataCenter.US_GA_1, DataCenter.EU_RO_1],
+    datacenter=[DataCenter.US_GA_2, DataCenter.EU_RO_1],
 )
 async def multi_dc_inference(payload: dict) -> dict:
-    """GPU inference available in US-GA-1 and EU-RO-1."""
+    """GPU inference available in US-GA-2 and EU-RO-1."""
     return {"result": payload}
 
 

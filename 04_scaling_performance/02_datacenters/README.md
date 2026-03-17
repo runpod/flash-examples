@@ -23,25 +23,30 @@ flash run
 
 | ID | Location |
 |----|----------|
-| `US-GA-1` | US - Georgia |
-| `US-KS-1` | US - Kansas |
-| `US-TX-1` | US - Texas |
-| `US-OR-1` | US - Oregon |
-| `CA-MTL-1` | Canada - Montreal |
-| `EU-NL-1` | Europe - Netherlands |
+| `US-CA-2` | US - California |
+| `US-GA-2` | US - Georgia |
+| `US-IL-1` | US - Illinois |
+| `US-KS-2` | US - Kansas |
+| `US-MD-1` | US - Maryland |
+| `US-MO-1` | US - Missouri |
+| `US-MO-2` | US - Missouri |
+| `US-NC-1` | US - North Carolina |
+| `US-NC-2` | US - North Carolina |
+| `US-NE-1` | US - Nebraska |
+| `US-WA-1` | US - Washington |
 | `EU-CZ-1` | Europe - Czech Republic |
 | `EU-RO-1` | Europe - Romania |
-| `EU-NO-1` | Europe - Norway |
-| `EU-SE-1` | Europe - Sweden |
+| `EUR-IS-1` | Europe - Iceland |
+| `EUR-NO-1` | Europe - Norway |
 
-CPU endpoints support: `EU-RO-1`, `US-TX-1`, `EU-SE-1`.
+CPU endpoints support: `EU-RO-1`.
 
 ## Examples
 
 **Single datacenter:**
 
 ```python
-@Endpoint(name="us-worker", gpu=GpuGroup.ANY, datacenter=DataCenter.US_GA_1)
+@Endpoint(name="us-worker", gpu=GpuGroup.ANY, datacenter=DataCenter.US_GA_2)
 async def inference(data: dict) -> dict:
     ...
 ```
@@ -52,7 +57,7 @@ async def inference(data: dict) -> dict:
 @Endpoint(
     name="global-worker",
     gpu=GpuGroup.ANY,
-    datacenter=[DataCenter.US_GA_1, DataCenter.EU_RO_1],
+    datacenter=[DataCenter.US_GA_2, DataCenter.EU_RO_1],
 )
 async def inference(data: dict) -> dict:
     ...
