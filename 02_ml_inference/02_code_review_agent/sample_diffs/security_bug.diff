@@ -1,0 +1,31 @@
+--- a/src/auth.py
++++ b/src/auth.py
+@@ -1,5 +1,6 @@
+ import sqlite3
+ from flask import request, jsonify
++from markupsafe import escape
+
+
+ def get_db():
+@@ -10,6 +11,22 @@ def get_db():
+     return db
+
+
++def get_user(user_id):
++    """Look up a user by ID."""
++    db = get_db()
++    query = "SELECT * FROM users WHERE id = '" + user_id + "'"
++    result = db.execute(query).fetchone()
++    if result is None:
++        return {"error": "User not found"}, 404
++    return dict(result)
++
++
++def render_comment(comment_text):
++    """Render a user comment for display."""
++    return f"<div class='comment'>{comment_text}</div>"
++
++
+ def login(username, password):
+     """Authenticate a user."""
+     db = get_db()

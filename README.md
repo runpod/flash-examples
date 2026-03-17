@@ -62,6 +62,7 @@ Open **http://localhost:8888/docs** to explore all endpoints.
 | | [03_mixed_workers](./01_getting_started/03_mixed_workers/) | GPU + CPU pipeline |
 | | [04_dependencies](./01_getting_started/04_dependencies/) | Dependency management |
 | **ML Inference** | [01_text_to_speech](./02_ml_inference/01_text_to_speech/) | Qwen3-TTS model serving |
+| | [02_code_review_agent](./02_ml_inference/02_code_review_agent/) | PR code review with self-hosted Kimi-K2 |
 | **Advanced** | [05_load_balancer](./03_advanced_workers/05_load_balancer/) | HTTP routing with load balancer |
 | **Scaling** | [01_autoscaling](./04_scaling_performance/01_autoscaling/) | Worker autoscaling configuration |
 | **Data** | [01_network_volumes](./05_data_workflows/01_network_volumes/) | Persistent storage with network volumes |
