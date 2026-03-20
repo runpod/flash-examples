@@ -659,7 +659,16 @@ Error: RUNPOD_API_KEY environment variable not set
 
 **Solutions:**
 
-**1. Set environment variable:**
+**1. Use `flash login` (recommended):**
+```bash
+# If you installed Flash via uv (recommended)
+uv run flash login
+
+# Or, if flash is installed globally
+flash login
+```
+
+**2. Set environment variable:**
 ```bash
 export RUNPOD_API_KEY=your-key-here
 
@@ -667,20 +676,20 @@ export RUNPOD_API_KEY=your-key-here
 echo $RUNPOD_API_KEY
 ```
 
-**2. Add to .env file:**
+**3. Add to .env file (for local CLI use):**
 ```bash
 echo "RUNPOD_API_KEY=your-key-here" >> .env
 
-# Flash automatically loads .env
+# Loaded into os.environ for CLI commands
 ```
 
-**3. Get API key:**
+**4. Get API key:**
 1. Visit https://runpod.io/console/user/settings
 2. Click "API Keys"
 3. Create new key or copy existing
 4. Set environment variable
 
-**4. Make persistent (bash/zsh):**
+**5. Make persistent (bash/zsh):**
 ```bash
 echo 'export RUNPOD_API_KEY=your-key-here' >> ~/.bashrc
 source ~/.bashrc
@@ -1046,12 +1055,12 @@ export RUNPOD_API_KEY=your-key
 flash deploy
 ```
 
-**3. Use .env file:**
+**3. Use .env file (for local CLI use):**
 ```bash
 # Create .env in project root
 echo "RUNPOD_API_KEY=your-key" > .env
 
-# Flash automatically loads .env
+# Loaded into os.environ for CLI commands
 flash deploy
 ```
 
@@ -1078,18 +1087,23 @@ ERROR: Authentication failed: API key expired
 
 **Solutions:**
 
-**1. Generate new key:**
+**1. Re-authenticate with `flash login` (recommended):**
+```bash
+flash login
+```
+
+**2. Or generate a new key manually:**
 1. Visit https://runpod.io/console/user/settings
 2. Revoke expired key
 3. Create new key
-4. Update environment variable
+4. Update environment variable or `.env` file
 
-**2. Update in all locations:**
+**3. Update in all locations:**
 ```bash
 # Update environment variable
 export RUNPOD_API_KEY=new-key
 
-# Update .env file
+# Or update .env file (for local CLI use)
 echo "RUNPOD_API_KEY=new-key" > .env
 
 # Update CI/CD secrets
