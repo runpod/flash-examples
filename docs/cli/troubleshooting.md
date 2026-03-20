@@ -689,7 +689,7 @@ echo "RUNPOD_API_KEY=your-key-here" >> .env
 3. Create new key or copy existing
 4. Set environment variable
 
-**4. Make persistent (bash/zsh):**
+**5. Make persistent (bash/zsh):**
 ```bash
 echo 'export RUNPOD_API_KEY=your-key-here' >> ~/.bashrc
 source ~/.bashrc

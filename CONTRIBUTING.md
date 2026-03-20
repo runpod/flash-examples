@@ -334,8 +334,9 @@ To debug a worker:
 
 The `.env` file is loaded into `os.environ` for local CLI use and debugging.
 
-- To pass environment variables to deployed endpoints, declare them explicitly on the resource config, for example: `env={"KEY": os.getenv("KEY")}`.
-- For authentication, prefer using `flash login`.
+> To pass environment variables to deployed endpoints, declare them explicitly on the resource config, for example: `env={"KEY": os.environ["KEY"]}`.
+>
+> For authentication, prefer using `flash login`.
 
 ### Unit Tests (Recommended)
 

@@ -80,7 +80,7 @@ FLASH_HOST=localhost
 FLASH_PORT=8888
 ```
 
-> **Note:** `.env` values are **not** carried to deployed endpoints. To pass env vars at deploy time, declare them on the resource: `env={"KEY": os.getenv("KEY")}`.
+> **Note:** `.env` values are **not** carried to deployed endpoints. To pass env vars at deploy time, declare them on the resource: `env={"KEY": os.environ["KEY"]}`.
 
 #### 4. Start Development Server
 
