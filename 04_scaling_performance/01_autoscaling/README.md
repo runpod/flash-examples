@@ -8,7 +8,7 @@ Configure Flash worker autoscaling for different workload patterns. This example
 
 ```bash
 cd 04_scaling_performance/01_autoscaling
-flash run
+flash dev
 ```
 
 Server starts at http://localhost:8888 -- visit http://localhost:8888/docs for interactive API docs.

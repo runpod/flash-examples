@@ -165,16 +165,16 @@ Run commands with the package manager prefix without activation:
 
 ```bash
 # With uv
-uv run flash run
+uv run flash dev
 
 # With poetry
-poetry run flash run
+poetry run flash dev
 
 # With pipenv
-pipenv run flash run
+pipenv run flash dev
 
 # With conda
-conda run -p ./.venv flash run
+conda run -p ./.venv flash dev
 ```
 
 **Option B: Activate Virtual Environment (works with all managers)**
@@ -189,7 +189,7 @@ source .venv/bin/activate
 .venv\Scripts\activate
 
 # Then run normally
-flash run
+flash dev
 ```
 
 Once activated, you can run Flash and other commands directly without a prefix.
@@ -268,9 +268,9 @@ Or set `RUNPOD_API_KEY` in your `.env` file.
 
 ```bash
 # Run development server
-flash run                    # Default: localhost:8888
-flash run --port 9000        # Custom port
-flash run --host 0.0.0.0     # Network accessible
+flash dev                    # Default: localhost:8888
+flash dev --port 9000        # Custom port
+flash dev --host 0.0.0.0     # Network accessible
 
 # Build deployment package
 flash build                  # Standard build
@@ -511,7 +511,7 @@ cd 01_getting_started/05_new_example
 touch README.md gpu_worker.py pyproject.toml
 ```
 
-Each worker file (named `*_worker.py` by convention) is self-contained with `@Endpoint` decorated functions. `flash run` discovers all `.py` files with `@Endpoint` functions automatically -- no `main.py`, no `workers/` directories needed.
+Each worker file (named `*_worker.py` by convention) is self-contained with `@Endpoint` decorated functions. `flash dev` discovers all `.py` files with `@Endpoint` functions automatically -- no `main.py`, no `workers/` directories needed.
 
 **3. Declare dependencies:**
 
@@ -521,7 +521,7 @@ Add a `pyproject.toml` with `runpod-flash` as the only local dependency. Runtime
 
 ```bash
 cd ../../  # Back to root
-flash run  # Discovers all .py files with @Endpoint functions
+flash dev  # Discovers all .py files with @Endpoint functions
 ```
 
 ### Cleaning Up
@@ -544,7 +544,7 @@ make setup
 
 ## Unified App Architecture
 
-The root directory provides a programmatic discovery system that automatically finds and loads all examples when you run `flash run` from the project root.
+The root directory provides a programmatic discovery system that automatically finds and loads all examples when you run `flash dev` from the project root.
 
 ### Discovery Process
 

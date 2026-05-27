@@ -25,7 +25,7 @@ Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 ### 3. Run Locally
 
 ```bash
-uv run flash run
+uv run flash dev
 ```
 
 Server starts at `http://localhost:8888`

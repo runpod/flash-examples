@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-Production-ready examples demonstrating Flash framework capabilities. Flat-file pattern: each worker is a standalone `.py` file with `@Endpoint` decorator, auto-discovered by `flash run`. 6 categories, 18 worker files. Root `pyproject.toml` declares only `runpod-flash` dependency; runtime deps declared inline via `Endpoint(dependencies=[...])`.
+Production-ready examples demonstrating Flash framework capabilities. Flat-file pattern: each worker is a standalone `.py` file with `@Endpoint` decorator, auto-discovered by `flash dev`. 6 categories, 18 worker files. Root `pyproject.toml` declares only `runpod-flash` dependency; runtime deps declared inline via `Endpoint(dependencies=[...])`.
 
 ## Architecture
 
@@ -14,12 +14,12 @@ Production-ready examples demonstrating Flash framework capabilities. Flat-file 
 2. **Endpoint routes (LB)** -- Load-balanced pattern. `api = Endpoint(...)` with `@api.get()/@api.post()` route decorators for HTTP endpoints.
 3. **@Endpoint decorator (class)** -- Used on `SimpleSD` class (`05_data_workflows`). Class-based pattern for stateful workers.
 4. **Cross-worker orchestration** -- Pipeline files import from QB workers, chain with `await`. LB endpoint orchestrates QB workers.
-5. **Flat-file discovery** -- No FastAPI boilerplate, no routers, no `main.py`. `flash run` auto-generates routes from decorated functions.
+5. **Flat-file discovery** -- No FastAPI boilerplate, no routers, no `main.py`. `flash dev` auto-generates routes from decorated functions.
 6. **In-function imports** -- Heavy libs (torch, transformers, etc.) imported inside `@Endpoint` body, only `runpod_flash` at module level.
 
 ### Entry Points
 
-All worker files across 6 categories. Each file is an independent entry point discovered by `flash run`.
+All worker files across 6 categories. Each file is an independent entry point discovered by `flash dev`.
 
 ### Module Structure
 
@@ -136,7 +136,7 @@ flash-examples --> flash (runpod_flash) --> runpod-python (runpod)
 
 ### Known Drift
 
-- No automated tests -- changes caught only at import time or `flash run`
+- No automated tests -- changes caught only at import time or `flash dev`
 - No CI that validates examples against current flash version
 - Python version: inherits from flash (3.10+)
 
@@ -152,9 +152,8 @@ uv sync --all-groups
 ### Testing
 
 ```bash
-flash run                     # Start local dev server (localhost:8888)
+flash dev                     # Start local dev server (localhost:8888)
 # Visit http://localhost:8888/docs for interactive API docs
-python gpu_worker.py          # Test a single worker directly (if __name__ == "__main__" block)
 ```
 
 ### Quality
@@ -202,14 +201,14 @@ No formal test infrastructure exists. Each worker has an optional `if __name__ =
 
 - **100% uncovered** -- no test framework, no conftest, no pytest config
 - No smoke tests that verify examples import successfully
-- No integration tests that run `flash run` against examples
+- No integration tests that run `flash dev` against examples
 
 ### Patterns
 
 To test manually:
 ```bash
 cd 01_getting_started/01_hello_world
-flash run                    # Starts dev server, auto-discovers workers
+flash dev                    # Starts dev server, auto-discovers workers
 # Use http://localhost:8888/docs to invoke endpoints
 ```
 
@@ -217,7 +216,7 @@ flash run                    # Starts dev server, auto-discovers workers
 
 1. Add `tests/test_imports.py` that imports every worker file (catches `Endpoint` signature drift)
 2. Add `tests/test_configs.py` that validates all resource configs construct without error
-3. Add CI job that runs `flash run --check` (dry-run mode) against each example category
+3. Add CI job that runs `flash dev --check` (dry-run mode) against each example category
 
 ## Common Mistakes
 

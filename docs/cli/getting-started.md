@@ -92,7 +92,7 @@ async def process_request(payload: dict) -> dict:
 Start the development server:
 
 ```bash
-uv run flash run
+uv run flash dev
 ```
 
 **Expected output:**
@@ -104,7 +104,7 @@ INFO: Application startup complete
 
 **Checkpoint:** Server is running at http://localhost:8888
 
-**What's happening:** Your FastAPI app runs locally on your machine, but when you call an `@Endpoint` function, it executes on Runpod Serverless. This hybrid architecture gives you hot-reload for rapid development while testing real GPU/CPU workloads in the cloud. Endpoints created during `flash run` are prefixed with `live-` to keep them separate from production.
+**What's happening:** Your FastAPI app runs locally on your machine, but when you call an `@Endpoint` function, it executes on Runpod Serverless. This hybrid architecture gives you hot-reload for rapid development while testing real GPU/CPU workloads in the cloud. Endpoints created during `flash dev` are prefixed with `live-` to keep them separate from production.
 
 ---
 
@@ -275,7 +275,7 @@ curl -X POST https://abcd1234-hello-flash-gpu.runpod.io/run \
 In the past 10 minutes, you've:
 
 1. ✅ Created a Flash project with `flash init`
-2. ✅ Run a development server with `flash run`
+2. ✅ Run a development server with `flash dev`
 3. ✅ Tested locally via Swagger UI
 4. ✅ Created a deployment environment
 5. ✅ Built a deployment package with `flash build`
@@ -294,7 +294,7 @@ The flash-examples repository contains production-ready examples:
 git clone https://github.com/runpod/flash-examples.git
 cd flash-examples
 uv sync && uv pip install -e .
-uv run flash run
+uv run flash dev
 # Visit http://localhost:8888/docs to explore all examples
 ```
 
@@ -309,7 +309,7 @@ uv run flash run
 ### Learn More Commands
 
 **Development:**
-- [flash run options](../CLI-REFERENCE.md#flash-run) - Custom host, port, auto-reload
+- [flash dev options](../CLI-REFERENCE.md#flash-run) - Custom host, port, auto-reload
 - [flash build options](../CLI-REFERENCE.md#flash-build) - Size optimization, custom names
 
 **Deployment:**
@@ -350,7 +350,7 @@ uv run flash --version
 **Solution:**
 ```bash
 # Use different port
-uv run flash run --port 9000
+uv run flash dev --port 9000
 
 # Or find and kill process using port 8888
 lsof -ti:8888 | xargs kill -9
@@ -386,7 +386,7 @@ See [Troubleshooting Guide](troubleshooting.md) for more solutions.
 | Command | Purpose |
 |---------|---------|
 | `uv run flash init <name>` | Create new project |
-| `uv run flash run` | Run development server |
+| `uv run flash dev` | Run development server |
 | `uv run flash build` | Build deployment package |
 | `uv run flash deploy --env <name>` | Deploy to environment |
 | `uv run flash env create <name>` | Create environment |

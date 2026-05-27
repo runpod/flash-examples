@@ -18,7 +18,7 @@ async def generate_image(prompt: str) -> bytes:
 **Key features:**
 - **`@Endpoint` decorator**: Mark any async function to run on serverless infrastructure
 - **Auto-scaling**: Scale to zero when idle, scale up under load
-- **Local development**: `flash run` starts a local server with hot reload
+- **Local development**: `flash dev` starts a local server with hot reload
 - **One-command deploy**: `flash deploy` packages and ships your code
 
 ## Prerequisites
@@ -46,7 +46,7 @@ uv sync && uv pip install -e .
 uv run flash login
 
 # Run all examples locally
-uv run flash run
+uv run flash dev
 ```
 
 Open **http://localhost:8888/docs** to explore all endpoints.
@@ -72,7 +72,7 @@ More examples coming soon in each category.
 
 ```bash
 flash login              # Authenticate with Runpod (opens browser)
-flash run                # Run development server (localhost:8888)
+flash dev                # Run development server (localhost:8888)
 flash build              # Build deployment package
 flash deploy --env <name># Build and deploy to environment
 flash undeploy <name>    # Delete deployed endpoint

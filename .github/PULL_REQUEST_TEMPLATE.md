@@ -25,7 +25,7 @@ If adding a new example, which category does it belong to?
 ## Checklist
 
 ### Functionality
-- [ ] Example runs successfully with `flash run`
+- [ ] Example runs successfully with `flash dev`
 - [ ] All endpoints return correct responses
 - [ ] Tested locally
 - [ ] Error handling implemented

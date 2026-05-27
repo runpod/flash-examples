@@ -40,14 +40,14 @@ Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 ### 3. Run Locally (from repository root)
 
 ```bash
-uv run flash run
+uv run flash dev
 ```
 
 Visit **http://localhost:8888/docs** for interactive API documentation (unified app with all examples).
 
 ### 4. Test Endpoints (via unified app)
 
-When using `flash run` from the repository root, routes are prefixed with the example name:
+When using `flash dev` from the repository root, routes are prefixed with the example name:
 
 **GPU Service (Compute)**:
 ```bash
@@ -256,14 +256,10 @@ Response:
 }
 ```
 
-## Testing Workers Locally
+## Testing Locally
 
 ```bash
-# Test GPU worker
-python gpu_lb.py
-
-# Test CPU worker
-python cpu_lb.py
+flash dev
 ```
 
 ## Deployment

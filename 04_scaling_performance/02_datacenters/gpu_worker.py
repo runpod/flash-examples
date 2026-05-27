@@ -1,5 +1,5 @@
 # gpu workers pinned to specific datacenters.
-# run with: flash run
+# run with: flash dev
 from runpod_flash import Endpoint, GpuGroup, DataCenter
 
 

@@ -1,7 +1,7 @@
 # cpu worker pinned to a cpu-supported datacenter.
 # cpu endpoints are only available in a subset of datacenters
 # (see CPU_DATACENTERS). selecting an unsupported DC raises an error.
-# run with: flash run
+# run with: flash dev
 from runpod_flash import Endpoint, DataCenter
 
 api = Endpoint(

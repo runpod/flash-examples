@@ -44,7 +44,7 @@ Response
 
 ```bash
 cd 01_getting_started/03_mixed_workers
-flash run
+flash dev
 ```
 
 ### Alternative: Standalone Setup
@@ -60,7 +60,7 @@ uv run flash login
 # Or create .env file with RUNPOD_API_KEY=your_api_key_here
 
 # Run
-uv run flash run
+uv run flash dev
 ```
 
 Server starts at http://localhost:8888

@@ -40,13 +40,13 @@ Add examples that demonstrate:
 All examples must meet these standards:
 
 ### 1. Functional Requirements
-- [ ] Runs successfully with `flash run`
+- [ ] Runs successfully with `flash dev`
 - [ ] All endpoints return correct responses
 - [ ] Error handling is implemented
 - [ ] Environment variables are documented
 - [ ] Dependencies are declared in pyproject.toml
 - [ ] Runtime deps declared in `Endpoint(dependencies=[...])`
-- [ ] Example discovered by `flash run` from project root
+- [ ] Example discovered by `flash dev` from project root
 
 ### 2. Code Quality
 - [ ] Clear, readable code
@@ -126,17 +126,17 @@ Follow the [standard example structure](#example-structure).
 
 ```bash
 cd your_category/your_example
-flash run
+flash dev
 # Test all endpoints
 ```
 
 ### 5. Verify Discovery
 
-`flash run` auto-discovers all `.py` files containing `@Endpoint` functions. Verify your example loads:
+`flash dev` auto-discovers all `.py` files containing `@Endpoint` functions. Verify your example loads:
 
 ```bash
 # From the repository root
-flash run
+flash dev
 # Check http://localhost:8888/docs for your new endpoints
 ```
 
@@ -177,7 +177,7 @@ your_example/
     └── architecture.png
 ```
 
-`flash run` discovers all `.py` files with `@Endpoint` functions automatically -- no `main.py`, no `workers/` directories, no router wiring.
+`flash dev` discovers all `.py` files with `@Endpoint` functions automatically -- no `main.py`, no `workers/` directories, no router wiring.
 
 ### Minimal Worker (`gpu_worker.py`)
 
@@ -286,7 +286,7 @@ Test your example thoroughly:
 
 ```bash
 # Run the application
-flash run
+flash dev
 
 # Test health endpoint
 curl http://localhost:8888/health

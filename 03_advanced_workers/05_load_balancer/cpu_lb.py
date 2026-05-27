@@ -1,6 +1,5 @@
 # cpu load-balanced endpoints with custom HTTP routes.
-# run with: flash run
-# test directly: python cpu_lb.py
+# run with: flash dev
 from runpod_flash import Endpoint
 
 api = Endpoint(

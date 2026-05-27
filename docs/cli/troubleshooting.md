@@ -6,7 +6,7 @@ Solutions to common Flash CLI problems organized by command and error type.
 
 - [Installation Issues](#installation-issues)
 - [flash init Problems](#flash-init-problems)
-- [flash run Issues](#flash-run-issues)
+- [flash dev Issues](#flash-dev-issues)
 - [flash build Failures](#flash-build-failures)
 - [flash deploy Errors](#flash-deploy-errors)
 - [Environment Management](#environment-management)
@@ -90,7 +90,7 @@ python --version  # Should be 3.10+
 
 **Symptoms:**
 ```bash
-$ flash run
+$ flash dev
 Traceback (most recent call last):
   ImportError: cannot import name 'remote' from 'runpod_flash'
 ```
@@ -220,7 +220,7 @@ flash init my-api
 
 ---
 
-## flash run Issues
+## flash dev Issues
 
 ### Port Already in Use
 
@@ -228,7 +228,7 @@ flash init my-api
 
 **Symptoms:**
 ```bash
-$ flash run
+$ flash dev
 ERROR: [Errno 48] error while attempting to bind on address ('127.0.0.1', 8888): address already in use
 ```
 
@@ -236,7 +236,7 @@ ERROR: [Errno 48] error while attempting to bind on address ('127.0.0.1', 8888):
 
 **1. Use different port:**
 ```bash
-flash run --port 9000
+flash dev --port 9000
 ```
 
 **2. Find and kill process using port:**
@@ -255,11 +255,11 @@ kill <pid>
 **3. Use environment variable:**
 ```bash
 export FLASH_PORT=9000
-flash run
+flash dev
 ```
 
 **References:**
-- [flash run command](commands.md#flash-run)
+- [flash dev command](commands.md#flash-dev)
 - [Workflows: Local Development](workflows.md#local-development-workflow)
 
 ### Module Not Found Error
@@ -268,7 +268,7 @@ flash run
 
 **Symptoms:**
 ```bash
-$ flash run
+$ flash dev
 ModuleNotFoundError: No module named 'fastapi'
 ```
 
@@ -320,14 +320,14 @@ dependencies = [
 **1. Check reload is enabled:**
 ```bash
 # Reload is default, but verify:
-flash run  # Should show "StatReload" in output
+flash dev  # Should show "StatReload" in output
 ```
 
 **2. Manually restart:**
 ```bash
 # Press Ctrl+C to stop
 # Run again
-flash run
+flash dev
 ```
 
 **3. Check file watching:**
@@ -342,14 +342,14 @@ mv ignored_dir/worker.py workers/worker.py
 **4. Disable and re-enable reload:**
 ```bash
 # Try without reload
-flash run --no-reload
+flash dev --no-reload
 
 # Then with reload
-flash run
+flash dev
 ```
 
 **References:**
-- [flash run command](commands.md#flash-run)
+- [flash dev command](commands.md#flash-dev)
 
 ### Cannot Access from Network
 
@@ -363,7 +363,7 @@ flash run
 
 **1. Bind to 0.0.0.0:**
 ```bash
-flash run --host 0.0.0.0
+flash dev --host 0.0.0.0
 ```
 
 **2. Check firewall:**
@@ -391,7 +391,7 @@ ip addr show
 ```
 
 **References:**
-- [flash run command](commands.md#flash-run)
+- [flash dev command](commands.md#flash-dev)
 
 ---
 
@@ -1271,7 +1271,7 @@ When troubleshooting any issue:
 - [ ] No permission issues (`ls -la`)
 - [ ] Recent Flash version (`pip install --upgrade runpod-flash`)
 - [ ] Checked logs and error messages
-- [ ] Tested locally first (`flash run`)
+- [ ] Tested locally first (`flash dev`)
 - [ ] Reviewed documentation
 
 ---
@@ -1301,7 +1301,7 @@ git checkout main
 
 # 6. Fix issue properly
 # ... make changes ...
-flash run  # Test locally
+flash dev  # Test locally
 flash deploy --env staging  # Test in staging
 flash deploy --env production  # Redeploy to production
 ```
@@ -1342,7 +1342,7 @@ pip install runpod-flash
 pip install -e .
 
 # 6. Test locally
-flash run
+flash dev
 
 # 7. Redeploy
 flash env create production
@@ -1357,7 +1357,7 @@ flash deploy --env production
 
 1. **Always test locally first:**
    ```bash
-   flash run
+   flash dev
    # Test all endpoints
    ```
 
@@ -1417,7 +1417,7 @@ flash deploy --env production
 | Issue | Quick Fix |
 |-------|-----------|
 | Command not found | `pip install runpod-flash` |
-| Port in use | `flash run --port 9000` |
+| Port in use | `flash dev --port 9000` |
 | Build too large | `flash build --exclude torch,torchvision` |
 | Missing API key | `export RUNPOD_API_KEY=your-key` |
 | Environment not found | `flash env create <name>` |

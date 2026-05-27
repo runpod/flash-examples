@@ -6,7 +6,7 @@ Exhaustive documentation for all Flash CLI commands. This guide covers every opt
 
 - [flash login](#flash-login) - Authenticate with Runpod
 - [flash init](#flash-init) - Create new Flash project
-- [flash run](#flash-run) - Run development server
+- [flash dev](#flash-dev) - Run development server
 - [flash build](#flash-build) - Build deployment package
 - [flash deploy](#flash-deploy) - Build and deploy application
 - [flash undeploy](#flash-undeploy) - Delete deployed endpoints
@@ -225,7 +225,7 @@ The generated `.gitignore` already includes necessary patterns.
 
 3. **Run Locally**
    ```bash
-   uv run flash run
+   uv run flash dev
    ```
 
 4. **View Documentation**
@@ -267,7 +267,7 @@ flash init my-api
 
 ### Related Commands
 
-- [`flash run`](#flash-run) - Run the initialized project
+- [`flash dev`](#flash-dev) - Run the initialized project
 - [`flash build`](#flash-build) - Build the project
 - [`flash deploy`](#flash-deploy) - Deploy the project
 
@@ -278,14 +278,14 @@ flash init my-api
 
 ---
 
-## flash run
+## flash dev
 
 Run the Flash development server locally with hot reloading for rapid development and testing.
 
 ### Synopsis
 
 ```bash
-flash run [OPTIONS]
+flash dev [OPTIONS]
 ```
 
 ### Description
@@ -294,7 +294,7 @@ Starts a local uvicorn development server that runs your Flash application. The 
 
 ### Architecture: Hybrid Local + Cloud
 
-With `flash run`, your system operates in a **hybrid architecture**:
+With `flash dev`, your system operates in a **hybrid architecture**:
 
 - **Your FastAPI app runs locally** on your machine (localhost:8888)
 - **`@Endpoint` functions run on Runpod** as serverless endpoints
@@ -350,7 +350,7 @@ RUNPOD_API_KEY=your-key-here
 #### Basic Development Server
 
 ```bash
-flash run
+flash dev
 ```
 
 Output:
@@ -367,7 +367,7 @@ Visit `http://localhost:8888/docs` for interactive API documentation.
 #### Custom Host and Port
 
 ```bash
-flash run --host 0.0.0.0 --port 3000
+flash dev --host 0.0.0.0 --port 3000
 ```
 
 Makes server accessible from network at `http://<your-ip>:3000`. Useful for:
@@ -378,7 +378,7 @@ Makes server accessible from network at `http://<your-ip>:3000`. Useful for:
 #### Disable Auto-Reload
 
 ```bash
-flash run --no-reload
+flash dev --no-reload
 ```
 
 Useful for:
@@ -391,7 +391,7 @@ Useful for:
 ```bash
 export FLASH_HOST=0.0.0.0
 export FLASH_PORT=9000
-flash run
+flash dev
 ```
 
 Or with `.env` file:
@@ -402,14 +402,14 @@ FLASH_PORT=9000
 ```
 
 ```bash
-flash run
+flash dev
 # Automatically loads .env
 ```
 
 #### Auto-Provision Resources
 
 ```bash
-flash run --auto-provision
+flash dev --auto-provision
 ```
 
 This will:
@@ -423,7 +423,7 @@ This will:
 #### Combine Options
 
 ```bash
-flash run --host 0.0.0.0 --port 9000 --no-reload
+flash dev --host 0.0.0.0 --port 9000 --no-reload
 ```
 
 Runs on all network interfaces, port 9000, without auto-reload.
@@ -431,7 +431,7 @@ Runs on all network interfaces, port 9000, without auto-reload.
 #### Development with External Access
 
 ```bash
-flash run --host 0.0.0.0
+flash dev --host 0.0.0.0
 # Server accessible at http://192.168.1.100:8888 (your local IP)
 ```
 
@@ -501,7 +501,7 @@ When `--reload` is enabled (default):
 **Example workflow:**
 ```bash
 # Terminal 1: Run server
-flash run
+flash dev
 
 # Terminal 2: Edit code
 echo 'print("Updated!")' >> gpu_worker.py
@@ -520,7 +520,7 @@ echo 'print("Updated!")' >> gpu_worker.py
 
 **For production-like testing:**
 ```bash
-flash run --no-reload
+flash dev --no-reload
 # More representative of deployed performance
 ```
 
@@ -536,7 +536,7 @@ ERROR: [Errno 48] Address already in use
 Solutions:
 ```bash
 # Option 1: Use different port
-flash run --port 9000
+flash dev --port 9000
 
 # Option 2: Kill process using port
 lsof -ti:8888 | xargs kill -9
@@ -576,7 +576,7 @@ Solutions:
 echo "large_files/" >> .gitignore
 
 # Or disable reload temporarily
-flash run --no-reload
+flash dev --no-reload
 ```
 
 **Cannot Access from Network**
@@ -586,7 +586,7 @@ Problem: Cannot reach server from other devices.
 Solutions:
 ```bash
 # Use 0.0.0.0 instead of localhost
-flash run --host 0.0.0.0
+flash dev --host 0.0.0.0
 
 # Check firewall settings
 # macOS: System Preferences → Security & Privacy → Firewall
@@ -603,7 +603,7 @@ Error: RUNPOD_API_KEY environment variable not set
 Solution:
 ```bash
 export RUNPOD_API_KEY=your-key-here
-flash run --auto-provision
+flash dev --auto-provision
 ```
 
 ### Related Commands
@@ -1012,7 +1012,7 @@ flash build --exclude problematic-package
 ### Related Commands
 
 - [`flash deploy`](#flash-deploy) - Build and deploy in one step
-- [`flash run`](#flash-run) - Test before building
+- [`flash dev`](#flash-dev) - Test before building
 
 ### Related Workflows
 
@@ -1047,7 +1047,7 @@ With `flash deploy`, your **entire application** runs on Runpod Serverless:
 - **No `live-` prefix** on endpoint names—these are production endpoints
 - **No hot reload**—code changes require a new deployment
 
-This is different from `flash run`, where your FastAPI app runs locally on your machine. With `flash deploy`, everything is in the cloud for production use.
+This is different from `flash dev`, where your FastAPI app runs locally on your machine. With `flash deploy`, everything is in the cloud for production use.
 
 ### Options
 
@@ -1415,7 +1415,7 @@ flash deploy --env production
 - [`flash build`](#flash-build) - Build without deploying
 - [`flash env`](#flash-env) - Manage environments
 - [`flash undeploy`](#flash-undeploy) - Delete deployments
-- [`flash run`](#flash-run) - Test locally before deploying
+- [`flash dev`](#flash-dev) - Test locally before deploying
 
 ### Related Workflows
 
