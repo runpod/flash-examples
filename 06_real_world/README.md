@@ -118,7 +118,7 @@ All real-world examples include:
 ### Development
 ```bash
 cd example_name
-flash run
+flash dev
 ```
 
 ### Production

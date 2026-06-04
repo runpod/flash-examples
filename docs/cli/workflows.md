@@ -85,7 +85,7 @@ FLASH_PORT=8888
 #### 4. Start Development Server
 
 ```bash
-flash run
+flash dev
 ```
 
 **Expected output:**
@@ -151,7 +151,7 @@ Repeat steps 5-7:
 **Use Multiple Terminals:**
 ```bash
 # Terminal 1: Run server
-flash run
+flash dev
 
 # Terminal 2: Test with curl
 curl http://localhost:8888/process ...
@@ -162,18 +162,18 @@ tail -f logs/application.log
 
 **Disable Hot Reload for Debugging:**
 ```bash
-flash run --no-reload
+flash dev --no-reload
 # Easier to attach debugger
 ```
 
 **Change Port if Conflict:**
 ```bash
-flash run --port 9000
+flash dev --port 9000
 ```
 
 **Access from Network:**
 ```bash
-flash run --host 0.0.0.0
+flash dev --host 0.0.0.0
 # Access from mobile devices or other machines
 ```
 
@@ -182,7 +182,7 @@ flash run --host 0.0.0.0
 **Port in use:**
 ```bash
 # Solution: Use different port
-flash run --port 9000
+flash dev --port 9000
 ```
 
 **Import errors:**
@@ -194,11 +194,11 @@ pip install -e .
 **Changes not reflecting:**
 ```bash
 # Solution: Check hot reload is enabled
-flash run  # --reload is default
+flash dev  # --reload is default
 
 # Or manually restart
 # Ctrl+C to stop
-flash run
+flash dev
 ```
 
 ### Next Step
@@ -217,7 +217,7 @@ Deploy a tested application to Runpod with proper environment isolation and vali
 
 ### Prerequisites
 
-- Application tested locally (`flash run`)
+- Application tested locally (`flash dev`)
 - Runpod API key configured (`RUNPOD_API_KEY`)
 - Environment created (or will create in workflow)
 
@@ -228,7 +228,7 @@ Deploy a tested application to Runpod with proper environment isolation and vali
 Before deploying, ensure everything works locally:
 
 ```bash
-flash run
+flash dev
 # Test all endpoints via http://localhost:8888/docs
 # Ctrl+C when done
 ```
@@ -401,7 +401,7 @@ To deploy code changes:
 ```bash
 # Make changes to code
 # Test locally
-flash run
+flash dev
 
 # Redeploy (same environment)
 flash deploy --env production
@@ -956,7 +956,7 @@ jobs:
 Before production deployment:
 
 **Local Testing:**
-- [ ] `flash run` works without errors
+- [ ] `flash dev` works without errors
 - [ ] All endpoints tested via Swagger UI
 - [ ] Edge cases handled correctly
 - [ ] Error handling tested
@@ -1606,7 +1606,7 @@ async def infer(payload: dict) -> dict:
 **3. Test incrementally:**
 ```bash
 # Local
-flash run  # Does it work?
+flash dev  # Does it work?
 
 # Preview
 flash deploy --preview  # Does build work?
@@ -1655,7 +1655,7 @@ flash env get production
 
 Avoid deployment issues:
 
-- [ ] Test locally with `flash run`
+- [ ] Test locally with `flash dev`
 - [ ] Test build with `flash build`
 - [ ] Test preview with `flash deploy --preview`
 - [ ] Deploy to staging first

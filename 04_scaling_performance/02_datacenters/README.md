@@ -10,7 +10,7 @@ By default, endpoints deploy across all available data centers. The `datacenter`
 
 ```bash
 pip install -r requirements.txt
-flash run
+flash dev
 ```
 
 ## What You'll Learn

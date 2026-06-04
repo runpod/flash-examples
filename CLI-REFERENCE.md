@@ -23,7 +23,7 @@ flash <command> --help    # Show help for specific command
 |---------|---------|
 | [`flash login`](#flash-login) | Authenticate with Runpod |
 | [`flash init`](#flash-init) | Create new Flash project |
-| [`flash run`](#flash-run) | Run development server |
+| [`flash dev`](#flash-dev) | Run development server |
 | [`flash build`](#flash-build) | Build application package |
 | [`flash deploy`](#flash-deploy) | Build and deploy application |
 | [`flash undeploy`](#flash-undeploy) | Delete deployed endpoints |
@@ -101,7 +101,7 @@ Get your API key from [Runpod Settings](https://www.runpod.io/console/user/setti
 
 ### Related Commands
 
-- [`flash run`](#flash-run) - Run development server (requires authentication)
+- [`flash dev`](#flash-dev) - Run development server (requires authentication)
 - [`flash deploy`](#flash-deploy) - Deploy to Runpod (requires authentication)
 
 ---
@@ -156,19 +156,19 @@ flash init my-api --force
 
 ### Related Commands
 
-- [`flash run`](#flash-run) - Run the initialized project locally
+- [`flash dev`](#flash-dev) - Run the initialized project locally
 - [Getting Started Guide](docs/cli/getting-started.md) - Full tutorial
 
 ---
 
-## flash run
+## flash dev
 
 Run the Flash development server locally with hot reloading.
 
 ### Syntax
 
 ```bash
-flash run [OPTIONS]
+flash dev [OPTIONS]
 ```
 
 ### Options
@@ -189,26 +189,26 @@ flash run [OPTIONS]
 
 **Basic local development:**
 ```bash
-flash run
+flash dev
 # Server runs at http://localhost:8888
 # Visit http://localhost:8888/docs for Swagger UI
 ```
 
 **Custom host and port:**
 ```bash
-flash run --host 0.0.0.0 --port 3000
+flash dev --host 0.0.0.0 --port 3000
 # Accessible from network at http://<your-ip>:3000
 ```
 
 **Disable auto-reload:**
 ```bash
-flash run --no-reload
+flash dev --no-reload
 # Useful for debugging or production-like testing
 ```
 
 **Auto-provision resources:**
 ```bash
-flash run --auto-provision
+flash dev --auto-provision
 # Automatically creates Runpod endpoints on startup
 ```
 
@@ -216,7 +216,7 @@ flash run --auto-provision
 ```bash
 export FLASH_HOST=0.0.0.0
 export FLASH_PORT=9000
-flash run
+flash dev
 ```
 
 ### What It Does

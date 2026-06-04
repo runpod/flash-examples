@@ -29,7 +29,7 @@ Learn how to manage Python packages and system dependencies in Flash workers.
 
 ```bash
 cd 01_getting_started/04_dependencies
-flash run
+flash dev
 ```
 
 Server starts at http://localhost:8888
@@ -47,7 +47,7 @@ uv run flash login
 # Or create .env file with RUNPOD_API_KEY=your_api_key_here
 
 # Run
-uv run flash run
+uv run flash dev
 ```
 
 ## GPU vs CPU Packaging
@@ -273,9 +273,8 @@ async def fetch_data(url: str):
 ### 3. Test Dependency Compatibility
 
 ```bash
-# Test locally first
-python gpu_worker.py
-python cpu_worker.py
+# test locally
+flash dev
 ```
 
 ### 4. Document Dependencies

@@ -1,6 +1,5 @@
 # cpu worker with network volume for listing and serving generated images.
-# run with: flash run
-# test directly: python cpu_worker.py
+# run with: flash dev
 from runpod_flash import Endpoint, DataCenter, NetworkVolume
 
 # same volume as gpu_worker.py -- must match name and datacenter
