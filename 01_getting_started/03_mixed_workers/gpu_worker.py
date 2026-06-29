@@ -1,7 +1,7 @@
 # GPU worker for ML inference (sentiment classification).
 # Part of the mixed CPU/GPU pipeline example.
-# Run: python gpu_worker.py
-# Alternative: flash run (for HTTP API testing)
+# Run: uv run gpu_worker.py
+# Alternative: flash dev (for HTTP API testing)
 from runpod_flash import Endpoint, GpuGroup
 
 

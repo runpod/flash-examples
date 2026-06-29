@@ -9,13 +9,14 @@ A collection of example applications showcasing Runpod Flash - a framework for b
 git clone https://github.com/runpod/flash-examples.git
 cd flash-examples
 uv sync && uv pip install -e .
+uv tool install runpod-flash
 
 # Authenticate with Runpod
-uv run flash login
+flash login
 
 # Run an example
 cd 01_getting_started/01_hello_world
-python gpu_worker.py
+uv run gpu_worker.py
 ```
 
 The function executes on a Runpod GPU and prints the result directly. First run takes 30-60 seconds (provisioning); subsequent runs take 2-3 seconds.
@@ -53,7 +54,7 @@ async def generate_image(prompt: str) -> bytes:
 **Key features:**
 - **`@Endpoint` decorator**: Mark any async function to run on serverless infrastructure
 - **Auto-scaling**: Scale to zero when idle, scale up under load
-- **Local development**: `flash run` starts a local server with hot reload
+- **Local development**: `flash dev` starts a local server with hot reload
 - **One-command deploy**: `flash deploy` packages and ships your code
 
 ## Prerequisites

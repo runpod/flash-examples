@@ -12,12 +12,13 @@ The GPU worker generates images with Stable Diffusion and writes them to a Runpo
 
 ```bash
 uv sync
+uv tool install runpod-flash
 ```
 
 ### 2. Authenticate
 
 ```bash
-uv run flash login
+flash login
 ```
 
 Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
@@ -27,7 +28,7 @@ Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 Generate an image by running the GPU worker directly:
 
 ```bash
-python gpu_worker.py
+uv run gpu_worker.py
 ```
 
 First run takes 60-120 seconds (provisioning + model download). The image is saved to the network volume and the result is printed to your terminal.
@@ -37,7 +38,7 @@ First run takes 60-120 seconds (provisioning + model download). The image is sav
 The CPU worker serves images via HTTP routes. To test it:
 
 ```bash
-uv run flash run
+flash dev
 ```
 
 Server starts at `http://localhost:8888`

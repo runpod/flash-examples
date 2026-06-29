@@ -25,7 +25,8 @@ This example demonstrates running a 1.7B parameter TTS model on serverless GPU i
 ```bash
 cd 02_ml_inference/01_text_to_speech
 uv sync
-uv run flash login
+uv tool install runpod-flash
+flash login
 ```
 
 Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
@@ -33,7 +34,7 @@ Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 ### Run
 
 ```bash
-python gpu_worker.py
+uv run gpu_worker.py
 ```
 
 First run provisions the endpoint (~1 min) and downloads the model. The result is printed directly to your terminal.
@@ -45,7 +46,7 @@ Subsequent runs take 5-10 seconds (worker is already running).
 To test via HTTP endpoints:
 
 ```bash
-uv run flash run
+flash dev
 ```
 
 Server starts at http://localhost:8888. Visit http://localhost:8888/docs for interactive API documentation.
@@ -135,7 +136,7 @@ flash deploy send production
 
 ## Common Issues
 
-- **Cold start delay**: First request after idle takes 20-30s to load the model. Use `flash run --auto-provision` during development.
+- **Cold start delay**: First request after idle takes 20-30s to load the model. Use `flash dev --auto-provision` during development.
 - **Out of memory**: The model requires 24GB+ VRAM. Ensure `GpuGroup.ADA_24` or higher is configured.
 - **Invalid speaker/language**: Use `get_voices` to check valid options.
 

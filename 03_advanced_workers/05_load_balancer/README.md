@@ -27,12 +27,13 @@ Load-balanced endpoints use direct HTTP routing to serverless workers, providing
 
 ```bash
 uv sync
+uv tool install runpod-flash
 ```
 
 ### 2. Authenticate
 
 ```bash
-uv run flash login
+flash login
 ```
 
 Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
@@ -43,10 +44,10 @@ Run each load-balanced worker directly:
 
 ```bash
 # Test GPU load-balanced worker
-python gpu_lb.py
+uv run gpu_lb.py
 
 # Test CPU load-balanced worker
-python cpu_lb.py
+uv run cpu_lb.py
 ```
 
 This tests the worker setup. Results are printed directly to your terminal.
@@ -56,14 +57,14 @@ This tests the worker setup. Results are printed directly to your terminal.
 Load-balanced endpoints expose HTTP routes. To test the full API:
 
 ```bash
-uv run flash run
+flash dev
 ```
 
 Visit **http://localhost:8888/docs** for interactive API documentation.
 
 ### 4. Test Endpoints (via unified app)
 
-When using `flash run` from the repository root, routes are prefixed with the example name:
+When using `flash dev` from the repository root, routes are prefixed with the example name:
 
 **GPU Service (Compute)**:
 ```bash
@@ -276,10 +277,10 @@ Response:
 
 ```bash
 # Test GPU worker
-python gpu_lb.py
+uv run gpu_lb.py
 
 # Test CPU worker
-python cpu_lb.py
+uv run cpu_lb.py
 ```
 
 ## Deployment

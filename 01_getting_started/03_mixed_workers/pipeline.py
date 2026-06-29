@@ -1,7 +1,7 @@
 # Classification pipeline: CPU preprocess -> GPU inference -> CPU postprocess.
 # Demonstrates cross-worker orchestration via a load-balanced endpoint.
-# Run: python pipeline.py (local testing)
-# Alternative: flash run (for HTTP route testing)
+# Run: uv run pipeline.py (local testing)
+# Alternative: flash dev (for HTTP route testing)
 import sys
 from pathlib import Path
 

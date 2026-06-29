@@ -12,10 +12,10 @@ Configure Flash worker autoscaling for different workload patterns. This example
 cd 04_scaling_performance/01_autoscaling
 
 # Run GPU worker
-python gpu_worker.py
+uv run gpu_worker.py
 
 # Run CPU worker
-python cpu_worker.py
+uv run cpu_worker.py
 ```
 
 First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
@@ -25,7 +25,7 @@ First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
 To test via HTTP endpoints:
 
 ```bash
-uv run flash run
+flash dev
 ```
 
 Server starts at http://localhost:8888. Visit http://localhost:8888/docs for interactive API docs.
@@ -178,16 +178,16 @@ Use `load_test.py` to observe scaling behavior:
 
 ```bash
 # Default: 20 requests, concurrency 10, 10s pause
-python load_test.py
+uv run load_test.py
 
 # Target a specific endpoint
-python load_test.py --endpoint /gpu_worker/runsync --requests 50
+uv run load_test.py --endpoint /gpu_worker/runsync --requests 50
 
 # Longer pause to observe scale-down
-python load_test.py --pause 60 --concurrency 20
+uv run load_test.py --pause 60 --concurrency 20
 
 # Test CPU workers
-python load_test.py --endpoint /cpu_worker/runsync --requests 100 --concurrency 50
+uv run load_test.py --endpoint /cpu_worker/runsync --requests 100 --concurrency 50
 ```
 
 **Requires:** `pip install aiohttp`

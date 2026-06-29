@@ -120,13 +120,13 @@ All real-world examples include:
 Run individual workers directly:
 ```bash
 cd example_name
-python gpu_worker.py
-python cpu_worker.py
+uv run gpu_worker.py
+uv run cpu_worker.py
 ```
 
 Or run the full app with HTTP routes:
 ```bash
-uv run flash run
+flash dev
 ```
 
 ### Production

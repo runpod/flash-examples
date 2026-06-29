@@ -48,10 +48,10 @@ Run the CPU and GPU workers directly:
 cd 01_getting_started/03_mixed_workers
 
 # Test CPU preprocessing worker
-python cpu_worker.py
+uv run cpu_worker.py
 
 # Test GPU inference worker
-python gpu_worker.py
+uv run gpu_worker.py
 ```
 
 First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
@@ -61,7 +61,7 @@ First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
 The pipeline endpoint (`/classify`) orchestrates multiple workers via HTTP. To test it:
 
 ```bash
-uv run flash run
+flash dev
 ```
 
 Server starts at http://localhost:8888
@@ -71,9 +71,10 @@ Server starts at http://localhost:8888
 ```bash
 # Install dependencies
 uv sync
+uv tool install runpod-flash
 
 # Authenticate
-uv run flash login
+flash login
 # Or create .env file with RUNPOD_API_KEY=your_api_key_here
 ```
 

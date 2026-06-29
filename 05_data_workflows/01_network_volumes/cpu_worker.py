@@ -1,6 +1,6 @@
 # CPU worker with network volume for listing and serving generated images.
-# This is an LB endpoint with HTTP routes - use flash run to test routes.
-# Run: flash run (required for HTTP route testing)
+# This is an LB endpoint with HTTP routes - use flash dev to test routes.
+# Run: flash dev (required for HTTP route testing)
 from runpod_flash import Endpoint, NetworkVolume
 
 volume = NetworkVolume(

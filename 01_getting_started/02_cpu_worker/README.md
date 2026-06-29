@@ -8,12 +8,13 @@ Simple example demonstrating CPU-based serverless workers with automatic scaling
 
 ```bash
 uv sync
+uv tool install runpod-flash
 ```
 
 ### 2. Authenticate
 
 ```bash
-uv run flash login
+flash login
 ```
 
 Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
@@ -21,7 +22,7 @@ Or create a `.env` file with `RUNPOD_API_KEY=your_api_key_here`.
 ### 3. Run the Example
 
 ```bash
-python cpu_worker.py
+uv run cpu_worker.py
 ```
 
 The function executes on a Runpod CPU worker and prints the result directly:
@@ -38,7 +39,7 @@ First run takes 30-60 seconds (provisioning). Subsequent runs take 2-3 seconds.
 To test via HTTP endpoints instead:
 
 ```bash
-uv run flash run
+flash dev
 ```
 
 Visit **http://localhost:8888/docs** for interactive API documentation.
@@ -143,12 +144,12 @@ The CPU worker scales to zero when idle:
 
 ### Run the Worker
 ```bash
-python cpu_worker.py
+uv run cpu_worker.py
 ```
 
 ### HTTP API Testing (Optional)
 ```bash
-uv run flash run
+flash dev
 ```
 
 ## When to Use CPU Workers

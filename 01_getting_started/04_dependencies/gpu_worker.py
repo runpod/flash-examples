@@ -1,6 +1,6 @@
 # GPU workers demonstrating Python and system dependency management.
-# Run: python gpu_worker.py
-# Alternative: flash run (for HTTP API testing)
+# Run: uv run gpu_worker.py
+# Alternative: flash dev (for HTTP API testing)
 from runpod_flash import Endpoint, GpuGroup
 
 

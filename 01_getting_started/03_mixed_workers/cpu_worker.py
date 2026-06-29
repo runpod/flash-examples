@@ -1,7 +1,7 @@
 # CPU workers for text preprocessing and postprocessing.
 # Part of the mixed CPU/GPU pipeline example.
-# Run: python cpu_worker.py
-# Alternative: flash run (for HTTP API testing)
+# Run: uv run cpu_worker.py
+# Alternative: flash dev (for HTTP API testing)
 from runpod_flash import CpuInstanceType, Endpoint
 
 

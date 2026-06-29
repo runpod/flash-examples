@@ -1,6 +1,6 @@
 # GPU load-balanced endpoints with custom HTTP routes.
-# Run: python gpu_lb.py (test worker setup)
-# Run: flash run (test HTTP routes)
+# Run: uv run gpu_lb.py (test worker setup)
+# Run: flash dev (test HTTP routes)
 from runpod_flash import Endpoint, GpuType
 
 api = Endpoint(

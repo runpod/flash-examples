@@ -1,6 +1,6 @@
 # GPU autoscaling strategies -- scale-to-zero, always-on, high-throughput.
-# Run: python gpu_worker.py
-# Alternative: flash run (for HTTP API testing)
+# Run: uv run gpu_worker.py
+# Alternative: flash dev (for HTTP API testing)
 from runpod_flash import Endpoint, GpuType, ServerlessScalerType
 
 
