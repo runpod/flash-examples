@@ -15,21 +15,23 @@ Server starts at http://localhost:8888 -- visit http://localhost:8888/docs for i
 
 ### Test Individual Strategies
 
+> Queue-based (`/runsync`) endpoints require the Runpod serverless envelope `{"input": {"<function-parameter-name>": ...}}`. The autoscaling workers all take `payload`.
+
 ```bash
 # Scale-to-zero GPU worker
 curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
-  -d '{"matrix_size": 512}'
+  -d '{"input": {"payload": {"matrix_size": 512}}}'
 
 # Always-on GPU worker (same payload, different endpoint)
 curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
-  -d '{"matrix_size": 512}'
+  -d '{"input": {"payload": {"matrix_size": 512}}}'
 
 # CPU scale-to-zero
 curl -X POST http://localhost:8888/cpu_worker/runsync \
   -H "Content-Type: application/json" \
-  -d '{"text": "Hello autoscaling"}'
+  -d '{"input": {"payload": {"text": "Hello autoscaling"}}}'
 ```
 
 ## Scaling Strategies
