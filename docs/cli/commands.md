@@ -463,7 +463,7 @@ Visit `http://localhost:8888/docs`
 ```bash
 curl -X POST http://localhost:8888/your-endpoint \
   -H "Content-Type: application/json" \
-  -d '{"input": "test data"}'
+  -d '{"input": {"<param>": "test data"}}'
 ```
 
 **Python requests**
