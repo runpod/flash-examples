@@ -32,11 +32,13 @@ Server starts at `http://localhost:8888`
 
 ### 4. Test the API
 
+> Queue-based (`/runsync`) endpoints require the Runpod serverless envelope `{"input": {"<function-parameter-name>": ...}}`. The class method is `generate_image(self, prompt)`, so the inner key is `prompt` (not `input_data`).
+
 **Generate an image (GPU worker):**
 ```bash
 curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "a sunset over mountains"}'
+  -d '{"input": {"prompt": "a sunset over mountains"}}'
 ```
 
 **List generated images (CPU worker):**

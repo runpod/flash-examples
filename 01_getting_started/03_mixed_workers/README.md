@@ -73,14 +73,15 @@ curl -X POST http://localhost:8888/classify \
   -H "Content-Type: application/json" \
   -d '{"text": "This product is amazing! I love it!"}'
 
-# Individual stages
+# Individual stages (QB endpoints use the Runpod envelope:
+#   {"input": {"<fn-param>": ...}}; here both workers take input_data)
 curl -X POST http://localhost:8888/cpu_worker/runsync \
   -H "Content-Type: application/json" \
-  -d '{"text": "Test message"}'
+  -d '{"input": {"input_data": {"text": "Test message"}}}'
 
 curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
-  -d '{"cleaned_text": "Test message", "word_count": 2}'
+  -d '{"input": {"input_data": {"cleaned_text": "Test message", "word_count": 2}}}'
 ```
 
 Visit http://localhost:8888/docs for interactive API documentation.
