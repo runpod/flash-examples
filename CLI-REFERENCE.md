@@ -238,7 +238,7 @@ Visit `http://localhost:8888/docs` for interactive API testing
 ```bash
 curl -X POST http://localhost:8888/your-endpoint \
   -H "Content-Type: application/json" \
-  -d '{"input": "test"}'
+  -d '{"input": {"<param>": "test"}}'
 ```
 
 ### Related Commands
