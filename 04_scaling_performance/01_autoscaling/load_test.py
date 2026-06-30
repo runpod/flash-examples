@@ -21,7 +21,7 @@ import aiohttp
 
 DEFAULT_URL = "http://localhost:8888"
 DEFAULT_ENDPOINT = "/gpu_worker/runsync"
-DEFAULT_PAYLOAD = {"matrix_size": 256}
+DEFAULT_PAYLOAD = {"input": {"payload": {"matrix_size": 256}}}
 
 
 async def send_request(
