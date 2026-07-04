@@ -473,7 +473,7 @@ import requests
 
 response = requests.post(
     "http://localhost:8888/your-endpoint",
-    json={"input": "test data"}
+    json={"input": {"<param>": "test data"}}
 )
 print(response.json())
 ```
@@ -481,7 +481,7 @@ print(response.json())
 **HTTPie**
 
 ```bash
-http POST localhost:8888/your-endpoint input="test data"
+http POST localhost:8888/your-endpoint input:='{"<param>": "test data"}'
 ```
 
 ### Hot Reload Behavior
