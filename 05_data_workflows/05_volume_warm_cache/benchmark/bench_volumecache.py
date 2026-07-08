@@ -40,8 +40,10 @@ class BenchVolumeCache:
 
         self.logger = logging.getLogger(__name__)
 
-        # HF cache on local disk (default). VolumeCache mirrors it to the volume.
-        hf = os.path.expanduser("~/.cache/huggingface")
+        # HF cache on local disk. The flash-worker image sets HF_HOME=/hf-cache,
+        # so honor it (falling back to the HF default) — VolumeCache mirrors that
+        # local dir to the volume.
+        hf = os.environ.get("HF_HOME") or os.path.expanduser("~/.cache/huggingface")
         self._hf = hf
         self._vc = VolumeCache(dirs=[hf])
 
