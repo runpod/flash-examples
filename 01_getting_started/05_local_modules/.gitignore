@@ -1,0 +1,4 @@
+.flash/
+.venv/
+__pycache__/
+*.pyc
