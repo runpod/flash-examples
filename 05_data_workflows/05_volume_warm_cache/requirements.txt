@@ -1,0 +1,12 @@
+# VolumeCache ships in runpod-python via SLS-367 / PR #531 (not yet released).
+# Pin runpod to the PR branch so `from runpod.serverless import VolumeCache`
+# resolves today. Switch to a released version (e.g. runpod>=X.Y.Z) once merged.
+runpod @ git+https://github.com/runpod/runpod-python.git@deanquinanola/sls-367-network-volume-warm-cache-for-serverless-volumecache
+
+runpod-flash>=1.8.0
+
+# Model libraries used by the GPU worker
+torch
+diffusers
+transformers
+accelerate

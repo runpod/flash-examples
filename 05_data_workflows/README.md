@@ -49,6 +49,16 @@ ETL workflows for data processing.
 - Audio transcription + analysis
 - Image batch processing
 
+### [05_volume_warm_cache](./05_volume_warm_cache/)
+Warm-cache model weights across cold starts with `runpod.serverless.VolumeCache`.
+
+**What you'll learn:**
+- Mirroring a local model cache to a network volume and reconciling on each use
+- Why mirroring differs from mounting the cache directly on the volume
+- The `with VolumeCache(dirs=[...]):` closure inside a Flash `@Endpoint`
+
+> Requires `runpod-python` with `VolumeCache` (SLS-367 / PR #531); see the example README for status.
+
 ### 04_s3_integration _(coming soon)_
 Cloud storage integration (S3, R2, etc.).
 
