@@ -62,6 +62,14 @@ curl -X POST http://localhost:8888/gpu_worker/runsync \
   -d '{"prompt": "a sunset over mountains"}'
 ```
 
+## Benchmark: direct vs VolumeCache
+
+`benchmark/` contains an A/B that measures cold-start model-load time for the two
+caching strategies (direct HF-on-volume vs local-disk-mirrored-to-volume),
+reporting first-run vs warm load time and volume/local storage. See
+[benchmark/README.md](./benchmark/README.md). The direct arm is runnable today;
+the VolumeCache arm needs a flash-worker image that includes VolumeCache (#531).
+
 ## What You'll Learn
 
 - How to warm-cache model weights across cold starts with `runpod.serverless.VolumeCache`
