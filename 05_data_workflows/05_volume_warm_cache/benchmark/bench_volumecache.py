@@ -24,7 +24,10 @@ volume = NetworkVolume(name="flash-05-bench-volume", size=50)
     name="bench_volumecache",
     gpu=GpuType.NVIDIA_GEFORCE_RTX_5090,
     workers=(0, 1),
-    idle_timeout=30,
+    # Keep the worker alive long enough for the background mirror-back sync to
+    # finish before scale-to-0 (otherwise the volume mirror never populates and
+    # the next cold worker can't hydrate).
+    idle_timeout=180,
     volume=volume,
     dependencies=["torch", "diffusers", "transformers", "accelerate"],
 )
