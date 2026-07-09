@@ -40,17 +40,26 @@ LOCAL_HF = "/root/bench-hf-local"  # volumecache strategy: HF cache on local dis
 VC_NAMESPACE = "bench-volumecache"
 
 
-def drop_caches():
-    """Flush dirty pages and drop the OS page cache so the next read hits storage."""
-    subprocess.run(["sync"], check=True)
-    try:
-        with open("/proc/sys/vm/drop_caches", "w") as fh:
-            fh.write("3\n")
-    except PermissionError:
-        raise SystemExit(
-            "Need root to drop the page cache (/proc/sys/vm/drop_caches). "
-            "Run this on a Pod as root."
-        )
+def evict(path):
+    """Drop each file's pages from the page cache so the next read hits storage.
+
+    Containers can't write /proc/sys/vm/drop_caches (read-only, needs a
+    privileged host), so we evict per file with posix_fadvise(DONTNEED) — which
+    needs no root and targets exactly the tree we're about to read.
+    """
+    subprocess.run(["sync"], check=False)
+    for root, _dirs, files in os.walk(path):
+        for name in files:
+            try:
+                fd = os.open(os.path.join(root, name), os.O_RDONLY)
+            except OSError:
+                continue
+            try:
+                os.posix_fadvise(fd, 0, 0, os.POSIX_FADV_DONTNEED)
+            except OSError:
+                pass
+            finally:
+                os.close(fd)
 
 
 def dir_bytes(path):
@@ -78,7 +87,6 @@ def load_model(cache_dir):
         requires_safety_checker=False,
         use_safetensors=True,
         low_cpu_mem_usage=True,
-        local_files_only=True,  # measure load from cache, never a download
     ).to("cuda")
     dt = time.perf_counter() - t0
     del pipe
@@ -118,6 +126,9 @@ def seed(vc):
 
 
 def _download(cache_dir):
+    # Download only what this load config needs (~4GB safetensors), not the full
+    # ~33GB repo (all .ckpt/.bin variants) — the volume quota and container disk
+    # can't hold two full copies.
     import torch
     from diffusers import StableDiffusionPipeline
 
@@ -153,7 +164,7 @@ def main():
     # --- Direct: every load reads the model from the volume (cold page cache) ---
     direct_loads = []
     for i in range(args.trials + 1):  # +1 warmup, discarded
-        drop_caches()
+        evict(VOLUME_HF)
         dt = load_model(VOLUME_HF)
         if i:
             direct_loads.append(dt)
@@ -165,7 +176,7 @@ def main():
         shutil.rmtree(
             LOCAL_HF, ignore_errors=True
         )  # simulate a fresh worker's empty local disk
-        drop_caches()
+        evict(vc._mirror_root)  # hydrate should read the mirror cold from the volume
         t0 = time.perf_counter()
         vc.hydrate()  # copy mirror (volume) -> local
         h = time.perf_counter() - t0
@@ -182,7 +193,7 @@ def main():
     # --- Reload cost with the model already on local disk (cold page cache each) ---
     vc_reloads = []
     for i in range(args.reloads + 1):
-        drop_caches()
+        evict(LOCAL_HF)
         dt = load_model(LOCAL_HF)
         if i:
             vc_reloads.append(dt)

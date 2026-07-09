@@ -65,6 +65,28 @@ The point isn't a single winner: it's the crossover. Frequent reloads or a slow
 volume favor VolumeCache; a single load per cold start on a fast volume favors
 direct.
 
+## Results (measured 2026-07-09)
+
+RTX 4090 pod, EU-RO-1, 50GB MooseFS network volume, `stable-diffusion-v1-5`
+(~8.5GB), 5 trials each, page cache evicted (`posix_fadvise`) before every read.
+
+| metric | mean | stdev |
+| --- | --- | --- |
+| direct load (from volume) | **6.45s** | 0.19 |
+| vc hydrate (volume→local copy) | 4.81s | 0.04 |
+| vc first load (from local, after hydrate) | 2.21s | 0.02 |
+| vc reload (from local, cold cache) | **1.76s** | 0.01 |
+
+Storage: direct = 8.5GB on the volume; VolumeCache = ~4.3GB volume mirror + local copy (roughly double).
+
+**Reading local is ~3.7× faster than reading the MooseFS volume** (1.76s vs 6.45s) — the volume read is a real bottleneck.
+
+**Breakeven ≈ 1 load per worker:**
+- Load **once** per cold worker: direct ≈ 6.45s vs VolumeCache ≈ hydrate 4.81s + load 2.21s ≈ **7.0s** — direct is simpler and marginally faster.
+- Load **twice or more** per worker: VolumeCache wins decisively — each extra reload is 1.76s vs 6.45s. `direct = K×6.45` vs `volumecache = 4.81 + K×1.76`.
+
+**Takeaway:** on this network volume, VolumeCache pays off when a worker (re)loads the model more than once (or for read-heavy repeated access); for a single load per cold start, caching directly on the volume is the simpler choice with equivalent latency. Both beat re-downloading from Hugging Face.
+
 ## Note
 
 This script uses `runpod.serverless.VolumeCache` directly (no Flash). It is
