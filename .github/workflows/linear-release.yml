@@ -1,0 +1,26 @@
+name: Linear Release Sync
+
+# flash-examples has no versioned release system (no release-please, no tags),
+# so this uses a continuous pipeline: every push to main is synced to Linear as
+# a release, scanning commits for issue identifiers. (SLS-170)
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linear-sync:
+    name: Linear Release Sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for commit history scanning
+
+      - uses: linear/linear-release-action@v0
+        with:
+          access_key: ${{ secrets.LINEAR_RELEASE_ACCESS_KEY }}
+          command: sync
