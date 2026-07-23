@@ -2,7 +2,7 @@ name: Linear Release Sync
 
 # flash-examples has no versioned release system (no release-please, no tags),
 # so this uses a continuous pipeline: every push to main is synced to Linear as
-# a release, scanning commits for issue identifiers. (SLS-170)
+# a release, scanning commits for issue identifiers.
 on:
   push:
     branches: [main]
