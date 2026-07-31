@@ -61,6 +61,7 @@ Open **http://localhost:8888/docs** to explore all endpoints.
 | | [02_cpu_worker](./01_getting_started/02_cpu_worker/) | CPU-only worker |
 | | [03_mixed_workers](./01_getting_started/03_mixed_workers/) | GPU + CPU pipeline |
 | | [04_dependencies](./01_getting_started/04_dependencies/) | Dependency management |
+| | [05_local_modules](./01_getting_started/05_local_modules/) | Local (non-pip) modules and packages |
 | **ML Inference** | [01_text_to_speech](./02_ml_inference/01_text_to_speech/) | Qwen3-TTS model serving |
 | **Advanced** | [05_load_balancer](./03_advanced_workers/05_load_balancer/) | HTTP routing with load balancer |
 | **Scaling** | [01_autoscaling](./04_scaling_performance/01_autoscaling/) | Worker autoscaling configuration |

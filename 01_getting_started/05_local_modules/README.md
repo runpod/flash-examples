@@ -19,6 +19,11 @@ function source plus its local-module closure are shipped to the worker — so
 imports must resolve at call time. The same code works unchanged for
 `flash deploy`, where the whole project tree is bundled.
 
+## Requirements
+
+Local-module bundling landed in the SDK in **`runpod-flash>=1.19.0`** (runpod/flash#352).
+On 1.18.0 and earlier the modules are never collected, so every tier below fails.
+
 ## Run it
 
 ```bash
@@ -120,9 +125,10 @@ the function and materialized on the worker's `sys.path` before the function
 runs. It requires the worker runtime that materializes `FunctionRequest.modules`
 (flash-worker PR runpod-workers/flash#100).
 
-- **Against stock Runpod workers** (current published image): the inline modules
-  are ignored by the worker, so `import text_utils` fails on the worker. This is
-  expected until #100 is released.
+- **Against stock Runpod workers**: the inline modules are ignored by the worker,
+  so `import text_utils` fails on the worker. This is expected until #100 is
+  released — as of this writing no published `runpod/flash-cpu` tag carries it
+  (newest stock tags date to 2026-04-22; #100 merged 2026-07-14).
 - **To test now:** build the flash-worker image locally with #100
   (`make build` in the worker repo) and exercise it via the worker's
   `make smoketest` with a request carrying `modules`, or via
