@@ -130,7 +130,8 @@ large-file head) is warranted.
 
 Runpod CPU serverless (`cpu3g-4-16`), 50 GB MooseFS network volume in EU-RO-1,
 page cache evicted before every timed op. `trials=2` except `many_small`
-(`trials=1`). Raw data in `results.json`.
+(`trials=1`). The tables below are the record of that run; re-running the
+benchmark writes its own `results.json` locally (gitignored).
 
 ### Summary matrix — fastest strategy per quadrant
 
@@ -154,7 +155,8 @@ page cache evicted before every timed op. `trials=2` except `many_small`
 | mixed_hf | 92.0s (12) | 12.6s (86) | **3.48s (312)** |
 | many_small | 428.7s (1.5) | 62.0s (10) | **5.91s (106)** |
 
-Hydrate (volume → local) tracks the same winners; see `results.json`.
+Hydrate (volume → local) tracks the same winners — see the hydrate column of the
+summary matrix above.
 
 ### What the crossover says
 

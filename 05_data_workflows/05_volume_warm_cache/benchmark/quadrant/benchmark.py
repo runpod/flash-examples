@@ -17,7 +17,8 @@ Two ways to reach the worker:
       RUNPOD_API_KEY=... python benchmark.py --endpoint-id <id>
 
 Confirm the exact route at <base-url>/docs (dev) — pass --route if it differs.
-Results are printed and written to results.json for the README.
+Results are printed and written to results.json, which is a local run artifact
+(gitignored) — the committed record of our run lives in README.md.
 """
 
 import argparse
