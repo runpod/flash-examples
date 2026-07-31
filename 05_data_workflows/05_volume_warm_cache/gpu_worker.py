@@ -6,9 +6,9 @@
 # are local, while cold starts stay warm because the model is restored from the
 # volume instead of re-downloaded.
 #
-# STATUS: VolumeCache ships in runpod-python (SLS-367 / PR #531). This example
-# runs once that change is released and the flash-worker image includes it; see
-# README.md. Until then it is illustrative.
+# STATUS: VolumeCache ships in runpod-python 1.12.0 (SLS-367 / PR #538, merged).
+# This example runs once the deployed flash-worker image is built against
+# runpod>=1.12.0; see README.md. Until then it is illustrative.
 #
 # run with: flash dev
 import logging

@@ -5,8 +5,9 @@
 # local; the volume is a warm mirror. Paired with bench_direct.py; driven by
 # benchmark.py.
 #
-# PREREQUISITE: the deployed flash-worker image must include VolumeCache
-# (SLS-367 / runpod-python PR #531). It cannot be added at runtime via the
+# PREREQUISITE: the deployed flash-worker image must be built against
+# runpod>=1.12.0, where VolumeCache ships (SLS-367 / runpod-python PR #538).
+# It cannot be added at runtime via the
 # dependencies list because the worker's runpod is already imported before the
 # handler runs. Until flash-worker ships it, this arm will fail to import
 # VolumeCache — see benchmark/README.md.

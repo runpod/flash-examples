@@ -32,7 +32,8 @@ This runs as a **Runpod serverless worker**, deliberately:
 
 `VolumeCache` itself is not imported: the `serial` strategy **is** what
 VolumeCache does today (per-file copy); `parallel` and `tar` are the candidates
-we're evaluating to add. So this needs neither a GPU nor the #531 worker image.
+we're evaluating to add. So this needs neither a GPU nor a VolumeCache-capable
+worker image.
 
 ## The quadrants (tree shapes)
 

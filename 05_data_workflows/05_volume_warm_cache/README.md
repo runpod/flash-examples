@@ -6,17 +6,14 @@ restore the model from the volume instead of re-downloading it.
 ## Status
 
 `VolumeCache` is a `runpod-python` serverless primitive added in
-**SLS-367 / [runpod-python PR #531](https://github.com/runpod/runpod-python/pull/531)**.
-It is not yet in a released `runpod-python`. This example runs end-to-end once:
+**SLS-367 / [runpod-python PR #538](https://github.com/runpod/runpod-python/pull/538)**,
+which is merged and ships in `runpod` **1.12.0**.
 
-1. PR #531 is merged and released, and
-2. the deployed **flash-worker** image is built against a `runpod-python` that
-   includes `VolumeCache` (the model load runs inside the remote GPU worker, so
-   it is that image's `runpod`, not this example's local env, that must have it).
-
-Until then this example is illustrative. `requirements.txt` pins `runpod` to the
-PR branch so the local environment and any custom worker build can resolve
-`VolumeCache` today; switch it to the released version once available.
+One gate remains before this example runs end-to-end: the deployed
+**flash-worker** image must be built against `runpod>=1.12.0`. The model load
+runs inside the remote GPU worker, so it is that image's `runpod`, not this
+example's local env, that must have `VolumeCache`. Until flash-worker ships it,
+this example is illustrative.
 
 ## Overview
 
@@ -68,7 +65,7 @@ curl -X POST http://localhost:8888/gpu_worker/runsync \
 caching strategies (direct HF-on-volume vs local-disk-mirrored-to-volume),
 reporting first-run vs warm load time and volume/local storage. See
 [benchmark/README.md](./benchmark/README.md). The direct arm is runnable today;
-the VolumeCache arm needs a flash-worker image that includes VolumeCache (#531).
+the VolumeCache arm needs a flash-worker image built against `runpod>=1.12.0`.
 
 ## What You'll Learn
 

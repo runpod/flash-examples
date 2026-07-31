@@ -45,8 +45,7 @@ Provision a **Pod** with a GPU and the network volume attached (mounted at
 `/runpod-volume`), then on the pod (as root):
 
 ```bash
-pip install "runpod @ git+https://github.com/runpod/runpod-python.git@deanquinanola/sls-367-network-volume-warm-cache-for-serverless-volumecache" \
-            diffusers transformers accelerate torch
+pip install "runpod>=1.12.0" diffusers transformers accelerate torch
 python benchmark.py --trials 5 --reloads 5
 ```
 

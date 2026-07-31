@@ -18,8 +18,7 @@ Why this design (vs the naive serverless benchmark):
   one-time hydrate copy. This harness finds that crossover.
 
 Setup on the pod:
-    pip install "runpod @ git+https://github.com/runpod/runpod-python.git@deanquinanola/sls-367-network-volume-warm-cache-for-serverless-volumecache" \
-                diffusers transformers accelerate torch
+    pip install "runpod>=1.12.0" diffusers transformers accelerate torch
     python benchmark.py --trials 5 --reloads 5
 
 Requires root (for /proc/sys/vm/drop_caches) and a mounted network volume.

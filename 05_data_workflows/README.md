@@ -57,7 +57,7 @@ Warm-cache model weights across cold starts with `runpod.serverless.VolumeCache`
 - Why mirroring differs from mounting the cache directly on the volume
 - The `with VolumeCache(dirs=[...]):` closure inside a Flash `@Endpoint`
 
-> Requires `runpod-python` with `VolumeCache` (SLS-367 / PR #531); see the example README for status.
+> Requires `runpod>=1.12.0` for `VolumeCache` (SLS-367 / PR #538); see the example README for status.
 
 ### 04_s3_integration _(coming soon)_
 Cloud storage integration (S3, R2, etc.).

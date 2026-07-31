@@ -7,7 +7,7 @@ first-run and warm-run metrics for both strategies, and prints a table.
 
 Prerequisites:
 - Both endpoints deployed/served (see benchmark/README.md). The volumecache arm
-  additionally requires a flash-worker image that includes VolumeCache (#531).
+  additionally requires a flash-worker image built against runpod>=1.12.0.
 - The workers use idle_timeout=30, so waiting >~40s between trials lets the
   worker scale to 0, making the next call a fresh cold start.
 

@@ -11,7 +11,7 @@
 # CPU endpoint, no GPU — this is storage transport, not compute. VolumeCache
 # itself isn't imported: the `serial` strategy IS what VolumeCache does today
 # (per-file copy); `parallel` and `tar` are the candidates we're evaluating to
-# add. So this needs neither a GPU nor the #531 worker image.
+# add. So this needs neither a GPU nor a VolumeCache-capable worker image.
 #
 # One invocation runs ONE profile (the full sweep moves hundreds of GB — too
 # long for a single request); the driver (benchmark.py) loops the profiles.

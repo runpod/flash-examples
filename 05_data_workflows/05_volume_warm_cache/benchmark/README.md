@@ -25,8 +25,9 @@ Both load the same model (`stable-diffusion-v1-5`) and self-report metrics;
 
 - Both endpoints need a network volume attached (the workers declare one).
 - **Direct arm: runnable on Flash today.**
-- **VolumeCache arm requires a flash-worker image that includes `VolumeCache`
-  (SLS-367 / [runpod-python PR #531](https://github.com/runpod/runpod-python/pull/531)).**
+- **VolumeCache arm requires a flash-worker image built against `runpod>=1.12.0`,
+  which is where `VolumeCache` ships (SLS-367 /
+  [runpod-python PR #538](https://github.com/runpod/runpod-python/pull/538)).**
   It cannot be added at runtime via `dependencies` because the worker's `runpod`
   is already imported before the handler runs. Until flash-worker ships it, run
   the direct arm alone with `--skip-volumecache`.
