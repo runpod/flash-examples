@@ -1,0 +1,8 @@
+[project]
+name = "05_local_modules"
+version = "0.1.0"
+description = "Factor a Flash endpoint across local (non-pip) modules (SLS-360)"
+requires-python = ">=3.10"
+dependencies = [
+    "runpod-flash>=1.19.0",
+]

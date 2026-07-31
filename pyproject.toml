@@ -20,7 +20,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff>=0.8.0",
+    # Cap below 0.16: ruff 0.16 formats Python code blocks in Markdown by
+    # default, which reflows all existing docs and breaks the format check.
+    "ruff>=0.8.0,<0.16",
 ]
 
 [build-system]
