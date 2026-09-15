@@ -49,8 +49,11 @@ python benchmark.py --warm-trials 3
 ```
 
 Confirm the exact routes at `http://localhost:8888/docs` and pass
-`--direct-route` / `--vc-route` if they differ. `--cold-wait` (default 45s) must
-exceed the workers' `idle_timeout` (30s) so each trial is a fresh cold start.
+`--direct-route` / `--vc-route` if they differ. The scale-to-0 wait must exceed
+each arm's worker `idle_timeout`, or the "warm" trials reuse a still-alive worker
+and report warm reuse as a cold start. The two arms differ (direct `idle_timeout=30`,
+volumecache `idle_timeout=180`), so `--cold-wait` is derived per arm by default
+(direct 45s, volumecache 195s); pass `--cold-wait` to override both.
 
 > Running provisions real GPU workers and a network volume — it costs money and
 > cold starts are slow. Tear down with Ctrl+C on `flash dev` (or `flash undeploy`)

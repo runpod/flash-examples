@@ -8,8 +8,11 @@ first-run and warm-run metrics for both strategies, and prints a table.
 Prerequisites:
 - Both endpoints deployed/served (see benchmark/README.md). The volumecache arm
   additionally requires a flash-worker image built against runpod>=1.12.0.
-- The workers use idle_timeout=30, so waiting >~40s between trials lets the
-  worker scale to 0, making the next call a fresh cold start.
+- A trial only measures a true cold start if the wait exceeds that arm's worker
+  idle_timeout so it scales to 0 first (direct=30s, volumecache=180s). cold-wait
+  is derived per arm from each idle_timeout plus a margin; a single shared wait
+  would leave the longer-lived volumecache worker alive and report warm reuse as
+  a cold start.
 
 Usage:
     python benchmark.py --base-url http://localhost:8888 --warm-trials 3
@@ -23,6 +26,15 @@ import json
 import statistics
 import time
 import urllib.request
+
+# Each benchmark worker's idle_timeout, mirrored from bench_direct.py /
+# bench_volumecache.py. A warm trial only measures a real cold start if we wait
+# past the worker's idle_timeout so it scales to 0 first; a shorter wait reuses
+# the still-alive worker and silently reports warm-reuse time as a cold start.
+DIRECT_IDLE_TIMEOUT = 30
+VOLUMECACHE_IDLE_TIMEOUT = 180
+# Extra seconds over idle_timeout to be sure the worker has scaled to 0.
+COLD_WAIT_MARGIN = 15
 
 
 def call(base_url: str, route: str, timeout: int) -> dict:
@@ -78,7 +90,13 @@ def main():
     ap.add_argument("--vc-route", default="bench_volumecache/runsync")
     ap.add_argument("--warm-trials", type=int, default=3)
     ap.add_argument(
-        "--cold-wait", type=int, default=45, help="seconds to wait for scale-to-0"
+        "--cold-wait",
+        type=int,
+        default=None,
+        help="override the scale-to-0 wait (seconds) for BOTH arms; by default "
+        "each arm derives its own from its worker idle_timeout + margin "
+        f"(direct {DIRECT_IDLE_TIMEOUT + COLD_WAIT_MARGIN}s, volumecache "
+        f"{VOLUMECACHE_IDLE_TIMEOUT + COLD_WAIT_MARGIN}s)",
     )
     ap.add_argument("--timeout", type=int, default=1200)
     ap.add_argument(
@@ -88,16 +106,23 @@ def main():
     )
     args = ap.parse_args()
 
+    direct_cold_wait = args.cold_wait or DIRECT_IDLE_TIMEOUT + COLD_WAIT_MARGIN
+    vc_cold_wait = args.cold_wait or VOLUMECACHE_IDLE_TIMEOUT + COLD_WAIT_MARGIN
+
     print("Direct arm:")
     direct = run_arm(
-        args.base_url, args.direct_route, args.warm_trials, args.cold_wait, args.timeout
+        args.base_url,
+        args.direct_route,
+        args.warm_trials,
+        direct_cold_wait,
+        args.timeout,
     )
     rows = [summarize("direct", direct)]
 
     if not args.skip_volumecache:
         print("VolumeCache arm:")
         vc = run_arm(
-            args.base_url, args.vc_route, args.warm_trials, args.cold_wait, args.timeout
+            args.base_url, args.vc_route, args.warm_trials, vc_cold_wait, args.timeout
         )
         rows.append(summarize("volumecache", vc))
 

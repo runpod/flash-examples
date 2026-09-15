@@ -46,7 +46,8 @@ reads stay local (fast) while cold starts stay warm (persisted).
 ## Quick Start
 
 ```bash
-uv pip install -r 05_data_workflows/05_volume_warm_cache/requirements.txt
+cd 05_data_workflows/05_volume_warm_cache
+uv pip install -r requirements.txt
 uv run flash login          # or set RUNPOD_API_KEY in .env
 uv run flash dev            # serves at http://localhost:8888
 ```
@@ -56,7 +57,7 @@ Generate an image (provisions a real GPU worker with the volume attached):
 ```bash
 curl -X POST http://localhost:8888/gpu_worker/runsync \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "a sunset over mountains"}'
+  -d '{"input": {"prompt": "a sunset over mountains"}}'
 ```
 
 ## Benchmark: direct vs VolumeCache
