@@ -56,12 +56,27 @@ Managing Python packages and system dependencies.
 - Version pinning for reproducibility
 - Dependency optimization strategies
 
+### [05_local_modules](./05_local_modules/)
+Factoring endpoint logic across local (non-pip) Python files.
+
+**What you'll learn:**
+- Importing a local sibling module from an endpoint
+- Importing a local package whose `__init__` re-exports from a submodule
+- Why endpoint imports belong inside the function body
+- How the build path resolves and bundles local modules
+
+**Concepts:**
+- Local-module resolution: the endpoint's import closure ships alongside the function
+- In-function imports as a requirement on the live path, and a no-op on the deploy path
+- Endpoint imports override the build's ignore filter
+
 ## Learning Path
 
 1. Start with **01_hello_world** to understand the basics
 2. Explore **03_mixed_workers** for cost optimization and validation patterns
 3. Move to **02_cpu_worker** to learn CPU-only patterns
 4. Master **04_dependencies** for production readiness
+5. Finish with **05_local_modules** to split an endpoint across your own files
 
 ## Next Steps
 
