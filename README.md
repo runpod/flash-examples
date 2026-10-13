@@ -2,6 +2,10 @@
 
 A collection of example applications showcasing Runpod Flash - a framework for building production-ready AI applications with distributed GPU and CPU computing.
 
+<!-- runpod-agent-setup:start -->
+**Using an AI agent?** Point it to https://docs.runpod.io/agent-setup.md to install the Runpod skills and MCP server.
+<!-- runpod-agent-setup:end -->
+
 ## What is Flash?
 
 Flash is a Python framework that lets you run functions on Runpod's Serverless infrastructure with a single decorator. Write code locally, deploy globally—Flash handles provisioning, scaling, and routing automatically.
