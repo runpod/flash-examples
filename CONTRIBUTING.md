@@ -294,7 +294,7 @@ curl http://localhost:8888/health
 # Test your endpoints
 curl -X POST http://localhost:8888/your/endpoint \
   -H "Content-Type: application/json" \
-  -d '{"test": "data"}'
+  -d '{"input": {"test": "data"}}'
 
 # Check API docs
 open http://localhost:8888/docs

@@ -463,7 +463,7 @@ Visit `http://localhost:8888/docs`
 ```bash
 curl -X POST http://localhost:8888/your-endpoint \
   -H "Content-Type: application/json" \
-  -d '{"input": "test data"}'
+  -d '{"input": {"<param>": "test data"}}'
 ```
 
 **Python requests**
@@ -473,7 +473,7 @@ import requests
 
 response = requests.post(
     "http://localhost:8888/your-endpoint",
-    json={"input": "test data"}
+    json={"input": {"<param>": "test data"}}
 )
 print(response.json())
 ```
@@ -481,7 +481,7 @@ print(response.json())
 **HTTPie**
 
 ```bash
-http POST localhost:8888/your-endpoint input="test data"
+http POST localhost:8888/your-endpoint input:='{"<param>": "test data"}'
 ```
 
 ### Hot Reload Behavior
